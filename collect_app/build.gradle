@@ -88,6 +88,79 @@ android {
         archivesName = "ODK-Collect"
     }
 
+    flavorDimensions "flavour"
+
+    productFlavors {
+        standard {
+            applicationId "org.smap.smapTask.android"
+            versionName "7.000"
+        }
+        fieldTaskMax {
+            applicationId "org.smap.smapTask.android.fieldTaskMax"
+            versionName "7.000"
+        }
+        plan {
+            applicationId "org.smap.smapTask.android.plan"
+            versionName "7.000-plan"
+        }
+        kontrolid {
+            applicationId "org.smap.smapTask.android.kontrolid"
+            versionName "7.000-kontrolid"
+        }
+        xxx4 {
+            applicationId "org.smap.smapTask.android.xxx4"
+            versionName "7.000-xxx4"
+        }
+        kontrolid_corporate {
+            applicationId "org.smap.smapTask.android.kontrolid_corporate"
+            versionName "7.000-kontrolid"
+        }
+        xxx3 {
+            applicationId "org.smap.smapTask.android.xxx3"
+            versionName "7.000-xxx3"
+        }
+        xxx1 {
+            applicationId "org.smap.smapTask.android.xxx1"
+            versionName "7.000-xxx1"
+        }
+        meqa {
+            applicationId "org.smap.smapTask.android.meqa"
+            versionName "7.000-meqa"
+        }
+        xxx2 {
+            applicationId "org.smap.smapTask.android.xxx2"
+            versionName "7.000-xxx2"
+        }
+        pop {
+            applicationId "org.smap.smapTask.android.pop"
+            versionName "7.000-pop"
+        }
+        tdh {
+            applicationId "org.smap.smapTask.android.tdh"
+            versionName "7.000-tdh"
+        }
+        informEd {
+            applicationId "org.smap.smapTask.android.informEd"
+            versionName "7.000-informEd"
+        }
+        pangolin {
+            applicationId "org.smap.smapTask.android.pangolin"
+            versionName "7.000-pangolin"
+        }
+        stl2 {
+            applicationId "org.smap.smapTask.android.stl2"
+            versionName "7.000-stl2"
+        }
+        ljstracker {
+            applicationId "org.smap.smapTask.android.ljstracker"
+            versionName "7.000-ljstracker"
+        }
+        bps {
+            applicationId "org.smap.smapTask.android.bps"
+            versionName "7.000-bps"
+        }
+    }
+
     signingConfigs {
         release {
             if (secrets.getProperty('RELEASE_STORE_FILE')) {

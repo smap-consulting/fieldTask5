@@ -58,3 +58,4 @@ apks
 # Smap
 secrets.properties
 google-services.json
+.claude
