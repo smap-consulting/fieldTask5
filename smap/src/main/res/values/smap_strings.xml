@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		Copyright (C) 2013 Smap Consulting Pty Ltd Licensed under the Apache
+		License, Version 2.0 (the "License"); you may not use this file except
+		in compliance with the License. You may obtain a copy of the License
+		at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+
+		This file contains strings that are specific to fieldTask
+-->
+<resources
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:ignore="MissingTranslation">
+
+    <string name="smap_task">Task</string>
+    <string name="smap_accept_task">Accept the task</string>
+    <string name="smap_accepted">: accepted. </string> 
+    <string name="smap_cannot_accept">Unable to accept task</string> 
+    <string name="smap_cannot_complete">Unable to complete task</string>  
+    <string name="smap_cannot_reject">Unable to reject task</string>
+    <string name="smap_cannot_restore">Unable to restore the task</string>
+    <string name="smap_complete_task">Complete Task</string>
+    <string name="smap_data_collection">Data Collection</string>
+    <string name="smap_destination_not_found">The destination for the route is not set</string>
+    <string name="smap_done">: done. </string>
+    <string name="smap_finding_route">Routing</string>
+    <string name="smap_found_route">Route to destination has been found!</string>
+    <string name="smap_get_tasks">Refresh Task List</string>
+    <string name="smap_gps_trail">GPS Trail</string>
+    <string name="smap_gps_trail_summary">Record the path taken by the user</string>
+    <string name="smap_menu_settings">Settings</string>
+    <string name="smap_missed">: rejected. </string>
+    <string name="smap_no_tasks">No tasks downloaded</string>
+    <string name="smap_no_tasks_display"></string>
+    <string name="smap_pending">: pending. </string>
+    <string name="smap_reject_task">Reject Task</string>
+    <string name="smap_release_case">Release Case</string>
+    <string name="smap_restore_task">Restore Task</string>
+    <string name="smap_route_finding_inprogress">Finding route to the task</string>
+    <string name="smap_routing_network_error">Failed to find a route due to networking error</string>
+    <string name="smap_route_parse_error">Fail to find the route due to error while parsing the route</string>
+    <string name="smap_synchronising">Synchronising with Server</string>
+    <string name="smap_task_preferences">Tasks</string>
+    <string name="smap_tasks_not_enabled">Tasks not enabled - Enable from the settings screen</string>
+    <string name="smap_forms">Forms</string>
+    <string name="smap_tasks">Tasks</string>
+    <string name="smap_map">Map</string>
+    <string name="smap_taskList">Task List</string>
+    <string name="smap_taskMap">Task Map</string>
+    <string name="smap_zoom_data">Zoom to Tasks </string>
+    <string name="smap_project">Project </string>
+    <string name="smap_no_tasks_nfc">No tasks are started by NFC tags</string>
+    <string name="smap_no_matching_tasks_nfc">No tasks match this NFC  : %1$s</string>
+    <string name="smap_starting_task_from_nfc">Starting task from NFC  : %1$s</string>
+    <string name="smap_must_start_from_nfc">This task must be started by swiping an NFC</string>
+    <string name="smap_nfc_not_authorised">Tasks cannot be started using NFC</string>
+    <string name="smap_read_nfc">Read NFC</string>
+    <string name="smap_reading_nfc">Reading NFC</string>
+    <string name="smap_replace_nfc">Replace NFC</string>
+    <string name="smap_nfc_not_available">NFC not available</string>
+    <string name="smap_nfc_is_available">NFC is available</string>
+    <string name="smap_nfc_not_enabled">NFC is not enabled</string>
+    <string name="smap_swipe_nfc">Place phone against NFC</string>
+    <string name="read_only">This task is complete and only its comments can be changed</string>
+    <string name="no_review">This task is finalised and cannot be reviewed</string>
+    <string name="smap_add_comment">Add Comment</string>
+    <string name="smap_clear_remote_cache">Clear remote cache</string>
+    <string name="smap_new_forms">Look for new forms and tasks</string>
+    <string name="smap_no_forms">No forms to download</string>
+    <string name="smap_downloading">Downloading %1$d forms</string>
+    <string name="smap_submitting">"Submitting %1$d finalised surveys"</string>
+    <string name="smap_update_task_status">"Update status of tasks on the server"</string>
+    <string name="smap_status">"Status"</string>
+    <string name="smap_current_status">"Current Status"</string>
+    <string name="smap_deleted">"deleted"</string>
+    <string name="smap_cancelled">"Cancelled Tasks"</string>
+    <string name="smap_rejected">"Rejected Tasks"</string>
+    <string name="smap_submitted">"Submitted Tasks"</string>
+    <string name="smap_closed">"Closed Tasks"</string>
+    <string name="smap_created">"Created"</string>
+    <string name="smap_error">"Error"</string>
+    <string name="smap_unauth">"Unauthorised - you may not have the \"enumerator\" privilege"</string>
+    <string name="smap_no_server">"Server not specified in settings"</string>
+    <string name="smap_refresh_started">"Refresh started"</string>
+    <string name="smap_refresh_finished">"Refresh finished"</string>
+    <string name="smap_server_changed">"Changes on server - refresh to update"</string>
+    <string name="smap_version_changed">"The version of the form you are opening has just been updated. Please close and reopen."</string>
+    <string name="smap_been_submitted">"This form has already been submitted and cannot be opened for review"</string>
+    <string name="smap_location_tracking">Device location is being tracked. (Exit app to stop).</string>
+    <string name="smap_reset_locations">"Recorded GPS Trail"</string>
+    <string name="smap_reset_locations_result">Recorded GPS Trail :: %s</string>
+    <string name="smap_visit_website">Visit the website</string>
+    <string name="smap_get_media">"Getting media file: %s"</string>
+    <string name="smap_lookup">"Requesting remote data"</string>
+    <string name="smap_phone_number_not_found">Cannot find phone number</string>
+    <string name="smap_unknown_error">"Unknown error"</string>
+    <string name="smap_forbidden">"The upload of %s was not accepted. It may have been marked as blocked or deleted on the server."</string>
+    <string name="smap_form_not_specified">"The form identifier has not been specified as a parameter."</string>
+    <string name="smap_form_not_found">"The form with identifier \"%s\" was not found on this device."</string>
+    <string name="smap_starting_form">Launching form \"%s\"</string>
+    <string name="smap_restarting_form">Re-launching form \"%s\"</string>
+    <string name="smap_form_completed">The form \"%s\" has already been saved as finalised</string>
+    <string name="smap_show_incomplete">Show incomplete forms</string>
+    <string name="smap_login">Login</string>
+    <string name="smap_authenticating">Authenticating...</string>
+    <string name="smap_login_success">Login succeeded</string>
+    <string name="smap_login_failed">Could not connect to server</string>
+    <string name="smap_login_unauthorized">Login failed</string>
+    <string name="smap_geofence_tasks">New local tasks</string>
+    <string name="smap_reason">Reason to reject task</string>
+    <string name="smap_reason_title">Reason</string>
+    <string name="smap_locate">Locate</string>
+    <string name="smap_phone">Call</string>
+    <string name="smap_sms">SMS</string>
+    <string name="smap_directions">Directions</string>
+    <string name="smap_accept">Accept Task</string>
+    <string name="smap_history">History</string>
+    <string name="smap_reason_not_specified">A reason longer than 5 characters must be specified</string>
+    <string name="smap_continue_tracking">Exit has been disabled.  To stop tracking of the phone it should be turned off.</string>
+    <string name="smap_warning">Warning</string>
+    <string name="smap_time_difference">The server has a time difference of %s minutes compared to this device</string>
+    <string name="smap_disable_prevent_background_location_enabled">This form tracks your location.</string>
+    <string name="smap_sort_by_project_asc">Project, A-Z</string>
+    <string name="smap_sort_by_project_desc">Project, Z-A</string>
+    <string name="smap_no_label">A label was not specified in choices</string>
+    <string name="smap_survey_blocked">The survey \"%1$s\" has been blocked on the server.  Contact your administrator to un-block it so that your results can be sent.</string>
+    <string name="smap_survey_deleted">The survey \"%1$s\" has been deleted on the server.  Contact your administator if you need to un-delete it so that your data can be sent.</string>
+    <string name="smap_csv_column_nf">The column %1$s was not found in csv file %2$s</string>
+    <string name="smap_self_select">This is a self assigned task.  You need to accept it by doing a long press on the task before it can be completed</string>
+    <string name="smap_android_version">Android Version %1s</string>
+    <string name="smap_eval_required">%1$s is not valid as the type of a lookup_choices function that has 3 parameters.  Only eval can be used.</string>
+    <string name="smap_other">Other</string>
+    <string name="smap_organisation">Organization</string>
+    <string name="smap_default">Default</string>
+    <string name="smap_local_data">Loading local data</string>
+    <string name="smap_checking_file">Checking %1$s.\n\nForm %2$s of %3$s form(s).</string>
+    <string name="smap_location_runtime_permissions_denied_desc">Without these permissions FieldTask can\'t record your location which you will need if you are collecting location data. You can change the location permissions in the android settings under "Apps".</string>
+    <string name="smap_storage_runtime_permission_denied_desc">Without these permissions FieldTask can\'t access your forms or save answers. </string>
+    <string name="smap_background_location_permission_denied">If location recording is not allowed all the time FieldTask will not be able to alert you if a location dependent task is nearby.</string>
+    <string name="smap_request_background_location_permission">FieldTask collects location data to alert you when you are near a location dependent task even when the app is closed or not in use.</string>
+    <string name="smap_request_foreground_location_permission">FieldTask collects location data to alert you when you are near a location dependent task.</string>
+    <string name="smap_set_marker">Set Marker</string>
+    <string name="smap_apply">Apply</string>
+    <string name="smap_deny">Deny</string>
+    <string name="smap_accept2">Accept</string>
+    <string name="smap_media_download">Unable to download initial data from \"%s\" into file %s</string>
+    <string name="smap_use_token">Use a token to access the server</string>
+    <string name="smap_scan_qr">Scan QR code</string>
+    <string name="smap_auth_token">Authentication Token</string>
+    <string name="smap_invalid_auth_token">Error Invalid Token</string>
+    <string name="smap_compromised">Compromised device detected - the application will exit</string>
+    <string name="smap_emulator">The app is not allowed to be run on an emulator - the application will exit</string>
+    <string-array name="smap_kontrolid_servers">
+        <item>Kontrolid Org Server</item>
+        <item>Kontrolid Com Server</item>
+    </string-array>
+</resources>

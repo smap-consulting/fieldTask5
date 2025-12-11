@@ -37,7 +37,7 @@ public class LocationRegister {
     }
 
     public int getMessageId() {
-        return R.string.smap_request_foreground_location_permission;
+        return au.smap.fieldTask.R.string.smap_request_foreground_location_permission;
     }
     /*
      * Disable permissions concerned with background location

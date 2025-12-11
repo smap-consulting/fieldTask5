@@ -3,10 +3,8 @@ plugins {
 }
 
 android {
-    namespace = "au.smap.smap"
-    compileSdk {
-        version = release(36)
-    }
+    namespace = "au.smap.fieldTask"
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
