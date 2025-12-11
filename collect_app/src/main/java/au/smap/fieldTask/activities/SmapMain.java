@@ -53,11 +53,9 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.odk.collect.android.R;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
-import org.odk.collect.android.activities.viewmodels.SurveyDataViewModelFactory;
-import org.odk.collect.android.adapters.ViewPagerAdapter;
+import au.smap.fieldTask.viewmodels.SurveyDataViewModelFactory;
+import au.smap.fieldTask.adapters.ViewPagerAdapter;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.configure.SettingsImporter;
-import org.odk.collect.android.configure.legacy.LegacySettingsFileImporter;
 import au.smap.fieldTask.fragments.SmapFormListFragment;
 import au.smap.fieldTask.fragments.SmapTaskListFragment;
 import au.smap.fieldTask.fragments.SmapTaskMapFragment;
@@ -165,9 +163,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      */
 
     @Inject
-    SettingsImporter settingsImporter;
-
-    @Inject
     StoragePathProvider storagePathProvider;
 
     // End scoped storage
@@ -245,19 +240,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             (new RequestLocationPermissionsDialog()).show(this.getSupportFragmentManager(), "LOCATION_PERMISSIONS_DIALOG");
         } else if ((hasFineLocation || hasCoarseLocation) && (asked.equals("accept"))){
             lr.locationStart(this, permissionsProvider);
-        }
-
-        LegacySettingsFileImporter legacySettingsFileImporter = new LegacySettingsFileImporter(storagePathProvider, null, settingsImporter);
-        if (legacySettingsFileImporter.importFromFile()) {
-            new MaterialAlertDialogBuilder(this)
-                    .setTitle(org.odk.collect.strings.R.string.successfully_imported_settings)
-                    .setMessage(org.odk.collect.strings.R.string.settings_successfully_loaded_file_notification)
-                    .setPositiveButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> {
-                        dialog.dismiss();
-                        recreate();
-                    })
-                    .setCancelable(false)
-                    .create().show();
         }
 
         try {
