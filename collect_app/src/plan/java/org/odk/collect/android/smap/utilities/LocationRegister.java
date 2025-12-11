@@ -8,7 +8,7 @@ import android.location.Location;
 import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.PermissionListener;
 
-import org.odk.collect.android.activities.SmapMain;
+import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.permissions.PermissionsProvider;
 import org.odk.collect.android.preferences.GeneralKeys;
 

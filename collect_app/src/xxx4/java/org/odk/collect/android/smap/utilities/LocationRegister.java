@@ -10,7 +10,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.activities.SmapMain;
+import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.TraceUtilities;
 import org.odk.collect.android.listeners.PermissionListener;
