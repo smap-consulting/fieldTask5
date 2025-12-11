@@ -82,8 +82,6 @@ import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageStateProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
-import org.odk.collect.android.storage.migration.StorageMigrationRepository;
-import org.odk.collect.android.storage.migration.StorageMigrationResult;
 import org.odk.collect.android.taskModel.FormLaunchDetail;
 import org.odk.collect.android.taskModel.FormRestartDetails;
 import au.smap.fieldTask.models.NfcTrigger;
@@ -173,15 +171,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      * Start scoped storage
      */
 
-    @BindView(R.id.storageMigrationBannerSmap)
-    MaterialBanner storageMigrationBanner;
-
-    @Inject
-    StorageMigrationRepository storageMigrationRepository;
-
-    @Inject
-    StorageStateProvider storageStateProvider;
-
     @Inject
     SettingsImporter settingsImporter;
 
@@ -206,8 +195,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         LocationRegister lr = new LocationRegister();
         DaggerUtils.getComponent(this).inject(this);
-
-        storageMigrationRepository.getResult().observe(this, this::onStorageMigrationFinish);
 
         String[] tabNames = {getString(au.smap.fieldTask.R.string.smap_forms), getString(au.smap.fieldTask.R.string.smap_tasks), getString(au.smap.fieldTask.R.string.smap_map)};
         // Get the ViewPager and set its PagerAdapter so that it can display items
@@ -384,8 +371,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             }
         }
 
-        setUpStorageMigrationBanner();
-        tryToPerformAutomaticMigration();
     }
 
     @Override
@@ -393,7 +378,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         if(mLocationService != null) {
             stopService(mLocationServiceIntent);
         }
-        storageMigrationRepository.clearResult();
         super.onDestroy();
 
     }
@@ -405,7 +389,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     // Get tasks and forms from the server
     public void processGetTask(boolean manual) {
 
-      if(!storageMigrationRepository.isMigrationBeingPerformed() && (manual || Utilities.isFormAutoSendOptionEnabled())) {
+      if(manual || Utilities.isFormAutoSendOptionEnabled()) {
             mDownloadTasks = new DownloadTasksTask();
             if(manual) {
                 mProgressMsg = getString(au.smap.fieldTask.R.string.smap_synchronising);
@@ -730,7 +714,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      */
     public void completeTask(TaskEntry entry, boolean force) {
 
-        if(!storageMigrationRepository.isMigrationBeingPerformed() && (!mPaused || force)) {
+        if(!mPaused || force) {
             String surveyNotes = null;
             String formPath = new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS) + entry.taskForm;
             String instancePath = entry.instancePath;
@@ -842,7 +826,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      * The force parameter can be used to force launching of the new form even when the smap activity is paused
      */
     public void completeForm(TaskEntry entry, boolean force, String initialData) {
-        if(!storageMigrationRepository.isMigrationBeingPerformed() && (!mPaused || force)) {
+        if(!mPaused || force) {
             Uri formUri = ContentUris.withAppendedId(FormsProviderAPI.FormsColumns.CONTENT_URI, entry.id);
 
             // Use an explicit intent
@@ -1028,51 +1012,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             }
         }
         listenerRegistered = false;
-    }
-
-    /*
-     * Start of content migration functions
-     */
-
-    private void onStorageMigrationFinish(StorageMigrationResult result) {
-        if (result == StorageMigrationResult.SUCCESS) {
-            DialogUtils.dismissDialog(StorageMigrationDialog.class, getSupportFragmentManager());
-            displayBannerWithSuccessStorageMigrationResult();
-        } else {
-            DialogUtils.dismissDialog(StorageMigrationDialog.class, getSupportFragmentManager());
-        }
-    }
-
-    @Nullable
-    private StorageMigrationDialog showStorageMigrationDialog() {
-        Bundle args = new Bundle();
-        args.putInt(StorageMigrationDialog.ARG_UNSENT_INSTANCES, Utilities.countFinalised());
-
-        showIfNotShowing(StorageMigrationDialog.class, args, getSupportFragmentManager());
-        return getDialog(StorageMigrationDialog.class, getSupportFragmentManager());
-    }
-
-    private void setUpStorageMigrationBanner() {
-
-    }
-
-    private void displayBannerWithSuccessStorageMigrationResult() {
-        storageMigrationBanner.setVisibility(View.VISIBLE);
-        storageMigrationBanner.setText(getString(org.odk.collect.strings.R.string.storage_migration_completed));
-        storageMigrationBanner.setActionText(getString(org.odk.collect.strings.R.string.scoped_storage_dismiss));
-        storageMigrationBanner.setAction(() -> {
-            storageMigrationBanner.setVisibility(View.GONE);
-            storageMigrationRepository.clearResult();
-        });
-    }
-
-    private void tryToPerformAutomaticMigration() {
-        if (storageStateProvider.shouldPerformAutomaticMigration()) {
-            StorageMigrationDialog dialog = showStorageMigrationDialog();
-            if (dialog != null) {
-                dialog.startStorageMigration();
-            }
-        }
     }
 
     protected class RefreshListener extends BroadcastReceiver {
