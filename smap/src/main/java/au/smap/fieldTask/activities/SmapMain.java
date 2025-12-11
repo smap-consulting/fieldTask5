@@ -66,7 +66,7 @@ import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.listeners.InstanceUploaderListener;
 import au.smap.fieldTask.listeners.NFCListener;
 import au.smap.fieldTask.listeners.TaskDownloaderListener;
-import org.odk.collect.android.loaders.SurveyData;
+import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
 import org.odk.collect.android.preferences.AdminKeys;
@@ -80,20 +80,18 @@ import org.odk.collect.android.smap.formmanagement.ServerFormDetailsSmap;
 import au.smap.fieldTask.listeners.DownloadFormsTaskListenerSmap;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.storage.StoragePathProvider;
-import org.odk.collect.android.storage.StorageStateProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
-import org.odk.collect.android.taskModel.FormLaunchDetail;
-import org.odk.collect.android.taskModel.FormRestartDetails;
+import au.smap.fieldTask.models.FormLaunchDetail;
+import au.smap.fieldTask.models.FormRestartDetails;
 import au.smap.fieldTask.models.NfcTrigger;
 import au.smap.fieldTask.tasks.DownloadTasksTask;
 import au.smap.fieldTask.tasks.NdefReaderTask;
 import org.odk.collect.android.utilities.ApplicationConstants;
-import org.odk.collect.android.utilities.DialogUtils;
+import org.odk.collect.android.utilities.ApplicationConstants;
 import org.odk.collect.android.utilities.ManageForm;
 import org.odk.collect.android.utilities.MultiClickGuard;
 import org.odk.collect.android.utilities.SnackbarUtils;
 import org.odk.collect.android.utilities.Utilities;
-import org.odk.collect.material.MaterialBanner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,7 +102,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -114,9 +111,6 @@ import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
-
-import static org.odk.collect.android.utilities.DialogUtils.getDialog;
-import static org.odk.collect.android.utilities.DialogUtils.showIfNotShowing;
 
 public class SmapMain extends CollectAbstractActivity implements TaskDownloaderListener,
         NFCListener,

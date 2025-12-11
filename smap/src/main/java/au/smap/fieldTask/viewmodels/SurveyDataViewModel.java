@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModel;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.TraceUtilities;
 import org.odk.collect.android.loaders.PointEntry;
-import org.odk.collect.android.loaders.SurveyData;
+import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.utilities.ApplicationConstants;

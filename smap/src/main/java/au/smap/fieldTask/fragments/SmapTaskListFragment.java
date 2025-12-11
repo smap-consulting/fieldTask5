@@ -57,7 +57,7 @@ import org.odk.collect.android.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.database.DatabaseInstancesRepository;
 import org.odk.collect.android.instances.Instance;
 import org.odk.collect.android.listeners.OnTaskOptionsClickLisener;
-import org.odk.collect.android.loaders.SurveyData;
+import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.android.preferences.AdminKeys;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;

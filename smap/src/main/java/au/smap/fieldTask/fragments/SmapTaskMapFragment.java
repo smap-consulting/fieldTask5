@@ -74,7 +74,7 @@ import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.loaders.MapLocationObserver;
 import org.odk.collect.android.loaders.PointEntry;
-import org.odk.collect.android.loaders.SurveyData;
+import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
 import org.odk.collect.android.preferences.AdminKeys;

@@ -50,7 +50,7 @@ import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
 import org.odk.collect.android.adapters.SortDialogAdapter;
 import org.odk.collect.android.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.injection.DaggerUtils;
-import org.odk.collect.android.loaders.SurveyData;
+import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
 import org.odk.collect.android.preferences.AdminKeys;
