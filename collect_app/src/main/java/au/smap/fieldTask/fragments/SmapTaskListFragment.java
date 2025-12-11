@@ -67,7 +67,7 @@ import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.utilities.MultiClickGuard;
 import org.odk.collect.android.utilities.SnackbarUtils;
 import org.odk.collect.android.utilities.ThemeUtils;
-import org.odk.collect.android.utilities.Utilities;
+import au.smap.fieldTask.utilities.Utilities;
 
 import timber.log.Timber;
 

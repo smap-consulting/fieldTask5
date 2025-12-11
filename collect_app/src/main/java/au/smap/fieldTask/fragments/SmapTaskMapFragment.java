@@ -81,7 +81,7 @@ import org.odk.collect.android.preferences.AdminKeys;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.KeyValueJsonFns;
-import org.odk.collect.android.utilities.Utilities;
+import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.Date;

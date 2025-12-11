@@ -15,7 +15,7 @@ import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.utilities.ApplicationConstants;
-import org.odk.collect.android.utilities.Utilities;
+import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;

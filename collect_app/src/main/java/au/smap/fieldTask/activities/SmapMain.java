@@ -74,7 +74,7 @@ import org.odk.collect.android.preferences.GeneralSharedPreferences;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import au.smap.fieldTask.services.LocationService;
-import org.odk.collect.android.smap.formmanagement.ServerFormDetailsSmap;
+import au.smap.fieldTask.formmanagement.ServerFormDetailsSmap;
 import au.smap.fieldTask.listeners.DownloadFormsTaskListenerSmap;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.storage.StoragePathProvider;
@@ -85,10 +85,10 @@ import au.smap.fieldTask.models.NfcTrigger;
 import au.smap.fieldTask.tasks.DownloadTasksTask;
 import au.smap.fieldTask.tasks.NdefReaderTask;
 import au.smap.fieldTask.utilities.ApplicationConstants;
-import org.odk.collect.android.utilities.ManageForm;
-import org.odk.collect.android.utilities.MultiClickGuard;
-import org.odk.collect.android.utilities.SnackbarUtils;
-import org.odk.collect.android.utilities.Utilities;
+import au.smap.fieldTask.utilities.ManageForm;
+import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
+import org.odk.collect.androidshared.ui.SnackbarUtils;
+import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -213,10 +213,10 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         String login_status = getIntent().getStringExtra(LOGIN_STATUS);
         if(login_status != null) {
             if(login_status.equals("success")) {
-                SnackbarUtils.showShortSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_success));
+                SnackbarUtils.showSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_success), SnackbarUtils.DURATION_SHORT);
                 Utilities.updateServerRegistration(false);     // Update the server registration
             } else if(login_status.equals("failed")) {
-                SnackbarUtils.showShortSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_failed));
+                SnackbarUtils.showSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_failed), SnackbarUtils.DURATION_SHORT);
             }
         }
 
@@ -830,8 +830,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 // Start a form
                 te.id = fld.id;
 
-                SnackbarUtils.showLongSnackbar(findViewById(R.id.llParent),
-                        Collect.getInstance().getString(R.string.smap_starting_form, fld.formName));
+                SnackbarUtils.showSnackbar(findViewById(R.id.llParent),
+                        Collect.getInstance().getString(R.string.smap_starting_form, fld.formName),
+                        SnackbarUtils.DURATION_LONG);
 
                 completeForm(te, true, fld.initialData);
             } else if(fld.instancePath != null) {
@@ -845,8 +846,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 te.formStatus = formStatus;
                 te.formURI = formURI;
 
-                SnackbarUtils.showLongSnackbar(findViewById(R.id.pager),
-                        Collect.getInstance().getString(R.string.smap_restarting_form, fld.formName));
+                SnackbarUtils.showSnackbar(findViewById(R.id.pager),
+                        Collect.getInstance().getString(R.string.smap_restarting_form, fld.formName),
+                        SnackbarUtils.DURATION_LONG);
 
                 completeTask(te, true);
             }
@@ -959,7 +961,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             GeneralSharedPreferences.getInstance().save(GeneralKeys.KEY_SMAP_USER_LOCATION, false);
             this.finish();
         } else {
-            SnackbarUtils.showLongSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_continue_tracking));
+            SnackbarUtils.showSnackbar(findViewById(R.id.pager),
+                    Collect.getInstance().getString(R.string.smap_continue_tracking),
+                    SnackbarUtils.DURATION_LONG);
         }
 
     }

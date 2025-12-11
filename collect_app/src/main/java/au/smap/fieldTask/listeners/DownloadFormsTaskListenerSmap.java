@@ -14,7 +14,7 @@
 
 package au.smap.fieldTask.listeners;
 
-import org.odk.collect.android.smap.formmanagement.ServerFormDetailsSmap;
+import au.smap.fieldTask.formmanagement.ServerFormDetailsSmap;
 
 import java.util.Map;
 
