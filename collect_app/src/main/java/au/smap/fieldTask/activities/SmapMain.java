@@ -86,8 +86,7 @@ import au.smap.fieldTask.models.FormRestartDetails;
 import au.smap.fieldTask.models.NfcTrigger;
 import au.smap.fieldTask.tasks.DownloadTasksTask;
 import au.smap.fieldTask.tasks.NdefReaderTask;
-import org.odk.collect.android.utilities.ApplicationConstants;
-import org.odk.collect.android.utilities.ApplicationConstants;
+import au.smap.fieldTask.utilities.ApplicationConstants;
 import org.odk.collect.android.utilities.ManageForm;
 import org.odk.collect.android.utilities.MultiClickGuard;
 import org.odk.collect.android.utilities.SnackbarUtils;
@@ -190,7 +189,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         LocationRegister lr = new LocationRegister();
         DaggerUtils.getComponent(this).inject(this);
 
-        String[] tabNames = {getString(au.smap.fieldTask.R.string.smap_forms), getString(au.smap.fieldTask.R.string.smap_tasks), getString(au.smap.fieldTask.R.string.smap_map)};
+        String[] tabNames = {getString(R.string.smap_forms), getString(R.string.smap_tasks), getString(R.string.smap_map)};
         // Get the ViewPager and set its PagerAdapter so that it can display items
         viewPager = findViewById(R.id.pager);
         viewPager.setOffscreenPageLimit(2);
@@ -219,10 +218,10 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         String login_status = getIntent().getStringExtra(LOGIN_STATUS);
         if(login_status != null) {
             if(login_status.equals("success")) {
-                SnackbarUtils.showShortSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(au.smap.fieldTask.R.string.smap_login_success));
+                SnackbarUtils.showShortSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_success));
                 Utilities.updateServerRegistration(false);     // Update the server registration
             } else if(login_status.equals("failed")) {
-                SnackbarUtils.showShortSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(au.smap.fieldTask.R.string.smap_login_failed));
+                SnackbarUtils.showShortSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_failed));
             }
         }
 
@@ -386,7 +385,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
       if(manual || Utilities.isFormAutoSendOptionEnabled()) {
             mDownloadTasks = new DownloadTasksTask();
             if(manual) {
-                mProgressMsg = getString(au.smap.fieldTask.R.string.smap_synchronising);
+                mProgressMsg = getString(R.string.smap_synchronising);
                 if (!this.isFinishing()) {
                     showDialog(PROGRESS_DIALOG);
                 }
@@ -433,7 +432,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 return mProgressDialog;
             //case ALERT_DIALOG:
             //    mAlertDialog = new AlertDialog.Builder(this).create();
-            //    mAlertDialog.setTitle(getString(au.smap.fieldTask.R.string.smap_get_tasks));
+            //    mAlertDialog.setTitle(getString(R.string.smap_get_tasks));
             //    DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
             //        public void onClick(DialogInterface dialog, int i) {
             //            dialog.dismiss();
@@ -509,7 +508,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     public void progressUpdate(String currentFile, int progress, int total) {
         // TODO Auto-generated method stub
-        mProgressMsg = getString(au.smap.fieldTask.R.string.smap_checking_file, currentFile, String.valueOf(progress), String.valueOf(total));
+        mProgressMsg = getString(R.string.smap_checking_file, currentFile, String.valueOf(progress), String.valueOf(total));
         if(mProgressDialog != null) {
             mProgressDialog.setMessage(mProgressMsg);
         }
@@ -554,11 +553,11 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                     String key = it.next();
                     String m = result.get(key);
                     if (key.equals("err_not_enabled")) {
-                        message.append(this.getString(au.smap.fieldTask.R.string.smap_tasks_not_enabled));
+                        message.append(this.getString(R.string.smap_tasks_not_enabled));
                     } else if (key.equals("err_no_tasks")) {
                         // No tasks is fine, in fact its the most common state
                     } else if (key.equals("Error:") && m != null && m.startsWith("403")) {
-                        message.append(this.getString(au.smap.fieldTask.R.string.smap_unauth));
+                        message.append(this.getString(R.string.smap_unauth));
                     } else {
                         message.append(key + " - " + m + "\n\n");
                     }
@@ -576,7 +575,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                                     }
                                 });
                         mAlertDialog = dialogBuilder.create();
-                        mAlertDialog.setTitle(getString(au.smap.fieldTask.R.string.smap_get_tasks));
+                        mAlertDialog.setTitle(getString(R.string.smap_get_tasks));
                     }
                     mAlertDialog.setMessage(mAlertMsg);
                     mAlertDialog.show();
@@ -649,7 +648,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         } else {
             Toast.makeText(
                     this,
-                    au.smap.fieldTask.R.string.smap_no_tasks_nfc,
+                    R.string.smap_no_tasks_nfc,
                     Toast.LENGTH_LONG).show();
         }
 
@@ -673,7 +672,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
                     Toast.makeText(
                             SmapMain.this,
-                            getString(au.smap.fieldTask.R.string.smap_starting_task_from_nfc, result),
+                            getString(R.string.smap_starting_task_from_nfc, result),
                             Toast.LENGTH_LONG).show();
 
                     break;
@@ -683,7 +682,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         if (!foundTask) {
             Toast.makeText(
                     SmapMain.this,
-                    getString(au.smap.fieldTask.R.string.smap_no_matching_tasks_nfc, result),
+                    getString(R.string.smap_no_matching_tasks_nfc, result),
                     Toast.LENGTH_LONG).show();
         }
     }
@@ -726,14 +725,14 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             if (isSubmitted) {
                 Toast.makeText(
                         SmapMain.this,
-                        getString(au.smap.fieldTask.R.string.smap_been_submitted),
+                        getString(R.string.smap_been_submitted),
                         Toast.LENGTH_LONG).show();
             } else if (!canUpdate && reviewFinal) {
                 // Show a message if this task is read only
                 if(isSelfAssigned) {
                     Toast.makeText(
                             SmapMain.this,
-                            getString(au.smap.fieldTask.R.string.smap_self_select),
+                            getString(R.string.smap_self_select),
                             Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(
@@ -850,7 +849,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 te.id = fld.id;
 
                 SnackbarUtils.showLongSnackbar(findViewById(R.id.llParent),
-                        Collect.getInstance().getString(au.smap.fieldTask.R.string.smap_starting_form, fld.formName));
+                        Collect.getInstance().getString(R.string.smap_starting_form, fld.formName));
 
                 completeForm(te, true, fld.initialData);
             } else if(fld.instancePath != null) {
@@ -865,7 +864,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 te.formURI = formURI;
 
                 SnackbarUtils.showLongSnackbar(findViewById(R.id.pager),
-                        Collect.getInstance().getString(au.smap.fieldTask.R.string.smap_restarting_form, fld.formName));
+                        Collect.getInstance().getString(R.string.smap_restarting_form, fld.formName));
 
                 completeTask(te, true);
             }
@@ -978,7 +977,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             GeneralSharedPreferences.getInstance().save(GeneralKeys.KEY_SMAP_USER_LOCATION, false);
             this.finish();
         } else {
-            SnackbarUtils.showLongSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(au.smap.fieldTask.R.string.smap_continue_tracking));
+            SnackbarUtils.showLongSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_continue_tracking));
         }
 
     }

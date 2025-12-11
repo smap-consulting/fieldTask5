@@ -27,7 +27,7 @@ public class LocationRegister {
     }
 
     public int getMessageId() {
-        return au.smap.fieldTask.R.string.smap_request_foreground_location_permission;
+        return org.odk.collect.android.R.string.smap_request_foreground_location_permission;
     }
     /*
      * Disable permissions concerned with background location

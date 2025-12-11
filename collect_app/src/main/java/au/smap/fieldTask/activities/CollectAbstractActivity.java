@@ -74,7 +74,7 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
             }
 
             builder.setTitle(org.odk.collect.strings.R.string.storage_runtime_permission_denied_title)
-                    .setMessage(au.smap.fieldTask.R.string.smap_storage_runtime_permission_denied_desc)
+                    .setMessage(R.string.smap_storage_runtime_permission_denied_desc)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
                         finishAndRemoveTask();
                     })
