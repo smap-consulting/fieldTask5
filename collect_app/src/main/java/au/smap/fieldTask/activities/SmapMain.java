@@ -68,7 +68,7 @@ import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
-import org.odk.collect.android.preferences.AdminPreferencesActivity;
+import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
 import org.odk.collect.android.provider.FormsProviderAPI;
@@ -316,7 +316,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         // NFC
         boolean nfcAuthorised = false;
         SharedPreferences sharedPreferences = this.getSharedPreferences(
-                AdminPreferencesActivity.ADMIN_PREFERENCES, 0);
+                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
 
         if (sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_LOCATION_TRIGGER, true)) {
             if(mNfcAdapter == null) {
@@ -429,7 +429,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 final AlertDialog passwordDialog = builder.create();
                 final SharedPreferences adminPreferences = this.getSharedPreferences(
-                        AdminPreferencesActivity.ADMIN_PREFERENCES, 0);
+                        AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
 
                 passwordDialog.setTitle(getString(org.odk.collect.strings.R.string.enter_admin_password));
                 final EditText input = new EditText(this);
@@ -448,7 +448,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                                         ProtectedProjectKeys.KEY_ADMIN_PW, "");
                                 if (pw.compareTo(value) == 0) {
                                     Intent i = new Intent(getApplicationContext(),
-                                            AdminPreferencesActivity.class);
+                                            AdminPreferencesActivitySmap.class);
                                     startActivity(i);
                                     input.setText("");
                                     passwordDialog.dismiss();

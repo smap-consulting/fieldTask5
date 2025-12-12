@@ -60,7 +60,7 @@ import org.odk.collect.android.listeners.OnTaskOptionsClickLisener;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
-import org.odk.collect.android.preferences.AdminPreferencesActivity;
+import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.smap.utilities.LocationRegister;
@@ -230,7 +230,7 @@ public class SmapTaskListFragment extends ListFragment {
         setListAdapter(mAdapter);
 
         adminPreferences = getActivity().getSharedPreferences(
-                AdminPreferencesActivity.ADMIN_PREFERENCES, 0);
+                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
 
     }
 
@@ -466,7 +466,7 @@ public class SmapTaskListFragment extends ListFragment {
                         ProtectedProjectKeys.KEY_ADMIN_PW, "");
                 if ("".equalsIgnoreCase(pw)) {
                     Intent i = new Intent(getActivity(),
-                            AdminPreferencesActivity.class);
+                            AdminPreferencesActivitySmap.class);
                     startActivity(i);
                 } else {
                     ((SmapMain) getActivity()).processAdminMenu();
