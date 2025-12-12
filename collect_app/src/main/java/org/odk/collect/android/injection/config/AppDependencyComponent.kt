@@ -155,6 +155,22 @@ interface AppDependencyComponent {
 
     fun inject(mainMenuActivity: MainMenuActivity)
 
+    fun inject(smapMain: au.smap.fieldTask.activities.SmapMain)
+
+    fun inject(smapTaskMapFragment: au.smap.fieldTask.fragments.SmapTaskMapFragment)
+
+    fun inject(smapFormListFragment: au.smap.fieldTask.fragments.SmapFormListFragment)
+
+    fun inject(adminPreferencesActivitySmap: au.smap.fieldTask.preferences.AdminPreferencesActivitySmap)
+
+    fun inject(requestLocationPermissionsDialogSmap: au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap)
+
+    fun inject(collectAbstractActivity: au.smap.fieldTask.activities.CollectAbstractActivity)
+
+    fun inject(downloadTasksTask: au.smap.fieldTask.tasks.DownloadTasksTask)
+
+    fun inject(utilities: au.smap.fieldTask.utilities.Utilities)
+
     fun inject(qrCodeTabsActivity: QRCodeTabsActivity)
 
     fun inject(showQRCodeFragment: ShowQRCodeFragment)
