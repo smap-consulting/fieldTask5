@@ -649,8 +649,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
                     Intent i = new Intent();
                     i.setAction("startTask");
+                    i.setPackage(getPackageName());
                     i.putExtra("position", trigger.position);
-                    sendBroadcast(i);
+                    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 
                     Toast.makeText(
                             SmapMain.this,
