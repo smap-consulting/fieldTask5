@@ -103,8 +103,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import org.odk.collect.android.databinding.SmapMainLayoutBinding;
 import timber.log.Timber;
 
 public class SmapMain extends CollectAbstractActivity implements TaskDownloaderListener,
@@ -151,7 +150,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     private FusedLocationProviderClient fusedLocationClient;
 
     private AlertDialog mAlertDialog;
-    private ViewPager viewPager;
+    private SmapMainLayoutBinding binding;
 
     @Inject
     PermissionsProvider permissionsProvider;
@@ -176,34 +175,32 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.smap_main_layout);
-        ButterKnife.bind(this);
+        binding = SmapMainLayoutBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         LocationRegister lr = new LocationRegister();
         DaggerUtils.getComponent(this).inject(this);
 
         String[] tabNames = {getString(R.string.smap_forms), getString(R.string.smap_tasks), getString(R.string.smap_map)};
         // Get the ViewPager and set its PagerAdapter so that it can display items
-        viewPager = findViewById(R.id.pager);
-        viewPager.setOffscreenPageLimit(2);
+        binding.pager.setOffscreenPageLimit(2);
 
         ArrayList<Fragment> fragments = new ArrayList<>();
         fragments.add(formManagerList);
         fragments.add(taskManagerList);
         fragments.add(taskManagerMap);
 
-        viewPager.setAdapter(new ViewPagerAdapter(
+        binding.pager.setAdapter(new ViewPagerAdapter(
                 getSupportFragmentManager(), tabNames, fragments));
 
         // Give the SlidingTabLayout the ViewPager
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         // Attach the view pager to the tab strip
-        tabLayout.setBackgroundColor(getResources().getColor(R.color.tabBackground));
+        binding.tabs.setBackgroundColor(getResources().getColor(R.color.tabBackground));
 
-        tabLayout.setTabTextColors(Color.LTGRAY, Color.WHITE);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        binding.tabs.setTabTextColors(Color.LTGRAY, Color.WHITE);
+        binding.tabs.setupWithViewPager(binding.pager);
+        binding.tabs.setTabGravity(TabLayout.GRAVITY_FILL);
+        binding.tabs.setTabMode(TabLayout.MODE_FIXED);
 
         stateChanged();
 
@@ -211,10 +208,10 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         String login_status = getIntent().getStringExtra(LOGIN_STATUS);
         if(login_status != null) {
             if(login_status.equals("success")) {
-                SnackbarUtils.showSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_success), SnackbarUtils.DURATION_SHORT);
+                SnackbarUtils.showSnackbar(binding.pager, Collect.getInstance().getString(R.string.smap_login_success), SnackbarUtils.DURATION_SHORT);
                 Utilities.updateServerRegistration(false);     // Update the server registration
             } else if(login_status.equals("failed")) {
-                SnackbarUtils.showSnackbar(findViewById(R.id.pager), Collect.getInstance().getString(R.string.smap_login_failed), SnackbarUtils.DURATION_SHORT);
+                SnackbarUtils.showSnackbar(binding.pager, Collect.getInstance().getString(R.string.smap_login_failed), SnackbarUtils.DURATION_SHORT);
             }
         }
 
@@ -828,7 +825,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 // Start a form
                 te.id = fld.id;
 
-                SnackbarUtils.showSnackbar(findViewById(R.id.llParent),
+                SnackbarUtils.showSnackbar(binding.rl,
                         Collect.getInstance().getString(R.string.smap_starting_form, fld.formName),
                         SnackbarUtils.DURATION_LONG);
 
@@ -844,7 +841,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 te.formStatus = formStatus;
                 te.formURI = formURI;
 
-                SnackbarUtils.showSnackbar(findViewById(R.id.pager),
+                SnackbarUtils.showSnackbar(binding.pager,
                         Collect.getInstance().getString(R.string.smap_restarting_form, fld.formName),
                         SnackbarUtils.DURATION_LONG);
 
@@ -920,7 +917,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
     public void locateTaskOnMap(TaskEntry task) {
         taskManagerMap.locateTask(task);
-        viewPager.setCurrentItem(2);
+        binding.pager.setCurrentItem(2);
     }
 
     protected class MainTaskListener extends BroadcastReceiver {
@@ -959,7 +956,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
             this.finish();
         } else {
-            SnackbarUtils.showSnackbar(findViewById(R.id.pager),
+            SnackbarUtils.showSnackbar(binding.pager,
                     Collect.getInstance().getString(R.string.smap_continue_tracking),
                     SnackbarUtils.DURATION_LONG);
         }

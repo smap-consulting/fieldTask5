@@ -11,4 +11,7 @@
     <color name="colorPrimaryContainerDark">#004d65</color>
     <color name="colorOnPrimaryContainerDark">#bfe9ff</color>
     <color name="colorSurfaceDark">#001117</color>
+
+    <!-- Smap-specific colors -->
+    <color name="tabBackground">#444444</color>
 </resources>
