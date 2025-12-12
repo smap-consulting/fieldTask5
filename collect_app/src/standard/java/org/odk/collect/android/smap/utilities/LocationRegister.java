@@ -5,11 +5,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 
+import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.PermissionListener;
-import org.odk.collect.settings.keys.ProjectKeys;
 
 import au.smap.fieldTask.activities.SmapMain;
-import au.smap.fieldTask.permissions.PermissionsProvider;
+import org.odk.collect.android.permissions.PermissionsProvider;
+import org.odk.collect.settings.keys.ProjectKeys;
 
 public class LocationRegister {
 
@@ -26,7 +27,7 @@ public class LocationRegister {
     }
 
     public int getMessageId() {
-        return org.odk.collect.android.R.string.smap_request_foreground_location_permission;
+        return R.string.smap_request_foreground_location_permission;
     }
     /*
      * Disable permissions concerned with background location

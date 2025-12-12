@@ -63,7 +63,7 @@ import au.smap.fieldTask.listeners.TaskDownloaderListener;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.formmanagement.MultiFormDownloaderSmap;
 import au.smap.fieldTask.formmanagement.ServerFormDetailsSmap;
-import org.odk.collect.android.smap.listeners.DownloadFormsTaskListenerSmap;
+import au.smap.fieldTask.listeners.DownloadFormsTaskListenerSmap;
 import org.odk.collect.android.smap.tasks.DownloadFormsTaskSmap;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.storage.StoragePathProvider;
