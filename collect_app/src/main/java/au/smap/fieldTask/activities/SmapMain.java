@@ -41,14 +41,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 
 import org.odk.collect.android.R;
