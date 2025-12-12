@@ -52,9 +52,9 @@ import org.odk.collect.android.logic.PropertyManager;
 import org.odk.collect.android.notifications.Notifier;
 import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
 import org.odk.collect.android.openrosa.OpenRosaXmlFetcher;
-import org.odk.collect.android.preferences.AdminKeys;
+import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import org.odk.collect.android.preferences.AdminSharedPreferences;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
 import org.odk.collect.android.preferences.GuidanceHint;
 import org.odk.collect.android.provider.FormsProviderAPI;
@@ -184,7 +184,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(Collect.getInstance().getBaseContext());
         source = Utilities.getSource();
-        serverUrl = sharedPreferences.getString(GeneralKeys.KEY_SERVER_URL, null);
+        serverUrl = sharedPreferences.getString(ProjectKeys.KEY_SERVER_URL, null);
         taskURL = serverUrl + "/surveyKPI/myassignments?orgs=true&noprojects=true&linked=true&manifests=true";
 
         // Should mostly work may be better to add a lock however any error is recoverable
@@ -618,7 +618,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         /*
          * Send user trail if enabled
          */
-        boolean sendLocation = (Boolean) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_SMAP_USER_LOCATION);
+        boolean sendLocation = (Boolean) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_USER_LOCATION);
         long lastTraceIdSent = 0;
         if(sendLocation) {
             // Get Points
@@ -914,19 +914,19 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     private void updateSettings () {
         if(tr.settings != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(GeneralKeys.KEY_SMAP_LOCATION_TRIGGER, tr.settings.ft_location_trigger);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ODK_STYLE_MENUS, tr.settings.ft_odk_style_menus);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ODK_INSTANCENAME, tr.settings.ft_specify_instancename);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ODK_MARK_FINALIZED, tr.settings.ft_mark_finalized);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_PREVENT_DISABLE_TRACK, tr.settings.ft_prevent_disable_track);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ENABLE_GEOFENCE, tr.settings.ft_enable_geofence == null || tr.settings.ft_enable_geofence.equals("on"));
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ODK_ADMIN_MENU, tr.settings.ft_admin_menu);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ADMIN_SERVER_MENU, tr.settings.ft_server_menu);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_ADMIN_META_MENU, tr.settings.ft_meta_menu);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_EXIT_TRACK_MENU, tr.settings.ft_exit_track_menu);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_BG_STOP_MENU, tr.settings.ft_bg_stop_menu);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_REVIEW_FINAL, tr.settings.ft_review_final);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_FORCE_TOKEN, tr.settings.ft_force_token);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_LOCATION_TRIGGER, tr.settings.ft_location_trigger);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS, tr.settings.ft_odk_style_menus);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ODK_INSTANCENAME, tr.settings.ft_specify_instancename);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ODK_MARK_FINALIZED, tr.settings.ft_mark_finalized);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_PREVENT_DISABLE_TRACK, tr.settings.ft_prevent_disable_track);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, tr.settings.ft_enable_geofence == null || tr.settings.ft_enable_geofence.equals("on"));
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU, tr.settings.ft_admin_menu);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ADMIN_SERVER_MENU, tr.settings.ft_server_menu);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_ADMIN_META_MENU, tr.settings.ft_meta_menu);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU, tr.settings.ft_exit_track_menu);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_BG_STOP_MENU, tr.settings.ft_bg_stop_menu);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_REVIEW_FINAL, tr.settings.ft_review_final);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_FORCE_TOKEN, tr.settings.ft_force_token);
 
             /*
              * Override the user trail setting if this is set from the server
@@ -941,22 +941,22 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 // Server version is 17.11+ or new setting has not been used
                 if(tr.settings.ft_send.equals("off") || tr.settings.ft_send.equals("wifi_only") || tr.settings.ft_send.equals("wifi_and_cellular")) {
                     // Set the preference value using the server value and disable from local editing
-                    editor.putString(GeneralKeys.KEY_AUTOSEND, tr.settings.ft_send);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_SYNC, true);
+                    editor.putString(ProjectKeys.KEY_AUTOSEND, tr.settings.ft_send);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_SYNC, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_SYNC, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_SYNC, false);
                 }
             } else {
                 // Support legacy servers / settings
-                String autoSend = (String) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_AUTOSEND);
+                String autoSend = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_AUTOSEND);
                 if (tr.settings.ft_send_wifi_cell) {
                     autoSend = "wifi_and_cellular";
                 } else if (tr.settings.ft_send_wifi) {
                     autoSend = "wifi_only";
                 }
-                editor.putString(GeneralKeys.KEY_AUTOSEND, autoSend);
-                editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_SYNC, false);
+                editor.putString(ProjectKeys.KEY_AUTOSEND, autoSend);
+                editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_SYNC, false);
             }
 
             /*
@@ -967,13 +967,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                             || tr.settings.ft_input_method.equals("auto"))) {
 
                     // Set the preference value using the server value and disable from local editing
-                    editor.putString(GeneralKeys.KEY_SMAP_INPUT_METHOD, tr.settings.ft_input_method);
+                    editor.putString(ProjectKeys.KEY_SMAP_INPUT_METHOD, tr.settings.ft_input_method);
                     if(tr.settings.ft_input_method.equals("auto")) {
-                        editor.putInt(GeneralKeys.KEY_SMAP_IM_RI, tr.settings.ft_im_ri);
-                        editor.putInt(GeneralKeys.KEY_SMAP_IM_ACC, tr.settings.ft_im_acc);
+                        editor.putInt(ProjectKeys.KEY_SMAP_IM_RI, tr.settings.ft_im_ri);
+                        editor.putInt(ProjectKeys.KEY_SMAP_IM_ACC, tr.settings.ft_im_acc);
                     }
             } else {
-                editor.putString(GeneralKeys.KEY_SMAP_INPUT_METHOD, "not set");
+                editor.putString(ProjectKeys.KEY_SMAP_INPUT_METHOD, "not set");
             }
 
             /*
@@ -981,19 +981,19 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
              */
             if(tr.settings.ft_delete != null) {
                 if(tr.settings.ft_delete.equals("off")) {
-                    editor.putBoolean(GeneralKeys.KEY_DELETE_AFTER_SEND, false);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_DELETE, true);
+                    editor.putBoolean(ProjectKeys.KEY_DELETE_AFTER_SEND, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_DELETE, true);
                 } else if(tr.settings.ft_delete.equals("on")) {
-                    editor.putBoolean(GeneralKeys.KEY_DELETE_AFTER_SEND, true);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_DELETE, true);
+                    editor.putBoolean(ProjectKeys.KEY_DELETE_AFTER_SEND, true);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_DELETE, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_DELETE, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_DELETE, false);
                 }
 
             } else {
                 // Support legacy servers / settings
-                editor.putBoolean(GeneralKeys.KEY_DELETE_AFTER_SEND, tr.settings.ft_delete_submitted);
+                editor.putBoolean(ProjectKeys.KEY_DELETE_AFTER_SEND, tr.settings.ft_delete_submitted);
             }
 
             /*
@@ -1001,16 +1001,16 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
              */
             if(tr.settings.ft_image_size != null) {
                 if(!tr.settings.ft_image_size.equals("not set")) {
-                    editor.putString(GeneralKeys.KEY_IMAGE_SIZE, tr.settings.ft_image_size);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE, true);
+                    editor.putString(ProjectKeys.KEY_IMAGE_SIZE, tr.settings.ft_image_size);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE, false);
                 }
 
             } else {
                 // Leave the local settings as they are and enable for local editing
-                editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE, false);
+                editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE, false);
             }
 
             /*
@@ -1018,17 +1018,17 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
              */
             if(tr.settings.ft_guidance != null) {
                 if(tr.settings.ft_guidance.equals("no")) {
-                    editor.putString(GeneralKeys.KEY_GUIDANCE_HINT, GuidanceHint.No.toString());
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_GUIDANCE, true);
+                    editor.putString(ProjectKeys.KEY_GUIDANCE_HINT, GuidanceHint.No.toString());
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_GUIDANCE, true);
                 } else if(tr.settings.ft_guidance.equals("yes always")) {
-                    editor.putString(GeneralKeys.KEY_GUIDANCE_HINT, GuidanceHint.Yes.toString());
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_GUIDANCE, true);
+                    editor.putString(ProjectKeys.KEY_GUIDANCE_HINT, GuidanceHint.Yes.toString());
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_GUIDANCE, true);
                 } else if(tr.settings.ft_guidance.equals("yes collapsed")) {
-                    editor.putString(GeneralKeys.KEY_GUIDANCE_HINT, GuidanceHint.YesCollapsed.toString());
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_GUIDANCE, true);
+                    editor.putString(ProjectKeys.KEY_GUIDANCE_HINT, GuidanceHint.YesCollapsed.toString());
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_GUIDANCE, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_GUIDANCE, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_GUIDANCE, false);
                 }
             }
 
@@ -1037,21 +1037,21 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
              */
             if(tr.settings.ft_high_res_video != null) {
                 if(tr.settings.ft_high_res_video.equals("off")) {
-                    editor.putBoolean(GeneralKeys.KEY_HIGH_RESOLUTION, false);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO, true);
+                    editor.putBoolean(ProjectKeys.KEY_HIGH_RESOLUTION, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO, true);
                 } else if(tr.settings.ft_high_res_video.equals("on")) {
-                    editor.putBoolean(GeneralKeys.KEY_HIGH_RESOLUTION, true);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO, true);
+                    editor.putBoolean(ProjectKeys.KEY_HIGH_RESOLUTION, true);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO, false);
                 }
             }
 
             /*
              * Set the password policy
              */
-            editor.putString(GeneralKeys.KEY_SMAP_PASSWORD_POLICY, String.valueOf(tr.settings.ft_pw_policy));
+            editor.putString(ProjectKeys.KEY_SMAP_PASSWORD_POLICY, String.valueOf(tr.settings.ft_pw_policy));
 
             /*
              * Override backward navigation setting
@@ -1059,31 +1059,31 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             if(tr.settings.ft_backward_navigation != null) {
                 if(tr.settings.ft_backward_navigation.equals("disable")) {
                     // Disable moving backwards
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_MOVING_BACKWARDS, false);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, false);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_EDIT_SAVED, false);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_SAVE_MID, false);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_JUMP_TO, false);
-                    GeneralSharedPreferences.getInstance().save(GeneralKeys.KEY_CONSTRAINT_BEHAVIOR, GeneralKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_MOVING_BACKWARDS, false);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, false);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_EDIT_SAVED, false);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_SAVE_MID, false);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_JUMP_TO, false);
+                    GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_CONSTRAINT_BEHAVIOR, ProjectKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
 
-                    AdminSharedPreferences.getInstance().getInstance().save(AdminKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
+                    AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
                 } else if(tr.settings.ft_backward_navigation.equals("enable")) {
                     // Enable moving backwards
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_MOVING_BACKWARDS, true);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, true);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_EDIT_SAVED, true);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_SAVE_MID, true);
-                    AdminSharedPreferences.getInstance().save(AdminKeys.KEY_JUMP_TO, true);
-                    GeneralSharedPreferences.getInstance().save(GeneralKeys.KEY_CONSTRAINT_BEHAVIOR, GeneralKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_MOVING_BACKWARDS, true);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, true);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_EDIT_SAVED, true);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_SAVE_MID, true);
+                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_JUMP_TO, true);
+                    GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_CONSTRAINT_BEHAVIOR, ProjectKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
 
-                    AdminSharedPreferences.getInstance().getInstance().save(AdminKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
+                    AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    AdminSharedPreferences.getInstance().getInstance().save(AdminKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
+                    AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
                 }
             } else {
                 // Leave the local settings as they are and enable for local editing
-                AdminSharedPreferences.getInstance().getInstance().save(AdminKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
+                AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
             }
 
             /*
@@ -1091,23 +1091,23 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
              */
             if(tr.settings.ft_navigation != null) {
                 if(!tr.settings.ft_navigation.equals("not set")) {
-                    editor.putString(GeneralKeys.KEY_NAVIGATION, tr.settings.ft_navigation);
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_NAVIGATION, true);
+                    editor.putString(ProjectKeys.KEY_NAVIGATION, tr.settings.ft_navigation);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_NAVIGATION, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_NAVIGATION, false);
+                    editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_NAVIGATION, false);
                 }
 
             } else {
                 // Leave the local settings as they are and enable for local editing
-                editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_NAVIGATION, false);
+                editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_NAVIGATION, false);
             }
 
             /*
              * Record organisation settings
              */
-            editor.putString(GeneralKeys.KEY_SMAP_CURRENT_ORGANISATION, tr.current_org);
-            editor.putStringSet(GeneralKeys.KEY_SMAP_ORGANISATIONS, tr.orgs);
+            editor.putString(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION, tr.current_org);
+            editor.putStringSet(ProjectKeys.KEY_SMAP_ORGANISATIONS, tr.orgs);
 
             editor.apply();
         }
@@ -1118,7 +1118,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
      */
     private void cleanUpOrganisationFiles(String organsisation) {
         String source = Utilities.getSource();
-        String currentOrg = (String) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        String currentOrg = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
 
         String sharedMediaPath = new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS)  + File.separator + "smap_media";
 

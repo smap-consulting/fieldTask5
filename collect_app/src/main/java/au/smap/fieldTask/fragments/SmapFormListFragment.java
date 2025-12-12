@@ -53,9 +53,9 @@ import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
-import org.odk.collect.android.preferences.AdminKeys;
+import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.utilities.MultiClickGuard;
@@ -193,8 +193,8 @@ public class SmapFormListFragment extends ListFragment {
 
         // Notify the user if tracking is turned on
         if (new LocationRegister().locationEnabled()
-                && (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(GeneralKeys.KEY_SMAP_USER_LOCATION, false)
-                || PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(GeneralKeys.KEY_SMAP_ENABLE_GEOFENCE, false))) {
+                && (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)
+                || PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, false))) {
             SnackbarUtils.showLongSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking));
         }
 
@@ -268,7 +268,7 @@ public class SmapFormListFragment extends ListFragment {
 
         boolean odkMenus = PreferenceManager
                 .getDefaultSharedPreferences(getContext())
-                .getBoolean(GeneralKeys.KEY_SMAP_ODK_STYLE_MENUS, true);
+                .getBoolean(ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS, true);
 
         if (odkMenus) {
             menu
@@ -302,7 +302,7 @@ public class SmapFormListFragment extends ListFragment {
 
         boolean adminMenu = PreferenceManager
                 .getDefaultSharedPreferences(getContext())
-                .getBoolean(GeneralKeys.KEY_SMAP_ODK_ADMIN_MENU, false);
+                .getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU, false);
 
         if (adminMenu) {
             menu
@@ -369,7 +369,7 @@ public class SmapFormListFragment extends ListFragment {
                 return true;
             case R.id.menu_admin_preferences:
                 String pw = adminPreferences.getString(
-                        AdminKeys.KEY_ADMIN_PW, "");
+                        ProtectedProjectKeys.KEY_ADMIN_PW, "");
                 if ("".equalsIgnoreCase(pw)) {
                     Intent i = new Intent(getActivity(),
                             AdminPreferencesActivity.class);

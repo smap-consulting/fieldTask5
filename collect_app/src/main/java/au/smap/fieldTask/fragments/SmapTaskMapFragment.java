@@ -77,7 +77,7 @@ import org.odk.collect.android.loaders.PointEntry;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
-import org.odk.collect.android.preferences.AdminKeys;
+import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.KeyValueJsonFns;
@@ -227,7 +227,7 @@ public class SmapTaskMapFragment extends Fragment
                 return true;
             case R.id.menu_admin_preferences:
                 String pw = adminPreferences.getString(
-                        AdminKeys.KEY_ADMIN_PW, "");
+                        ProtectedProjectKeys.KEY_ADMIN_PW, "");
                 if ("".equalsIgnoreCase(pw)) {
                     Intent i = new Intent(getActivity(),
                             AdminPreferencesActivity.class);

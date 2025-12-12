@@ -53,6 +53,40 @@ object Defaults {
             hashMap[ProjectKeys.KEY_DEBUG_FILTERS] = BuildConfig.BUILD_TYPE == "selfSignedRelease"
             hashMap[ProjectKeys.KEY_ZXING_SCANNING] = false
             hashMap[ProjectKeys.KEY_ENTITIES_SPEC_V2025_1] = false
+            // smap preferences
+            hashMap[ProjectKeys.KEY_SMAP_USE_TOKEN] = false
+            hashMap[ProjectKeys.KEY_SMAP_SCAN_TOKEN] = false
+            hashMap[ProjectKeys.KEY_SMAP_AUTH_TOKEN] = ""
+            hashMap[ProjectKeys.KEY_SMAP_REVIEW_FINAL] = true
+            hashMap[ProjectKeys.KEY_SMAP_FORCE_TOKEN] = false
+            hashMap[ProjectKeys.KEY_SMAP_USER_LOCATION] = false
+            hashMap[ProjectKeys.KEY_SMAP_LOCATION_TRIGGER] = true
+            hashMap[ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS] = true
+            hashMap[ProjectKeys.KEY_SMAP_ODK_INSTANCENAME] = false
+            hashMap[ProjectKeys.KEY_SMAP_ODK_MARK_FINALIZED] = false
+            hashMap[ProjectKeys.KEY_SMAP_PREVENT_DISABLE_TRACK] = false
+            hashMap[ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE] = true
+            hashMap[ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU] = false
+            hashMap[ProjectKeys.KEY_SMAP_ADMIN_SERVER_MENU] = true
+            hashMap[ProjectKeys.KEY_SMAP_ADMIN_META_MENU] = true
+            hashMap[ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU] = false
+            hashMap[ProjectKeys.KEY_SMAP_BG_STOP_MENU] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_SYNC] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_DELETE] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_GUIDANCE] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_IMAGE_SIZE] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_NAVIGATION] = false
+            hashMap[ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION] = false
+            hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_ID] = ""
+            hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_SERVER] = ""
+            hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_USER] = ""
+            hashMap[ProjectKeys.KEY_SMAP_LAST_LOGIN] = "0"
+            hashMap[ProjectKeys.KEY_SMAP_PASSWORD_POLICY] = "-1"
+            hashMap[ProjectKeys.KEY_SMAP_INPUT_METHOD] = "not set"
+            hashMap[ProjectKeys.KEY_SMAP_IM_RI] = 3
+            hashMap[ProjectKeys.KEY_SMAP_IM_ACC] = 3
+            hashMap[ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE] = "no"
             return hashMap
         }
 

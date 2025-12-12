@@ -44,6 +44,9 @@ object ProtectedProjectKeys {
     const val ALLOW_OTHER_WAYS_OF_EDITING_FORM = "allow_other_ways_of_editing_form"
     const val KEY_BULK_FINALIZE = "bulk_finalize"
 
+    // smap preferences
+    const val KEY_SMAP_OVERRIDE_MOVING_BACKWARDS = "smap_override_moving_backwards" // Override the local settings for moving backwards
+
     fun allKeys() = listOf(
         KEY_ADMIN_PW,
         KEY_EDIT_SAVED,
@@ -79,6 +82,7 @@ object ProtectedProjectKeys {
         KEY_SAVE_AS_DRAFT,
         KEY_FINALIZE_IN_FORM_ENTRY,
         ALLOW_OTHER_WAYS_OF_EDITING_FORM,
-        KEY_BULK_FINALIZE
+        KEY_BULK_FINALIZE,
+        KEY_SMAP_OVERRIDE_MOVING_BACKWARDS
     )
 }

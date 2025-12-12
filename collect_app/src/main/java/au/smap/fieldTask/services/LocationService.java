@@ -38,7 +38,7 @@ import com.google.android.gms.location.Priority;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.receivers.LocationReceiver;
 import org.odk.collect.android.utilities.Constants;
 
@@ -75,7 +75,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         Timber.i("======================= Start Location Service");
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-        isRecordingLocation = sharedPreferences.getBoolean(GeneralKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
+        isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
 
         if (mTimer == null) {
             mTimer = new Timer();
@@ -142,7 +142,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 public void run() {
                     Timber.i("=================== Periodic check for user settings ");
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-                    isRecordingLocation = sharedPreferences.getBoolean(GeneralKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
+                    isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
 
                     // Restart location monitoring - Incase permission was disabled and then re-enabled
                     stopLocationUpdates();

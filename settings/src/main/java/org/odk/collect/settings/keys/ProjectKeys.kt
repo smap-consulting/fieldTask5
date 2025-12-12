@@ -76,4 +76,42 @@ object ProjectKeys {
     // remembered defaults
     const val KEY_SAVED_FORM_SORT_ORDER = "instanceUploaderListSortingOrder"
     const val KEY_BLANK_FORM_SORT_ORDER = "formChooserListSortingOrder"
+
+    // smap preferences
+    const val KEY_SMAP_USE_TOKEN = "smap_use_token" // Use token for logon
+    const val KEY_SMAP_SCAN_TOKEN = "smap_scan_token" // Scan the token
+    const val KEY_SMAP_AUTH_TOKEN = "auth_token" // Authentication Token
+    const val KEY_SMAP_REVIEW_FINAL = "review_final" // Allow review of Form after finalising
+    const val KEY_SMAP_FORCE_TOKEN = "force_token" // Require the use of tokens for authentication
+    const val KEY_SMAP_USER_LOCATION = "smap_gps_trail" // Record a user trail
+    const val KEY_SMAP_USER_SAVE_LOCATION = "smap_gps_trail" // Backup of decision to record the user trail
+    const val KEY_SMAP_LOCATION_TRIGGER = "location_trigger" // Enable triggering of forms by location
+    const val KEY_SMAP_ODK_STYLE_MENUS = "odk_style_menus" // Show ODK style menus as well as refresh
+    const val KEY_SMAP_ODK_INSTANCENAME = "odk_instancename" // Allow user to change instance name
+    const val KEY_SMAP_ODK_MARK_FINALIZED = "odk_mark_finalized" // Allow user to change instance name
+    const val KEY_SMAP_PREVENT_DISABLE_TRACK = "disable_prevent_track" // Prevent the user from disabling tracking
+    const val KEY_SMAP_ENABLE_GEOFENCE = "enable_geofence" // Monitor location for geofence
+    const val KEY_SMAP_ODK_ADMIN_MENU = "odk_admin_menu" // Show ODK admin menu
+    const val KEY_SMAP_ADMIN_SERVER_MENU = "admin_server_menu" // Show server menu in general settings
+    const val KEY_SMAP_ADMIN_META_MENU = "admin_meta_menu" // Show meta menu in general settings
+    const val KEY_SMAP_EXIT_TRACK_MENU = "smap_exit_track_menu" // Disable the exit track menu
+    const val KEY_SMAP_BG_STOP_MENU = "smap_bg_stop_menu" // Disable the exit track menu
+    const val KEY_SMAP_OVERRIDE_SYNC = "smap_override_sync" // Override the local settings for synchronisation
+    const val KEY_SMAP_OVERRIDE_LOCATION = "smap_override_location" // Override the local settings for user trail
+    const val KEY_SMAP_OVERRIDE_DELETE = "smap_override_del" // Override the local settings for delete after send
+    const val KEY_SMAP_OVERRIDE_HIGH_RES_VIDEO = "smap_override_high_res_video" // Override the local settings for video resolution
+    const val KEY_SMAP_OVERRIDE_GUIDANCE = "smap_override_guidance" // Override the local settings for guidance hint
+    const val KEY_SMAP_OVERRIDE_IMAGE_SIZE = "smap_override_image_size" // Override the local settings for the image size
+    const val KEY_SMAP_OVERRIDE_NAVIGATION = "smap_override_navigation" // Override the local settings for the screen navigation
+    const val KEY_SMAP_REGISTRATION_ID = "registration_id" // Android notifications id
+    const val KEY_SMAP_REGISTRATION_SERVER = "registration_server" // Server name that has been registered
+    const val KEY_SMAP_REGISTRATION_USER = "registration_user" // User name that has been registered
+    const val KEY_SMAP_LAST_LOGIN = "last_login" // System time in milli seconds that the user last logged in
+    const val KEY_SMAP_PASSWORD_POLICY = "pw_policy"
+    const val KEY_SMAP_CURRENT_ORGANISATION = "smap_current_organisation"
+    const val KEY_SMAP_ORGANISATIONS = "smap_organisations"
+    const val KEY_SMAP_INPUT_METHOD = "smap_input_method" // GeoPoly recording settings
+    const val KEY_SMAP_IM_RI = "smap_im_ri"
+    const val KEY_SMAP_IM_ACC = "smap_im_acc"
+    const val KEY_SMAP_REQUEST_LOCATION_DONE = "smap_request_location_done"
 }

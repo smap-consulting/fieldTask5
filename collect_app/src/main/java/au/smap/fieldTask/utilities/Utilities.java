@@ -44,7 +44,7 @@ import org.odk.collect.android.instances.Instance;
 import org.odk.collect.android.loaders.GeofenceEntry;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
 import org.odk.collect.android.provider.InstanceProvider;
 import org.odk.collect.android.provider.InstanceProviderAPI;
@@ -108,7 +108,7 @@ public class Utilities {
                 .getDefaultSharedPreferences(Collect.getInstance()
                         .getBaseContext());
         String serverUrl = sharedPreferences.getString(
-                GeneralKeys.KEY_SERVER_URL, null);
+                ProjectKeys.KEY_SERVER_URL, null);
         String source = STFileUtils.getSource(serverUrl);
 
 
@@ -117,7 +117,7 @@ public class Utilities {
 
     public static String getOrgMediaPath() {
         String source = getSource();
-        String currentOrg = (String) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        String currentOrg = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
         return new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS) + File.separator
                 + "smap_media" + File.separator + source + File.separator + currentOrg;
     }
@@ -1205,16 +1205,16 @@ public class Utilities {
         try {
 
             // Get the token
-            String token = sharedPreferences.getString(GeneralKeys.KEY_SMAP_REGISTRATION_ID, null);
+            String token = sharedPreferences.getString(ProjectKeys.KEY_SMAP_REGISTRATION_ID, null);
             if (token != null && token.trim().length() > 0) {
 
-                String username = sharedPreferences.getString(GeneralKeys.KEY_USERNAME, null);
+                String username = sharedPreferences.getString(ProjectKeys.KEY_USERNAME, null);
                 String server = getSource();
 
                 if (username != null && server != null && token != null && username.trim().length() != 0 && server.trim().length() != 0) {
 
-                    String registeredServer = sharedPreferences.getString(GeneralKeys.KEY_SMAP_REGISTRATION_SERVER, null);
-                    String registeredUser = sharedPreferences.getString(GeneralKeys.KEY_SMAP_REGISTRATION_USER, null);
+                    String registeredServer = sharedPreferences.getString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, null);
+                    String registeredUser = sharedPreferences.getString(ProjectKeys.KEY_SMAP_REGISTRATION_USER, null);
 
                     // Update the server if the token is new or the server or usernames have changed
                     if (newToken || registeredServer == null || registeredUser == null ||
@@ -1223,8 +1223,8 @@ public class Utilities {
                         SmapRegisterForMessagingTask task = new SmapRegisterForMessagingTask();
                         task.execute(token, server, username);
 
-                        editor.putString(GeneralKeys.KEY_SMAP_REGISTRATION_SERVER, server);
-                        editor.putString(GeneralKeys.KEY_SMAP_REGISTRATION_USER, username);
+                        editor.putString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, server);
+                        editor.putString(ProjectKeys.KEY_SMAP_REGISTRATION_USER, username);
                         editor.apply();
                     } else {
                         Timber.i("================================================== Notification not required");
@@ -1246,7 +1246,7 @@ public class Utilities {
         NetworkInfo currentNetworkInfo = manager.getActiveNetworkInfo();
 
         if (currentNetworkInfo != null) {
-            String autosend = (String) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_AUTOSEND);
+            String autosend = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_AUTOSEND);
             boolean sendwifi = autosend.equals("wifi_only");
             boolean sendnetwork = autosend.equals("cellular_only");
             if (autosend.equals("wifi_and_cellular")) {

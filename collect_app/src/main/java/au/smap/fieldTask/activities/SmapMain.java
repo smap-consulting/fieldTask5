@@ -67,9 +67,9 @@ import au.smap.fieldTask.listeners.TaskDownloaderListener;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import au.smap.fieldTask.permissions.PermissionsProvider;
-import org.odk.collect.android.preferences.AdminKeys;
+import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import org.odk.collect.android.preferences.AdminPreferencesActivity;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
@@ -221,8 +221,8 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         }
 
         // Restore the preference to record a user trail in case the user had previously selected "exit"
-        GeneralSharedPreferences.getInstance().save(GeneralKeys.KEY_SMAP_USER_LOCATION,
-                GeneralSharedPreferences.getInstance().getBoolean(GeneralKeys.KEY_SMAP_USER_SAVE_LOCATION, false));
+        GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION,
+                GeneralSharedPreferences.getInstance().getBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false));
 
         // Initiate a refresh if requested in start parameters
         String refresh = getIntent().getStringExtra(EXTRA_REFRESH);
@@ -235,7 +235,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
          */
         boolean hasFineLocation = ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED;
         boolean hasCoarseLocation = ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED;
-        String asked = (String) GeneralSharedPreferences.getInstance().get(GeneralKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
+        String asked = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
         if (asked.equals("no")) {
             (new RequestLocationPermissionsDialog()).show(this.getSupportFragmentManager(), "LOCATION_PERMISSIONS_DIALOG");
         } else if ((hasFineLocation || hasCoarseLocation) && (asked.equals("accept"))){
@@ -318,7 +318,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         SharedPreferences sharedPreferences = this.getSharedPreferences(
                 AdminPreferencesActivity.ADMIN_PREFERENCES, 0);
 
-        if (sharedPreferences.getBoolean(GeneralKeys.KEY_SMAP_LOCATION_TRIGGER, true)) {
+        if (sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_LOCATION_TRIGGER, true)) {
             if(mNfcAdapter == null) {
                 mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
             }
@@ -445,7 +445,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                                                 int whichButton) {
                                 String value = input.getText().toString();
                                 String pw = adminPreferences.getString(
-                                        AdminKeys.KEY_ADMIN_PW, "");
+                                        ProtectedProjectKeys.KEY_ADMIN_PW, "");
                                 if (pw.compareTo(value) == 0) {
                                     Intent i = new Intent(getApplicationContext(),
                                             AdminPreferencesActivity.class);
@@ -702,7 +702,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             boolean isSelfAssigned = Utilities.isSelfAssigned(status);
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean reviewFinal = sharedPreferences.getBoolean(GeneralKeys.KEY_SMAP_REVIEW_FINAL, true);
+            boolean reviewFinal = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_REVIEW_FINAL, true);
 
             if (isSubmitted) {
                 Toast.makeText(
@@ -956,9 +956,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     public void exit() {
         boolean continueTracking = PreferenceManager
                 .getDefaultSharedPreferences(this)
-                .getBoolean(GeneralKeys.KEY_SMAP_EXIT_TRACK_MENU, false);
+                .getBoolean(ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU, false);
         if(!continueTracking) {
-            GeneralSharedPreferences.getInstance().save(GeneralKeys.KEY_SMAP_USER_LOCATION, false);
+            GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
             this.finish();
         } else {
             SnackbarUtils.showSnackbar(findViewById(R.id.pager),
