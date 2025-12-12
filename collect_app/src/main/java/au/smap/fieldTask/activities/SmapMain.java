@@ -689,7 +689,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      */
     public void completeTask(TaskEntry entry, boolean force) {
 
-        if(!mPaused || force) {1
+        if(!mPaused || force) {
             String surveyNotes = null;
             String formPath = new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS) + entry.taskForm;
             String instancePath = entry.instancePath;
