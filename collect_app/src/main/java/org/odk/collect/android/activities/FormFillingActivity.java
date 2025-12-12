@@ -230,6 +230,14 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     public static final String KEY_ERROR = "error";
     private static final String KEY_LOCATION_PERMISSIONS_GRANTED = "location_permissions_granted";
 
+    // Smap-specific keys
+    public static final String KEY_TASK = "task";
+    public static final String KEY_SURVEY_NOTES = "surveyNotes";
+    public static final String KEY_CAN_UPDATE = "canUpdate";
+    public static final String KEY_READ_ONLY = "readOnly";
+    public static final String KEY_INITIAL_DATA = "initialData";
+    public static final String KEY_INSTANCEPATH = "instancePath";
+
     private static final String TAG_MEDIA_LOADING_FRAGMENT = "media_loading_fragment";
 
     // Identifies whether this is a new form, or reloading a form after a screen

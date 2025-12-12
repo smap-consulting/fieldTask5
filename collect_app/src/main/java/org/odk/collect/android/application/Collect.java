@@ -19,6 +19,7 @@ import static org.odk.collect.settings.keys.MetaKeys.KEY_GOOGLE_BUG_154855417_FI
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -90,7 +91,15 @@ import org.odk.collect.strings.localization.LocalizedApplication;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Stack;
+
+import au.smap.fieldTask.loaders.GeofenceEntry;
+import au.smap.fieldTask.external.handler.SmapRemoteDataItem;
+import au.smap.fieldTask.models.FormLaunchDetail;
+import au.smap.fieldTask.models.FormRestartDetails;
 
 public class Collect extends Application implements
         LocalizedApplication,
@@ -123,6 +132,20 @@ public class Collect extends Application implements
     private SelfieCameraDependencyComponent selfieCameraDependencyComponent;
     private GoogleMapsDependencyComponent googleMapsDependencyComponent;
     private DrawDependencyComponent drawDependencyComponent;
+
+    // Smap-specific fields
+    private Location location = null;
+    private Location savedLocation = null;
+    private ArrayList<GeofenceEntry> geofences = new ArrayList<GeofenceEntry>();
+    private boolean tasksDownloading = false;
+    private org.odk.collect.android.activities.FormFillingActivity formFillingActivity = null;
+    private HashMap<String, SmapRemoteDataItem> remoteCache = null;
+    private int remoteCalls;
+    private Stack<FormLaunchDetail> formStack = new Stack<>();
+    private HashMap<String, String> compoundAddresses = new HashMap<>();
+    private FormRestartDetails mRestartDetails;
+    private String formId;
+    private String searchLocalData;
 
     /**
      * @deprecated we shouldn't have to reference a static singleton of the application. Code doing this
@@ -366,4 +389,156 @@ public class Collect extends Application implements
                 })
                 .build();
     }
+
+    // Begin Smap-specific methods
+    public void setFormId(String v) {
+        formId = v;
+    }
+
+    public String getFormId() {
+        return formId;
+    }
+
+    public void setSearchLocalData(String v) {
+        searchLocalData = v;
+    }
+
+    public String getSearchLocalData() {
+        return searchLocalData;
+    }
+
+    public void setLocation(Location l) {
+        location = l;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setSavedLocation(Location l) {
+        savedLocation = l;
+    }
+
+    public Location getSavedLocation() {
+        return savedLocation;
+    }
+
+    public void setGeofences(ArrayList<GeofenceEntry> geofences) {
+        this.geofences = geofences;
+    }
+
+    public ArrayList<GeofenceEntry> getGeofences() {
+        return geofences;
+    }
+
+    public void setDownloading(boolean v) {
+        tasksDownloading = v;
+    }
+
+    public boolean isDownloading() {
+        return tasksDownloading;
+    }
+
+    // Set form filling activity
+    public void setFormFillingActivity(org.odk.collect.android.activities.FormFillingActivity activity) {
+        formFillingActivity = activity;
+    }
+
+    public org.odk.collect.android.activities.FormFillingActivity getFormFillingActivity() {
+        return formFillingActivity;
+    }
+
+    public void clearRemoteServiceCaches() {
+        remoteCache = new HashMap<String, SmapRemoteDataItem>();
+    }
+
+    public void initRemoteServiceCaches() {
+        if (remoteCache == null) {
+            remoteCache = new HashMap<String, SmapRemoteDataItem>();
+        } else {
+            ArrayList<String> expired = new ArrayList<String>();
+            for (String key : remoteCache.keySet()) {
+                SmapRemoteDataItem item = remoteCache.get(key);
+                if (item.perSubmission) {
+                    expired.add(key);
+                }
+            }
+            if (expired.size() > 0) {
+                for (String key : expired) {
+                    remoteCache.remove(key);
+                }
+            }
+        }
+        remoteCalls = 0;
+    }
+
+    public String getRemoteData(String key) {
+        SmapRemoteDataItem item = remoteCache.get(key);
+        if (item != null) {
+            return item.data;
+        } else {
+            return null;
+        }
+    }
+
+    public void setRemoteItem(SmapRemoteDataItem item) {
+        if (item.data == null) {
+            // There was a network error
+            remoteCache.remove(item.key);
+        } else {
+            remoteCache.put(item.key, item);
+        }
+    }
+
+    public void startRemoteCall() {
+        remoteCalls++;
+    }
+
+    public void endRemoteCall() {
+        remoteCalls--;
+    }
+
+    public boolean inRemoteCall() {
+        return remoteCalls > 0;
+    }
+
+    public void setFormRestartDetails(FormRestartDetails restartDetails) {
+        mRestartDetails = restartDetails;
+    }
+
+    public FormRestartDetails getFormRestartDetails() {
+        return mRestartDetails;
+    }
+
+    /*
+     * Push a FormLaunchDetail to the stack
+     * this form should then be launched by SmapMain
+     */
+    public void pushToFormStack(FormLaunchDetail fld) {
+        formStack.push(fld);
+    }
+
+    /*
+     * Pop a FormLaunchDetails from the stack
+     */
+    public FormLaunchDetail popFromFormStack() {
+        if (formStack.empty()) {
+            return null;
+        } else {
+            return formStack.pop();
+        }
+    }
+
+    public void clearCompoundAddresses() {
+        compoundAddresses = new HashMap<String, String>();
+    }
+
+    public void putCompoundAddress(String qName, String address) {
+        compoundAddresses.put(qName, address);
+    }
+
+    public String getCompoundAddress(String qName) {
+        return compoundAddresses.get(qName);
+    }
+    // End Smap-specific methods
 }

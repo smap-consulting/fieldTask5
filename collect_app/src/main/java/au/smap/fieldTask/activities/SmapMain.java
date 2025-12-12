@@ -58,7 +58,9 @@ import au.smap.fieldTask.fragments.SmapFormListFragment;
 import au.smap.fieldTask.fragments.SmapTaskListFragment;
 import au.smap.fieldTask.fragments.SmapTaskMapFragment;
 import au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap;
+import org.odk.collect.android.formmanagement.FormFillingIntentFactory;
 import org.odk.collect.android.injection.DaggerUtils;
+import org.odk.collect.android.projects.ProjectsDataService;
 import au.smap.fieldTask.listeners.InstanceUploaderListener;
 import au.smap.fieldTask.listeners.NFCListener;
 import au.smap.fieldTask.listeners.TaskDownloaderListener;
@@ -154,6 +156,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
     @Inject
     PermissionsProvider permissionsProvider;
+
+    @Inject
+    ProjectsDataService projectsDataService;
 
     /*
      * Start scoped storage
@@ -746,18 +751,18 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 if (cInstanceProvider.moveToFirst()) {
                     long idx = cInstanceProvider.getLong(cInstanceProvider.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns._ID));
                     if (idx > 0) {
-                        Uri instanceUri = ContentUris.withAppendedId(InstanceProviderAPI.InstanceColumns.CONTENT_URI, idx);
                         surveyNotes = cInstanceProvider.getString(
                                 cInstanceProvider.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.T_SURVEY_NOTES));
                         // Start activity to complete form
 
-                        // Use an explicit intent
-                        Intent i = new Intent(this, org.odk.collect.android.activities.FormEntryActivity.class);
-                        i.setData(instanceUri);
+                        // Use FormFillingIntentFactory to create the intent
+                        String projectId = projectsDataService.requireCurrentProject().getUuid();
+                        Intent i = FormFillingIntentFactory.editDraftFormIntent(this, projectId, idx);
 
-                        i.putExtra(FormEntryActivity.KEY_TASK, taskId);
-                        i.putExtra(FormEntryActivity.KEY_SURVEY_NOTES, surveyNotes);
-                        i.putExtra(FormEntryActivity.KEY_CAN_UPDATE, canUpdate);
+                        // Add Smap-specific extras
+                        i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_TASK, taskId);
+                        i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_SURVEY_NOTES, surveyNotes);
+                        i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_CAN_UPDATE, canUpdate);
                         i.putExtra(ApplicationConstants.BundleKeys.FORM_MODE, ApplicationConstants.FormModes.EDIT_SAVED);
                         if (entry.formIndex != null) {
                             FormRestartDetails frd = new FormRestartDetails();
@@ -767,8 +772,8 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                             frd.launchedFormURI = entry.formURI;
                             Collect.getInstance().setFormRestartDetails(frd);
                         }
-                        if (instancePath != null) {    // TODO Don't think this is needed
-                            i.putExtra(FormEntryActivity.KEY_INSTANCEPATH, instancePath);
+                        if (instancePath != null) {
+                            i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_INSTANCEPATH, instancePath);
                         }
                         startActivityForResult(i, COMPLETE_FORM);
 
@@ -797,15 +802,17 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      */
     public void completeForm(TaskEntry entry, boolean force, String initialData) {
         if(!mPaused || force) {
+            String projectId = projectsDataService.requireCurrentProject().getUuid();
             Uri formUri = ContentUris.withAppendedId(FormsProviderAPI.FormsColumns.CONTENT_URI, entry.id);
 
-            // Use an explicit intent
-            Intent i = new Intent(this, org.odk.collect.android.activities.FormEntryActivity.class);
+            // Use FormFillingIntentFactory to create the intent
+            Intent i = FormFillingIntentFactory.newFormIntent(this, formUri);
+
+            // Add Smap-specific extras
             i.putExtra(ApplicationConstants.BundleKeys.FORM_MODE, ApplicationConstants.FormModes.EDIT_SAVED);
-            i.putExtra(FormEntryActivity.KEY_READ_ONLY, entry.readOnly);
-            i.setData(formUri);
+            i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_READ_ONLY, entry.readOnly);
             if(initialData != null) {
-                i.putExtra(FormEntryActivity.KEY_INITIAL_DATA, initialData);
+                i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_INITIAL_DATA, initialData);
             }
             startActivityForResult(i, COMPLETE_FORM);
         } else {
