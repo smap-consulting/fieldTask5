@@ -32,6 +32,13 @@ object DatabaseFormColumns : BaseColumns {
     const val DELETED_DATE = "deleted_date"
     const val LAST_DETECTED_ATTACHMENTS_UPDATE_DATE = "lastDetectedAttachmentsUpdateDate"
 
+    // Smap-specific columns
+    const val PROJECT = "project" // can be null
+    const val TASKS_ONLY = "tasks_only" // Set to "yes" if the form should not be available to the user
+    const val READ_ONLY = "read_only" // Set to "yes" if the form should not be able to save to an instance
+    const val SEARCH_LOCAL_DATA = "search_local_data" // Set to "yes" if the form should lookup local data when doing pulldata or search requests
+    const val SOURCE = "source" // shouldn't be null but for migration can be
+
     // not used in the newest database version
     const val DISPLAY_SUBTEXT = "displaySubtext"
     const val LAST_DETECTED_FORM_VERSION_HASH = "lastDetectedFormVersionHash"

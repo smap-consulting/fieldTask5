@@ -28,6 +28,11 @@ import static org.odk.collect.android.database.forms.DatabaseFormColumns.LAST_DE
 import static org.odk.collect.android.database.forms.DatabaseFormColumns.LAST_DETECTED_FORM_VERSION_HASH;
 import static org.odk.collect.android.database.forms.DatabaseFormColumns.MD5_HASH;
 import static org.odk.collect.android.database.forms.DatabaseFormColumns.SUBMISSION_URI;
+import static org.odk.collect.android.database.forms.DatabaseFormColumns.PROJECT;
+import static org.odk.collect.android.database.forms.DatabaseFormColumns.TASKS_ONLY;
+import static org.odk.collect.android.database.forms.DatabaseFormColumns.READ_ONLY;
+import static org.odk.collect.android.database.forms.DatabaseFormColumns.SEARCH_LOCAL_DATA;
+import static org.odk.collect.android.database.forms.DatabaseFormColumns.SOURCE;
 import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.addColumn;
 
 import timber.log.Timber;
@@ -44,7 +49,7 @@ public class FormDatabaseMigrator implements DatabaseMigrator {
     private static final String MODEL_VERSION = "modelVersion";
 
     public void onCreate(SQLiteDatabase db) {
-        createFormsTableV14(db);
+        createFormsTableV15(db);
     }
 
     @SuppressWarnings({"checkstyle:FallThrough"})
@@ -77,8 +82,10 @@ public class FormDatabaseMigrator implements DatabaseMigrator {
             case 13:
                 upgradeToVersion14(db);
             case 14:
+                upgradeToVersion15(db);
+            case 15:
                 // Remember to bump the database version number in {@link org.odk.collect.android.database.DatabaseConstants}
-                // upgradeToVersion15(db);
+                // upgradeToVersion16(db);
         }
     }
 
@@ -280,6 +287,15 @@ public class FormDatabaseMigrator implements DatabaseMigrator {
         addColumn(db, FORMS_TABLE_NAME, USES_ENTITIES, "text");
     }
 
+    private void upgradeToVersion15(SQLiteDatabase db) {
+        // Add Smap-specific columns
+        addColumn(db, FORMS_TABLE_NAME, PROJECT, "text");
+        addColumn(db, FORMS_TABLE_NAME, TASKS_ONLY, "text");
+        addColumn(db, FORMS_TABLE_NAME, READ_ONLY, "text");
+        addColumn(db, FORMS_TABLE_NAME, SEARCH_LOCAL_DATA, "text");
+        addColumn(db, FORMS_TABLE_NAME, SOURCE, "text");
+    }
+
     private void createFormsTableV4(SQLiteDatabase db, String tableName) {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + tableName + " ("
                 + _ID + " integer primary key, "
@@ -470,5 +486,33 @@ public class FormDatabaseMigrator implements DatabaseMigrator {
                 + DELETED_DATE + " integer, "
                 + LAST_DETECTED_ATTACHMENTS_UPDATE_DATE + " integer, " // milliseconds
                 + USES_ENTITIES + " text);");
+    }
+
+    private void createFormsTableV15(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + FORMS_TABLE_NAME + " ("
+                + _ID + " integer primary key autoincrement, "
+                + DISPLAY_NAME + " text not null, "
+                + DESCRIPTION + " text, "
+                + JR_FORM_ID + " text not null, "
+                + JR_VERSION + " text, "
+                + MD5_HASH + " text not null UNIQUE ON CONFLICT IGNORE, "
+                + DATE + " integer not null, " // milliseconds
+                + FORM_MEDIA_PATH + " text not null, "
+                + FORM_FILE_PATH + " text not null, "
+                + LANGUAGE + " text, "
+                + SUBMISSION_URI + " text, "
+                + BASE64_RSA_PUBLIC_KEY + " text, "
+                + JRCACHE_FILE_PATH + " text not null, "
+                + AUTO_SEND + " text, "
+                + AUTO_DELETE + " text, "
+                + GEOMETRY_XPATH + " text, "
+                + DELETED_DATE + " integer, "
+                + LAST_DETECTED_ATTACHMENTS_UPDATE_DATE + " integer, " // milliseconds
+                + USES_ENTITIES + " text, "
+                + PROJECT + " text, " // Smap
+                + TASKS_ONLY + " text, " // Smap
+                + READ_ONLY + " text, " // Smap
+                + SEARCH_LOCAL_DATA + " text, " // Smap
+                + SOURCE + " text);"); // Smap
     }
 }

@@ -17,6 +17,32 @@ import static org.odk.collect.android.database.instances.DatabaseInstanceColumns
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.LAST_STATUS_CHANGE_DATE;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.STATUS;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SUBMISSION_URI;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SOURCE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.FORM_PATH;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.ACT_LON;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.ACT_LAT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SCHED_LON;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SCHED_LAT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TITLE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_TYPE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SCHED_START;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SCHED_FINISH;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ACT_START;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ACT_FINISH;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ADDRESS;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_IS_SYNC;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ASS_ID;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_STATUS;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_COMMENT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_REPEAT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_UPDATEID;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_LOCATION_TRIGGER;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SURVEY_NOTES;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_UPDATED;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.UUID;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SHOW_DIST;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_HIDE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.PHONE;
 import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.addColumn;
 import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.doesColumnExist;
 
@@ -41,7 +67,7 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
             LAST_STATUS_CHANGE_DATE, DELETED_DATE, GEOMETRY, GEOMETRY_TYPE};
 
     public void onCreate(SQLiteDatabase db) {
-        createInstancesTableV10(db);
+        createInstancesTableV11(db);
     }
 
     @SuppressWarnings({"checkstyle:FallThrough"})
@@ -67,8 +93,10 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
             case 9:
                 upgradeToVersion10(db);
             case 10:
+                upgradeToVersion11(db);
+            case 11:
                 // Remember to bump the database version number in {@link org.odk.collect.android.database.DatabaseConstants}
-                // upgradeToVersion11(db);
+                // upgradeToVersion12(db);
         }
     }
 
@@ -162,6 +190,36 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
                 "UPDATE " + INSTANCES_TABLE_NAME + " SET " + FINALIZATION_DATE + " = " + LAST_STATUS_CHANGE_DATE + " WHERE " + STATUS + " IN (?, ?, ?);",
                 new Object[] {Instance.STATUS_COMPLETE, Instance.STATUS_SUBMITTED, Instance.STATUS_SUBMISSION_FAILED}
         );
+    }
+
+    private void upgradeToVersion11(SQLiteDatabase db) {
+        // Add Smap-specific columns
+        addColumn(db, INSTANCES_TABLE_NAME, SOURCE, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, FORM_PATH, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, ACT_LON, "double");
+        addColumn(db, INSTANCES_TABLE_NAME, ACT_LAT, "double");
+        addColumn(db, INSTANCES_TABLE_NAME, SCHED_LON, "double");
+        addColumn(db, INSTANCES_TABLE_NAME, SCHED_LAT, "double");
+        addColumn(db, INSTANCES_TABLE_NAME, T_TITLE, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_TASK_TYPE, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_SCHED_START, "long");
+        addColumn(db, INSTANCES_TABLE_NAME, T_SCHED_FINISH, "long");
+        addColumn(db, INSTANCES_TABLE_NAME, T_ACT_START, "long");
+        addColumn(db, INSTANCES_TABLE_NAME, T_ACT_FINISH, "long");
+        addColumn(db, INSTANCES_TABLE_NAME, T_ADDRESS, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_IS_SYNC, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_ASS_ID, "long");
+        addColumn(db, INSTANCES_TABLE_NAME, T_TASK_STATUS, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_TASK_COMMENT, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_REPEAT, "integer");
+        addColumn(db, INSTANCES_TABLE_NAME, T_UPDATEID, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_LOCATION_TRIGGER, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_SURVEY_NOTES, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_UPDATED, "integer");
+        addColumn(db, INSTANCES_TABLE_NAME, UUID, "text");
+        addColumn(db, INSTANCES_TABLE_NAME, T_SHOW_DIST, "integer");
+        addColumn(db, INSTANCES_TABLE_NAME, T_HIDE, "integer");
+        addColumn(db, INSTANCES_TABLE_NAME, PHONE, "text");
     }
 
     private void createInstancesTableV5(SQLiteDatabase db, String name) {
@@ -266,6 +324,55 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
                 + GEOMETRY_TYPE + " text, "
                 + EDIT_OF + " integer REFERENCES " + INSTANCES_TABLE_NAME + "(" + _ID + ") CHECK (" + EDIT_OF + " != " + _ID + "),"
                 + EDIT_NUMBER + " integer CHECK ((" + EDIT_OF + " IS NULL AND " + EDIT_NUMBER + " IS NULL) OR + (" + EDIT_OF + " IS NOT NULL AND + " + EDIT_NUMBER + " IS NOT NULL))"
+                + ");"
+        );
+    }
+
+    public void createInstancesTableV11(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + INSTANCES_TABLE_NAME + " ("
+                + _ID + " integer primary key autoincrement, "
+                + DISPLAY_NAME + " text not null, "
+                + SUBMISSION_URI + " text, "
+                + CAN_EDIT_WHEN_COMPLETE + " text, "
+                + CAN_DELETE_BEFORE_SEND + " text, "
+                + INSTANCE_FILE_PATH + " text not null, "
+                + JR_FORM_ID + " text not null, "
+                + JR_VERSION + " text, "
+                + STATUS + " text not null, "
+                + LAST_STATUS_CHANGE_DATE + " date not null, "
+                + FINALIZATION_DATE + " date, "
+                + DELETED_DATE + " date, "
+                + GEOMETRY + " text, "
+                + GEOMETRY_TYPE + " text, "
+                + EDIT_OF + " integer REFERENCES " + INSTANCES_TABLE_NAME + "(" + _ID + ") CHECK (" + EDIT_OF + " != " + _ID + "),"
+                + EDIT_NUMBER + " integer CHECK ((" + EDIT_OF + " IS NULL AND " + EDIT_NUMBER + " IS NULL) OR + (" + EDIT_OF + " IS NOT NULL AND + " + EDIT_NUMBER + " IS NOT NULL)),"
+                // Smap columns
+                + SOURCE + " text, "
+                + FORM_PATH + " text, "
+                + ACT_LON + " double, "
+                + ACT_LAT + " double, "
+                + SCHED_LON + " double, "
+                + SCHED_LAT + " double, "
+                + T_TITLE + " text, "
+                + T_TASK_TYPE + " text, "
+                + T_SCHED_START + " long, "
+                + T_SCHED_FINISH + " long, "
+                + T_ACT_START + " long, "
+                + T_ACT_FINISH + " long, "
+                + T_ADDRESS + " text, "
+                + T_IS_SYNC + " text, "
+                + T_ASS_ID + " long, "
+                + T_TASK_STATUS + " text, "
+                + T_TASK_COMMENT + " text, "
+                + T_REPEAT + " integer, "
+                + T_UPDATEID + " text, "
+                + T_LOCATION_TRIGGER + " text, "
+                + T_SURVEY_NOTES + " text, "
+                + T_UPDATED + " integer, "
+                + UUID + " text, "
+                + T_SHOW_DIST + " integer, "
+                + T_HIDE + " integer, "
+                + PHONE + " text"
                 + ");"
         );
     }
