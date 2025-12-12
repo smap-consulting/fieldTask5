@@ -219,11 +219,11 @@ the specific language governing permissions and limitations under the License.
 
         <provider
             android:name=".external.FormsProvider"
-            android:authorities="org.odk.collect.android.provider.odk.forms"
+            android:authorities="org.odk.collect.android.provider.odk.forms.smap"
             android:exported="true" />
         <provider
             android:name=".external.InstanceProvider"
-            android:authorities="org.odk.collect.android.provider.odk.instances"
+            android:authorities="org.odk.collect.android.provider.odk.instances.smap"
             android:exported="true" />
 
         <activity-alias
