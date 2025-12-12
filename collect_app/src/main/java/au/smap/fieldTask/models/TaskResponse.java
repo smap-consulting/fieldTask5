@@ -16,8 +16,8 @@ package au.smap.fieldTask.models;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.odk.collect.android.database.TaskResponseAssignment;
-import org.odk.collect.android.loaders.PointEntry;
+import au.smap.fieldTask.database.TaskResponseAssignment;
+import au.smap.fieldTask.loaders.PointEntry;
 
 import java.util.List;
 import java.util.Set;

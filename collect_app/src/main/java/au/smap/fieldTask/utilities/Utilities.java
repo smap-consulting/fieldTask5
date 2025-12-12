@@ -14,7 +14,7 @@
 
 package au.smap.fieldTask.utilities;
 
-import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.T_TASK_STATUS;
+import static au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns.T_TASK_STATUS;
 import static au.smap.fieldTask.utilities.ApplicationConstants.SortingOrder.BY_DISTANCE_ASC;
 import static au.smap.fieldTask.utilities.ApplicationConstants.SortingOrder.BY_DISTANCE_DESC;
 import static org.odk.collect.android.utilities.FileUtils.LAST_SAVED_FILENAME;
@@ -38,17 +38,17 @@ import com.google.gson.GsonBuilder;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.database.TaskResponseAssignment;
+import au.smap.fieldTask.dao.InstancesDao;
+import au.smap.fieldTask.database.TaskResponseAssignment;
 import org.odk.collect.android.instances.Instance;
-import org.odk.collect.android.loaders.GeofenceEntry;
+import au.smap.fieldTask.loaders.GeofenceEntry;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
-import org.odk.collect.android.provider.InstanceProvider;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
+import au.smap.fieldTask.provider.InstanceProvider;
+import au.smap.fieldTask.provider.InstanceProviderAPI;
+import au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import au.smap.fieldTask.models.InstanceXML;

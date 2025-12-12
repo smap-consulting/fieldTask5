@@ -6,10 +6,10 @@ import android.database.Cursor;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.kxml2.io.KXmlParser;
-import org.odk.collect.android.dao.InstancesDao;
-import org.odk.collect.android.dao.SmapReferencesDao;
+import au.smap.fieldTask.dao.InstancesDao;
+import au.smap.fieldTask.dao.SmapReferencesDao;
 import org.odk.collect.android.external.ExternalDataUtil;
-import org.odk.collect.android.provider.InstanceProviderAPI;
+import au.smap.fieldTask.provider.InstanceProviderAPI;
 import org.odk.collect.android.smap.local.LocalSQLiteOpenHelperSmap;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;

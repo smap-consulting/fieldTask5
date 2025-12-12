@@ -21,10 +21,10 @@ import android.net.Uri;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.database.TaskResponseAssignment;
+import au.smap.fieldTask.database.TaskResponseAssignment;
 import org.odk.collect.android.instances.Instance;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
+import au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns;
+import au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 
