@@ -59,7 +59,7 @@ import org.odk.collect.android.application.Collect;
 import au.smap.fieldTask.fragments.SmapFormListFragment;
 import au.smap.fieldTask.fragments.SmapTaskListFragment;
 import au.smap.fieldTask.fragments.SmapTaskMapFragment;
-import org.odk.collect.android.fragments.dialogs.RequestLocationPermissionsDialog;
+import au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap;
 import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.listeners.InstanceUploaderListener;
 import au.smap.fieldTask.listeners.NFCListener;
@@ -70,7 +70,7 @@ import au.smap.fieldTask.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
-import org.odk.collect.android.preferences.GeneralSharedPreferences;
+import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import au.smap.fieldTask.services.LocationService;
@@ -221,8 +221,8 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         }
 
         // Restore the preference to record a user trail in case the user had previously selected "exit"
-        GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION,
-                GeneralSharedPreferences.getInstance().getBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false));
+        GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION,
+                GeneralSharedPreferencesSmap.getInstance().getBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false));
 
         // Initiate a refresh if requested in start parameters
         String refresh = getIntent().getStringExtra(EXTRA_REFRESH);
@@ -235,9 +235,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
          */
         boolean hasFineLocation = ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED;
         boolean hasCoarseLocation = ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED;
-        String asked = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
+        String asked = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
         if (asked.equals("no")) {
-            (new RequestLocationPermissionsDialog()).show(this.getSupportFragmentManager(), "LOCATION_PERMISSIONS_DIALOG");
+            (new RequestLocationPermissionsDialogSmap()).show(this.getSupportFragmentManager(), RequestLocationPermissionsDialogSmap.TAG);
         } else if ((hasFineLocation || hasCoarseLocation) && (asked.equals("accept"))){
             lr.locationStart(this, permissionsProvider);
         }
@@ -958,7 +958,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 .getDefaultSharedPreferences(this)
                 .getBoolean(ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU, false);
         if(!continueTracking) {
-            GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
+            GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
             this.finish();
         } else {
             SnackbarUtils.showSnackbar(findViewById(R.id.pager),

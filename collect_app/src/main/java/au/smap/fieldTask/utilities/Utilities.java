@@ -45,7 +45,7 @@ import org.odk.collect.android.loaders.GeofenceEntry;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
 import org.odk.collect.settings.keys.ProjectKeys;
-import org.odk.collect.android.preferences.GeneralSharedPreferences;
+import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.android.provider.InstanceProvider;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -117,7 +117,7 @@ public class Utilities {
 
     public static String getOrgMediaPath() {
         String source = getSource();
-        String currentOrg = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        String currentOrg = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
         return new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS) + File.separator
                 + "smap_media" + File.separator + source + File.separator + currentOrg;
     }
@@ -1246,7 +1246,7 @@ public class Utilities {
         NetworkInfo currentNetworkInfo = manager.getActiveNetworkInfo();
 
         if (currentNetworkInfo != null) {
-            String autosend = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_AUTOSEND);
+            String autosend = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_AUTOSEND);
             boolean sendwifi = autosend.equals("wifi_only");
             boolean sendnetwork = autosend.equals("cellular_only");
             if (autosend.equals("wifi_and_cellular")) {

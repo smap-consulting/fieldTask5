@@ -53,9 +53,9 @@ import org.odk.collect.android.notifications.Notifier;
 import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
 import org.odk.collect.android.openrosa.OpenRosaXmlFetcher;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
-import org.odk.collect.android.preferences.AdminSharedPreferences;
+import au.smap.fieldTask.preferences.AdminSharedPreferencesSmap;
 import org.odk.collect.settings.keys.ProjectKeys;
-import org.odk.collect.android.preferences.GeneralSharedPreferences;
+import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.android.preferences.GuidanceHint;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -618,7 +618,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         /*
          * Send user trail if enabled
          */
-        boolean sendLocation = (Boolean) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_USER_LOCATION);
+        boolean sendLocation = (Boolean) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_USER_LOCATION);
         long lastTraceIdSent = 0;
         if(sendLocation) {
             // Get Points
@@ -949,7 +949,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 }
             } else {
                 // Support legacy servers / settings
-                String autoSend = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_AUTOSEND);
+                String autoSend = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_AUTOSEND);
                 if (tr.settings.ft_send_wifi_cell) {
                     autoSend = "wifi_and_cellular";
                 } else if (tr.settings.ft_send_wifi) {
@@ -1059,31 +1059,31 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             if(tr.settings.ft_backward_navigation != null) {
                 if(tr.settings.ft_backward_navigation.equals("disable")) {
                     // Disable moving backwards
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_MOVING_BACKWARDS, false);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, false);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_EDIT_SAVED, false);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_SAVE_MID, false);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_JUMP_TO, false);
-                    GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_CONSTRAINT_BEHAVIOR, ProjectKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_MOVING_BACKWARDS, false);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, false);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_EDIT_SAVED, false);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_SAVE_MID, false);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_JUMP_TO, false);
+                    GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_CONSTRAINT_BEHAVIOR, ProjectKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
 
-                    AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
+                    AdminSharedPreferencesSmap.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
                 } else if(tr.settings.ft_backward_navigation.equals("enable")) {
                     // Enable moving backwards
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_MOVING_BACKWARDS, true);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, true);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_EDIT_SAVED, true);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_SAVE_MID, true);
-                    AdminSharedPreferences.getInstance().save(ProtectedProjectKeys.KEY_JUMP_TO, true);
-                    GeneralSharedPreferences.getInstance().save(ProjectKeys.KEY_CONSTRAINT_BEHAVIOR, ProjectKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_MOVING_BACKWARDS, true);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.ALLOW_OTHER_WAYS_OF_EDITING_FORM, true);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_EDIT_SAVED, true);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_SAVE_MID, true);
+                    AdminSharedPreferencesSmap.getInstance().save(ProtectedProjectKeys.KEY_JUMP_TO, true);
+                    GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_CONSTRAINT_BEHAVIOR, ProjectKeys.CONSTRAINT_BEHAVIOR_ON_SWIPE);
 
-                    AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
+                    AdminSharedPreferencesSmap.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, true);
                 } else {
                     // Leave the local settings as they are and enable for local editing
-                    AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
+                    AdminSharedPreferencesSmap.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
                 }
             } else {
                 // Leave the local settings as they are and enable for local editing
-                AdminSharedPreferences.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
+                AdminSharedPreferencesSmap.getInstance().getInstance().save(ProtectedProjectKeys.KEY_SMAP_OVERRIDE_MOVING_BACKWARDS, false);
             }
 
             /*
@@ -1118,7 +1118,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
      */
     private void cleanUpOrganisationFiles(String organsisation) {
         String source = Utilities.getSource();
-        String currentOrg = (String) GeneralSharedPreferences.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        String currentOrg = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
 
         String sharedMediaPath = new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS)  + File.separator + "smap_media";
 
