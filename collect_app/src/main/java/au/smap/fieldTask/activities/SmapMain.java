@@ -236,7 +236,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         boolean hasFineLocation = ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) == PERMISSION_GRANTED;
         boolean hasCoarseLocation = ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED;
         String asked = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
-        if (asked.equals("no")) {
+        if (asked != null && asked.equals("no")) {
             (new RequestLocationPermissionsDialogSmap()).show(this.getSupportFragmentManager(), RequestLocationPermissionsDialogSmap.TAG);
         } else if ((hasFineLocation || hasCoarseLocation) && (asked.equals("accept"))){
             lr.locationStart(this, permissionsProvider);

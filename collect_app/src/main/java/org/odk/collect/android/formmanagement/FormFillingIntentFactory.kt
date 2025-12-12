@@ -9,6 +9,8 @@ import org.odk.collect.android.external.InstancesContract
 import kotlin.reflect.KClass
 
 object FormFillingIntentFactory {
+    @JvmStatic
+    @JvmOverloads
     fun newFormIntent(
         context: Context,
         uri: Uri?,
