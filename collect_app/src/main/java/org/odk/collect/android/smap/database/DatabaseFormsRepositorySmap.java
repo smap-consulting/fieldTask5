@@ -19,22 +19,22 @@ import javax.annotation.Nullable;
 
 import static android.provider.BaseColumns._ID;
 import static au.smap.fieldTask.dao.FormsDao.getFormsFromCursor;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.AUTO_DELETE;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.AUTO_SEND;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.DELETED_DATE;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.DISPLAY_NAME;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.FORM_FILE_PATH;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.GEOMETRY_XPATH;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.JR_FORM_ID;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.JR_VERSION;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.PROJECT;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.SOURCE;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.SUBMISSION_URI;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.TASKS_ONLY;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.READ_ONLY;
-import static au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns.SEARCH_LOCAL_DATA;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.AUTO_DELETE;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.AUTO_SEND;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.DELETED_DATE;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.DISPLAY_NAME;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.FORM_FILE_PATH;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.GEOMETRY_XPATH;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.JR_FORM_ID;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.JR_VERSION;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.PROJECT;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.SOURCE;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.SUBMISSION_URI;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.TASKS_ONLY;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.READ_ONLY;
+import static org.odk.collect.android.provider.FormsProviderAPI.FormsColumns.SEARCH_LOCAL_DATA;
 
 public class DatabaseFormsRepositorySmap implements FormsRepositorySmap {
 
