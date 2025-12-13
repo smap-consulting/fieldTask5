@@ -13,7 +13,7 @@ import au.smap.fieldTask.database.TraceUtilities;
 import au.smap.fieldTask.loaders.PointEntry;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
-import au.smap.fieldTask.provider.FormsProviderAPI;
+import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.utilities.ApplicationConstants;
 import au.smap.fieldTask.utilities.Utilities;
 

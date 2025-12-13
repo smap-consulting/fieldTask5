@@ -24,7 +24,7 @@ import androidx.loader.content.CursorLoader;
 
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.instances.Instance;
-import au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns;
+import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.utilities.ApplicationConstants;
 import au.smap.fieldTask.utilities.Utilities;

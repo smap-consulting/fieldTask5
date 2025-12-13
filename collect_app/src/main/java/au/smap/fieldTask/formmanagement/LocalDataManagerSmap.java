@@ -9,7 +9,7 @@ import org.kxml2.io.KXmlParser;
 import au.smap.fieldTask.dao.InstancesDao;
 import au.smap.fieldTask.dao.SmapReferencesDao;
 import org.odk.collect.android.external.ExternalDataUtil;
-import au.smap.fieldTask.provider.InstanceProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.smap.local.LocalSQLiteOpenHelperSmap;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;

@@ -23,7 +23,7 @@ import org.odk.collect.android.instances.Instance;
 import org.odk.collect.android.javarosawrapper.FormController;
 import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;
-import au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns;
+import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 
 import timber.log.Timber;
 

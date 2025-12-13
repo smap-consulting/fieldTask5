@@ -27,7 +27,7 @@ import android.widget.TextView;
 import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.InstanceListCursorAdapter;
 import au.smap.fieldTask.dao.InstancesDao;
-import au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns;
+import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.tasks.InstanceSyncTask;
 
 /**

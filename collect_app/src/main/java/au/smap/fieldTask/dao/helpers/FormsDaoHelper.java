@@ -17,7 +17,7 @@ package au.smap.fieldTask.dao.helpers;
 import android.database.Cursor;
 
 import au.smap.fieldTask.dao.FormsDao;
-import au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 

@@ -27,7 +27,7 @@ import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.FormsDatabaseHelper;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import org.odk.collect.android.forms.Form;
-import au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 
 import java.util.ArrayList;

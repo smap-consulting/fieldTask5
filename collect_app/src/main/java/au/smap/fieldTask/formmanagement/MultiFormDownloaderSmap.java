@@ -17,7 +17,7 @@ import org.odk.collect.android.listeners.FormDownloaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
 import org.odk.collect.metadata.PropertyManager;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
-import au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.smap.database.DatabaseFormsRepositorySmap;
 import org.odk.collect.android.smap.forms.FormsRepositorySmap;
 import org.odk.collect.android.smap.openrosa.api.FormListApiSmap;

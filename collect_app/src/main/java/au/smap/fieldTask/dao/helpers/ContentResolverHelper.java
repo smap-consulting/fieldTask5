@@ -22,8 +22,8 @@ import android.webkit.MimeTypeMap;
 
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.logic.FormInfo;
-import au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns;
-import au.smap.fieldTask.provider.InstanceProviderAPI.InstanceColumns;
+import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 
