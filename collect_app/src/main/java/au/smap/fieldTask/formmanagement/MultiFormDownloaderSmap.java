@@ -15,7 +15,7 @@ import org.odk.collect.android.forms.FormsRepository;
 import org.odk.collect.android.forms.MediaFile;
 import org.odk.collect.android.listeners.FormDownloaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
-import org.odk.collect.android.logic.PropertyManager;
+import org.odk.collect.metadata.PropertyManager;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
 import au.smap.fieldTask.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.smap.database.DatabaseFormsRepositorySmap;
@@ -57,10 +57,12 @@ public class MultiFormDownloaderSmap {
 
     private final FormListApiSmap formListApi;
     private final FormsRepositorySmap formsRepository;
+    private final PropertyManager propertyManager;
 
-    public MultiFormDownloaderSmap(OpenRosaXmlFetcher openRosaXmlFetcher) {
+    public MultiFormDownloaderSmap(OpenRosaXmlFetcher openRosaXmlFetcher, PropertyManager propertyManager) {
         this.formsRepository = new DatabaseFormsRepositorySmap();
-        formListApi = new OpenRosaFormListApiSmap(openRosaXmlFetcher);
+        this.formListApi = new OpenRosaFormListApiSmap(openRosaXmlFetcher);
+        this.propertyManager = propertyManager;
     }
 
     private static final String NAMESPACE_OPENROSA_ORG_XFORMS_XFORMS_MANIFEST =
@@ -131,8 +133,7 @@ public class MultiFormDownloaderSmap {
         FileResult fileResult = null;
 
         try {
-            String deviceId = new PropertyManager(Collect.getInstance().getApplicationContext())
-                    .getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID);        // smap
+            String deviceId = propertyManager.reload().getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID);        // smap
 
             // get the xml file - either download or use the existing one
             fileResult = downloadXform(fd.getProject(), fd.getFormName(), fd.getDownloadUrl() + "&deviceID=" +

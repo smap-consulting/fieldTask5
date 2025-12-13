@@ -132,6 +132,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     WebCredentialsUtils webCredentialsUtils;
 
     @Inject
+    PropertyManager propertyManager;
+
+    @Inject
     InstancesRepository instancesRepository;
 
     @Inject
@@ -367,8 +370,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 }
                 // Send device time, device id and fieldTask version with request
                 headers.put("devicetime", String.valueOf(System.currentTimeMillis()));
-                headers.put("deviceid", new PropertyManager(Collect.getInstance().getApplicationContext())
-                        .getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID));
+                headers.put("deviceid", propertyManager.reload().getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID));
                 headers.put("appversion", Collect.getInstance().getString(org.odk.collect.strings.R.string.app_version));
 
                 URI uri = URI.create(taskURL);
@@ -578,8 +580,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         TaskResponse updateResponse = new TaskResponse();
 
         // Add device id to response
-        updateResponse.deviceId = new PropertyManager(Collect.getInstance().getApplicationContext())
-                .getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID);
+        updateResponse.deviceId = propertyManager.reload().getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID);
 
         // Get tasks that have not been synchronised
         ArrayList<TaskEntry> nonSynchTasks = new ArrayList<TaskEntry>();
@@ -833,7 +834,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             mf.deleteForms(formMap, results);
 
             OpenRosaHttpInterface httpInterface = Collect.getInstance().getComponent().openRosaHttpInterface();
-            MultiFormDownloaderSmap multiFormDownloader = new MultiFormDownloaderSmap(new OpenRosaXmlFetcher(httpInterface, webCredentialsUtils));
+            MultiFormDownloaderSmap multiFormDownloader = new MultiFormDownloaderSmap(
+                    new OpenRosaXmlFetcher(httpInterface, webCredentialsUtils),
+                    propertyManager);
             Timber.i("Downloading " + toDownload.size() + " forms");
             if(toDownload.size() > 0) {
                 DownloadFormsTaskSmap downloadFormsTask = new DownloadFormsTaskSmap(multiFormDownloader);
