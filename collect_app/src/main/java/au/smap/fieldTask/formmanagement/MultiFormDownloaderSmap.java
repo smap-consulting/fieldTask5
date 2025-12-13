@@ -48,7 +48,7 @@ import static org.odk.collect.android.utilities.FileUtils.LAST_SAVED_FILENAME;
 import static org.odk.collect.android.utilities.FileUtils.STUB_XML;
 import static org.odk.collect.android.utilities.FileUtils.deleteOldFile;
 import static org.odk.collect.android.utilities.FileUtils.write;
-import static org.odk.collect.utilities.PathUtils.getAbsoluteFilePath;
+import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
 
 public class MultiFormDownloaderSmap {
 

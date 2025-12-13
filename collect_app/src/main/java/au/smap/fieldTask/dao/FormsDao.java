@@ -33,7 +33,7 @@ import org.odk.collect.android.storage.StoragePathProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.odk.collect.utilities.PathUtils.getAbsoluteFilePath;
+import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
 
 /**
  * This class is used to encapsulate all access to the {@link FormsDatabaseHelper#DATABASE_NAME}

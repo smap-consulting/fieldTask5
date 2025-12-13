@@ -31,7 +31,7 @@ import java.io.File;
 import java.net.FileNameMap;
 import java.net.URLConnection;
 
-import static org.odk.collect.utilities.PathUtils.getAbsoluteFilePath;
+import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
 
 public final class ContentResolverHelper {
 

@@ -21,7 +21,7 @@ import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 
-import static org.odk.collect.utilities.PathUtils.getAbsoluteFilePath;
+import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
 
 public final class FormsDaoHelper {
 

@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 import timber.log.Timber;
 
-import static org.odk.collect.utilities.PathUtils.getAbsoluteFilePath;
+import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
 
 public class ManageForm {
 
