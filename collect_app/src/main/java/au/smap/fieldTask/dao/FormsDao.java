@@ -240,11 +240,11 @@ public class FormsDao {
                     int deletedDateColumnIndex = cursor.getColumnIndex(FormsColumns.DELETED_DATE);
 
                     Form form = new Form.Builder()
-                            .id(cursor.getLong(idColumnIndex))
+                            .dbId(cursor.getLong(idColumnIndex))
                             .displayName(cursor.getString(displayNameColumnIndex))
                             .description(cursor.getString(descriptionColumnIndex))
-                            .jrFormId(cursor.getString(jrFormIdColumnIndex))
-                            .jrVersion(cursor.getString(jrVersionColumnIndex))
+                            .formId(cursor.getString(jrFormIdColumnIndex))
+                            .version(cursor.getString(jrVersionColumnIndex))
                             .formFilePath(new StoragePathProvider().getFormDbPath(cursor.getString(formFilePathColumnIndex)))
                             .submissionUri(cursor.getString(submissionUriColumnIndex))
                             .base64RSAPublicKey(cursor.getString(base64RSAPublicKeyColumnIndex))
@@ -272,8 +272,8 @@ public class FormsDao {
         ContentValues values = new ContentValues();
         values.put(FormsColumns.DISPLAY_NAME, form.getDisplayName());
         values.put(FormsColumns.DESCRIPTION, form.getDescription());
-        values.put(FormsColumns.JR_FORM_ID, form.getJrFormId());
-        values.put(FormsColumns.JR_VERSION, form.getJrVersion());
+        values.put(FormsColumns.JR_FORM_ID, form.getFormId());
+        values.put(FormsColumns.JR_VERSION, form.getVersion());
         values.put(FormsColumns.FORM_FILE_PATH, form.getFormFilePath());
         values.put(FormsColumns.SUBMISSION_URI, form.getSubmissionUri());
         values.put(FormsColumns.BASE64_RSA_PUBLIC_KEY, form.getBASE64RSAPublicKey());
