@@ -53,7 +53,7 @@ import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 import au.smap.fieldTask.listeners.InstanceUploaderListener;
 import org.odk.collect.metadata.PropertyManager;
-import org.odk.collect.android.notifications.Notifier;
+import org.odk.collect.android.notifications.NotificationManagerNotifier;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
@@ -132,14 +132,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     WebCredentialsUtils webCredentialsUtils;
 
     @Inject
-    Notifier notifier;
-
-    @Inject
     InstancesRepository instancesRepository;
 
     @Inject
     FormsRepository formsRepository;
     private FormsDao formsDao;
+    private NotificationManager notificationManager;
 
     private class TaskStatus {
         public long tid;
@@ -160,7 +158,10 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         }
     }
 
-	public DownloadTasksTask(){Collect.getInstance().getComponent().inject(this);}
+	public DownloadTasksTask(){
+        Collect.getInstance().getComponent().inject(this);
+        notificationManager = (NotificationManager) Collect.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+    }
     /*
      * Add a custom date parser as old versions of the server will send an invalid date format
      */
@@ -207,11 +208,15 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
         try {
 
-            notifier.showNotification(null,
-                    NotificationActivity.NOTIFICATION_ID,
-                    R.string.app_name,
-                    Collect.getInstance().getBaseContext().getString(R.string.smap_refresh_started),
-                    true);
+            // Show notification that refresh has started
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                    Collect.getInstance(),
+                    NotificationManagerNotifier.COLLECT_NOTIFICATION_CHANNEL)
+                    .setContentTitle(Collect.getInstance().getString(R.string.app_name))
+                    .setContentText(Collect.getInstance().getBaseContext().getString(R.string.smap_refresh_started))
+                    .setSmallIcon(org.odk.collect.icons.R.drawable.ic_notification_small)
+                    .setAutoCancel(true);
+            notificationManager.notify(NotificationActivity.NOTIFICATION_ID, builder.build());
 
             synchronise();      // Synchronise the phone with the server
         } finally {
@@ -224,11 +229,16 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             PendingIntent pendingNotify = PendingIntent.getActivity(Collect.getInstance(), 0,
                     notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-            notifier.showNotification(pendingNotify,
-                    NotificationActivity.NOTIFICATION_ID,
-                    R.string.app_name,
-                    message.toString().trim(),
-                    false);
+            // Show notification that refresh is complete
+            NotificationCompat.Builder completeBuilder = new NotificationCompat.Builder(
+                    Collect.getInstance(),
+                    NotificationManagerNotifier.COLLECT_NOTIFICATION_CHANNEL)
+                    .setContentTitle(Collect.getInstance().getString(R.string.app_name))
+                    .setContentText(message.toString().trim())
+                    .setSmallIcon(org.odk.collect.icons.R.drawable.ic_notification_small)
+                    .setContentIntent(pendingNotify)
+                    .setAutoCancel(true);
+            notificationManager.notify(NotificationActivity.NOTIFICATION_ID, completeBuilder.build());
 
             Collect.getInstance().setDownloading(false);
         }
