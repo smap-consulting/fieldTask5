@@ -984,6 +984,7 @@
     <string name="admin_password_changed">Admin password successfully changed</string>
     <string name="admin_password_disabled">Admin password disabled</string>
     <string name="admin_password_incorrect">Sorry, password is incorrect!</string>
+    <string name="admin_preferences">Admin Preferences</string>
     <string name="enter_admin_password">Enter Admin Password</string>
     <string name="change_admin_password">Change Admin Password</string>
     <string name="show_password">Show password</string>

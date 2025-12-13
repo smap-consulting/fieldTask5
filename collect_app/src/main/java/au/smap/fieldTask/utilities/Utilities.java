@@ -38,6 +38,7 @@ import com.google.gson.GsonBuilder;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.WebCredentialsUtils;
 import au.smap.fieldTask.dao.InstancesDao;
 import au.smap.fieldTask.database.TaskResponseAssignment;
 import org.odk.collect.forms.instances.Instance;

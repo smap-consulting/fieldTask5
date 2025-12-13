@@ -8,13 +8,12 @@ import android.preference.PreferenceManager;
 
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.TraceUtilities;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.smap.tasks.SubmitLocationTask;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import timber.log.Timber;
 
-import static org.odk.collect.android.preferences.GeneralKeys.KEY_SERVER_URL;
 
 /*
  * location Register
@@ -31,7 +30,7 @@ public class LocationRegister {
     }
 
     public void register(Context context, Location location) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(GeneralKeys.KEY_SMAP_USER_LOCATION, false)) {
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)) {
 
             // Save trace
             TraceUtilities.insertPoint(location);
@@ -40,7 +39,7 @@ public class LocationRegister {
 
             // Attempt to send current location and trace immediately
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-            String server = sharedPreferences.getString(KEY_SERVER_URL, "");
+            String server = sharedPreferences.getString(ProjectKeys.KEY_SERVER_URL, "");
             String latString = String.valueOf(location.getLatitude());
             String lonString = String.valueOf(location.getLongitude());
             SubmitLocationTask task = new SubmitLocationTask();
@@ -53,15 +52,15 @@ public class LocationRegister {
          * SAVE_LOCATION is used to store the setting so that it can be restored if overriden by EXIT
          */
         if(sendLocation == null || sendLocation.equals("off")) {
-            editor.putBoolean(GeneralKeys.KEY_SMAP_USER_SAVE_LOCATION, false);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_USER_LOCATION, false);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
         } else if(sendLocation.equals("on")) {
-            editor.putBoolean(GeneralKeys.KEY_SMAP_USER_SAVE_LOCATION, true);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_USER_LOCATION, true);
-            editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, true);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, true);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
         } else {
-            editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_LOCATION, false);
+            editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, false);
         }
     }
 }

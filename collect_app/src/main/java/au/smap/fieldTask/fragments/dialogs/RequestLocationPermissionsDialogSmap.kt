@@ -25,7 +25,7 @@ import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.odk.collect.android.R
 import org.odk.collect.android.injection.DaggerUtils
-import org.odk.collect.android.permissions.PermissionsProvider
+import au.smap.fieldTask.permissions.PermissionsProvider
 import org.odk.collect.android.smap.utilities.LocationRegister
 import org.odk.collect.settings.keys.ProjectKeys
 import timber.log.Timber

@@ -30,7 +30,6 @@ import org.odk.collect.android.activities.InstanceUploaderActivity;
 import org.odk.collect.android.activities.InstanceUploaderListActivity;
 import org.odk.collect.android.activities.SplashScreenActivity;
 import org.odk.collect.android.listeners.PermissionListener;
-import org.odk.collect.android.storage.StorageStateProvider;
 import org.odk.collect.android.utilities.DialogUtils;
 
 import java.util.List;
@@ -44,11 +43,9 @@ import timber.log.Timber;
  */
 public class PermissionsProvider {
     private final PermissionsChecker permissionsChecker;
-    private final StorageStateProvider storageStateProvider;
 
-    public PermissionsProvider(PermissionsChecker permissionsChecker, StorageStateProvider storageStateProvider) {
+    public PermissionsProvider(PermissionsChecker permissionsChecker) {
         this.permissionsChecker = permissionsChecker;
-        this.storageStateProvider = storageStateProvider;
     }
 
     public boolean areStoragePermissionsGranted() {

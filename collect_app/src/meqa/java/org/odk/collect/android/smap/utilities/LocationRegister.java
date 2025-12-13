@@ -14,8 +14,8 @@ import org.odk.collect.android.fragments.SmapTaskMapFragment;
 import org.odk.collect.android.listeners.PermissionListener;
 
 import au.smap.fieldTask.activities.SmapMain;
-import org.odk.collect.android.permissions.PermissionsProvider;
-import org.odk.collect.android.preferences.GeneralKeys;
+import au.smap.fieldTask.permissions.PermissionsProvider;
+import org.odk.collect.settings.keys.ProjectKeys;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +43,8 @@ public class LocationRegister {
      * Disable permissions concerned with background location
      */
     public void set(SharedPreferences.Editor editor, String sendLocation) {
-        editor.putBoolean(GeneralKeys.KEY_SMAP_USER_LOCATION, false);
-        editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+        editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
+        editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
     }
 
     // Start foreground location recording

@@ -9,7 +9,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.PermissionListener;
 
 import au.smap.fieldTask.activities.SmapMain;
-import org.odk.collect.android.permissions.PermissionsProvider;
+import au.smap.fieldTask.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 
 public class LocationRegister {

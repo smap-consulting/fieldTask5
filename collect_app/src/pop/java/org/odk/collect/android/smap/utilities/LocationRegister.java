@@ -7,7 +7,7 @@ import android.location.Location;
 import android.preference.PreferenceManager;
 
 import org.odk.collect.android.database.TraceUtilities;
-import org.odk.collect.android.preferences.GeneralKeys;
+import org.odk.collect.settings.keys.ProjectKeys;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import timber.log.Timber;
@@ -30,8 +30,8 @@ public class LocationRegister {
      * Disable permissions concerned with background location
      */
     public void set(SharedPreferences.Editor editor, String sendLocation) {
-        editor.putBoolean(GeneralKeys.KEY_SMAP_USER_LOCATION, false);
-        editor.putBoolean(GeneralKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+        editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
+        editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
     }
 
     // Check that the installation is good

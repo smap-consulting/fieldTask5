@@ -7,6 +7,11 @@ object PathUtils {
         return if (filePath.startsWith(dirPath)) filePath.substring(dirPath.length + 1) else filePath
     }
 
+    @JvmStatic
+    fun getAbsoluteFilePath(dirPath: String, filePath: String): String {
+        return if (filePath.startsWith("/")) filePath else "$dirPath/$filePath"
+    }
+
     // https://stackoverflow.com/questions/2679699/what-characters-allowed-in-file-names-on-android
     @JvmStatic
     fun getPathSafeFileName(fileName: String) = fileName.replace("[\"*/:<>?\\\\|]".toRegex(), "_")

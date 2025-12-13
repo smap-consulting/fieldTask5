@@ -48,6 +48,8 @@ import au.smap.fieldTask.database.TrTask;
 import au.smap.fieldTask.database.TraceUtilities;
 
 import org.odk.collect.android.tasks.InstanceUploaderTask;
+import org.odk.collect.android.utilities.FormsRepositoryProvider;
+import org.odk.collect.android.utilities.InstancesRepositoryProvider;
 import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
@@ -135,10 +137,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     PropertyManager propertyManager;
 
     @Inject
-    InstancesRepository instancesRepository;
+    InstancesRepositoryProvider instancesRepositoryProvider;
 
     @Inject
-    FormsRepository formsRepository;
+    FormsRepositoryProvider formsRepositoryProvider;
+
+    private InstancesRepository instancesRepository;
+    private FormsRepository formsRepository;
     private FormsDao formsDao;
     private NotificationManager notificationManager;
 
@@ -553,6 +558,10 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             }
 
             if(toUpload.size() > 0) {
+                // Initialize repositories from providers
+                instancesRepository = instancesRepositoryProvider.get();
+                formsRepository = formsRepositoryProvider.get();
+
                 InstanceUploaderTask instanceUploaderTask = new InstanceServerUploaderTask();
                 publishProgress(Collect.getInstance().getString(R.string.smap_submitting, toUpload.size()));
                 instanceUploaderTask.setUploaderListener((InstanceUploaderListener) mStateListener);
