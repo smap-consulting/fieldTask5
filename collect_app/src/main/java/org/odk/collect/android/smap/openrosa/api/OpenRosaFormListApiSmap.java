@@ -6,8 +6,8 @@ import org.kxml2.kdom.Element;
 import org.odk.collect.android.forms.FormListItem;
 import org.odk.collect.android.forms.ManifestFile;
 import org.odk.collect.android.forms.MediaFile;
-import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
-import org.odk.collect.android.openrosa.OpenRosaXmlFetcher;
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
+import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
 import org.odk.collect.android.utilities.DocumentFetchResult;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 

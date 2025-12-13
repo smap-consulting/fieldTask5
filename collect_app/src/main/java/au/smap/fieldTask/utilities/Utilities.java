@@ -43,7 +43,7 @@ import au.smap.fieldTask.database.TaskResponseAssignment;
 import org.odk.collect.android.instances.Instance;
 import au.smap.fieldTask.loaders.GeofenceEntry;
 import au.smap.fieldTask.loaders.TaskEntry;
-import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import au.smap.fieldTask.provider.InstanceProvider;
