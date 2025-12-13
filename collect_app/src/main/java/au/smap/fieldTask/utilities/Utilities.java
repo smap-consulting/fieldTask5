@@ -40,7 +40,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import au.smap.fieldTask.dao.InstancesDao;
 import au.smap.fieldTask.database.TaskResponseAssignment;
-import org.odk.collect.android.instances.Instance;
+import org.odk.collect.forms.instances.Instance;
 import au.smap.fieldTask.loaders.GeofenceEntry;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;

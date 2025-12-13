@@ -19,7 +19,7 @@ import android.net.Uri;
 
 import org.odk.collect.android.application.Collect;
 import au.smap.fieldTask.dao.InstancesDao;
-import org.odk.collect.android.instances.Instance;
+import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.android.javarosawrapper.FormController;
 import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.preferences.GeneralSharedPreferences;

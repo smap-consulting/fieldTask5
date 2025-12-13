@@ -23,7 +23,7 @@ import android.net.Uri;
 import androidx.loader.content.CursorLoader;
 
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.instances.Instance;
+import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.utilities.ApplicationConstants;
