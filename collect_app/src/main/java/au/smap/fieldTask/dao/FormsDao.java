@@ -24,7 +24,6 @@ import android.provider.BaseColumns;
 import androidx.loader.content.CursorLoader;
 
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.database.FormsDatabaseHelper;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import org.odk.collect.forms.Form;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
@@ -36,7 +35,7 @@ import java.util.List;
 import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
 
 /**
- * This class is used to encapsulate all access to the {@link FormsDatabaseHelper#DATABASE_NAME}
+ * This class is used to encapsulate all access to the Forms database via FormsRepository.
  * For more information about this pattern go to https://en.wikipedia.org/wiki/Data_access_object
  */
 public class FormsDao {
