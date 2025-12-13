@@ -14,6 +14,7 @@
 
 package au.smap.fieldTask.tasks;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
@@ -24,6 +25,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import androidx.core.app.NotificationCompat;
 
 import java.net.URI;
 import com.google.gson.Gson;
@@ -44,6 +46,8 @@ import au.smap.fieldTask.database.TrAssignment;
 import au.smap.fieldTask.database.TaskResponseAssignment;
 import au.smap.fieldTask.database.TrTask;
 import au.smap.fieldTask.database.TraceUtilities;
+
+import org.odk.collect.android.tasks.InstanceUploaderTask;
 import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
@@ -73,8 +77,8 @@ import au.smap.fieldTask.models.TaskCompletionInfo;
 import au.smap.fieldTask.models.TaskResponse;
 import org.odk.collect.android.utilities.ApplicationConstants;
 import au.smap.fieldTask.utilities.ManageForm;
-import org.odk.collect.android.utilities.ManageForm.ManageFormDetails;
-import org.odk.collect.android.utilities.ManageFormResponse;
+import au.smap.fieldTask.utilities.ManageForm.ManageFormDetails;
+import au.smap.fieldTask.utilities.ManageFormResponse;
 import au.smap.fieldTask.utilities.Utilities;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
@@ -146,6 +150,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             this.tid = tid;
             this.status = status;
             keep = false;
+        }
+    }
+
+    private class CancelException extends Exception {
+
+        public CancelException(String msg) {
+            super(msg);
         }
     }
 
