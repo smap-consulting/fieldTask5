@@ -14,7 +14,7 @@ import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.TraceUtilities;
 import org.odk.collect.android.listeners.PermissionListener;
-import au.smap.fieldTask.permissions.PermissionsProvider;
+import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.android.smap.tasks.SubmitLocationTask;
 import org.odk.collect.settings.keys.ProjectKeys;
 
@@ -76,7 +76,7 @@ public class LocationRegister {
     }
 
     public void locationStart(Activity currentActivity, PermissionsProvider permissionsProvider) {
-        permissionsProvider.requestLocationPermissions(currentActivity, new PermissionListener() {
+        permissionsProvider.requestEnabledLocationPermissions(currentActivity, new PermissionListener() {
             @Override
             public void granted() {
 

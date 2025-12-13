@@ -6,8 +6,8 @@ import android.net.Uri;
 
 import org.jetbrains.annotations.NotNull;
 import au.smap.fieldTask.dao.FormsDao;
-import org.odk.collect.android.forms.Form;
-import org.odk.collect.android.forms.FormsRepository;
+import org.odk.collect.forms.Form;
+import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.android.smap.forms.FormsRepositorySmap;
 import org.odk.collect.android.storage.StoragePathProvider;
 

@@ -27,7 +27,7 @@ import au.smap.fieldTask.fragments.SmapTaskListFragment;
 import au.smap.fieldTask.fragments.SmapTaskMapFragment;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.utilities.LocaleHelper;
-import au.smap.fieldTask.permissions.PermissionsProvider;
+import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.android.utilities.ThemeUtils;
 
 import androidx.annotation.Nullable;

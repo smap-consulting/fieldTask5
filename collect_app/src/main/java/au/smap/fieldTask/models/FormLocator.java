@@ -14,7 +14,7 @@
 
 package au.smap.fieldTask.models;
 
-import org.odk.collect.android.forms.MediaFile;
+import org.odk.collect.forms.MediaFile;
 
 import java.util.List;
 

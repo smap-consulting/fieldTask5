@@ -1,7 +1,7 @@
 package org.odk.collect.android.smap.openrosa.api;
 
-import org.odk.collect.android.forms.FormListItem;
-import org.odk.collect.android.forms.ManifestFile;
+import org.odk.collect.forms.FormListItem;
+import org.odk.collect.forms.ManifestFile;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
 import java.io.InputStream;

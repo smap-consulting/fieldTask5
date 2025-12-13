@@ -372,12 +372,6 @@ public class AppDependencyModule {
 
     @Provides
     @Singleton
-    public au.smap.fieldTask.permissions.PermissionsProvider providesSmapPermissionsProvider(PermissionsChecker permissionsChecker) {
-        return new au.smap.fieldTask.permissions.PermissionsProvider(permissionsChecker);
-    }
-
-    @Provides
-    @Singleton
     public ExternalAppIntentProvider providesExternalAppIntentProvider() {
         return new ExternalAppIntentProvider();
     }

@@ -3,7 +3,7 @@ package org.odk.collect.android.smap.forms;
 import android.net.Uri;
 
 import org.jetbrains.annotations.NotNull;
-import org.odk.collect.android.forms.Form;
+import org.odk.collect.forms.Form;
 
 import java.util.List;
 

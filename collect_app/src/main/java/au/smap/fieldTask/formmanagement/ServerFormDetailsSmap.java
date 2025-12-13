@@ -14,8 +14,8 @@
 
 package au.smap.fieldTask.formmanagement;
 
-import org.odk.collect.android.forms.ManifestFile;
-import org.odk.collect.android.forms.MediaFile;
+import org.odk.collect.forms.ManifestFile;
+import org.odk.collect.forms.MediaFile;
 import org.odk.collect.android.utilities.FileUtils;
 
 import java.io.Serializable;

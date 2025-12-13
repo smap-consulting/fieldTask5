@@ -52,7 +52,7 @@ import org.odk.collect.android.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
-import au.smap.fieldTask.permissions.PermissionsProvider;
+import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;

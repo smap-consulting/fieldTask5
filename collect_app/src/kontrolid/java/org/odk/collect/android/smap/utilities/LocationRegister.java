@@ -9,7 +9,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.listeners.PermissionListener;
 
 import au.smap.fieldTask.activities.SmapMain;
-import au.smap.fieldTask.permissions.PermissionsProvider;
+import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 
 public class LocationRegister {
@@ -39,7 +39,7 @@ public class LocationRegister {
 
     // Start foreground location recording
     public void locationStart(Activity currentActivity, PermissionsProvider permissionsProvider) {
-        permissionsProvider.requestLocationPermissions(currentActivity, new PermissionListener() {
+        permissionsProvider.requestEnabledLocationPermissions(currentActivity, new PermissionListener() {
             @Override
             public void granted() {
                 ((SmapMain) currentActivity).startLocationService();
