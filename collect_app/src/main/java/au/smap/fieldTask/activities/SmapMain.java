@@ -60,6 +60,7 @@ import au.smap.fieldTask.fragments.SmapTaskMapFragment;
 import au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap;
 import org.odk.collect.android.formmanagement.FormFillingIntentFactory;
 import org.odk.collect.android.injection.DaggerUtils;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
 import org.odk.collect.android.projects.ProjectsDataService;
 
 import au.smap.fieldTask.listeners.NFCListener;

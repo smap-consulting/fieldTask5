@@ -671,7 +671,10 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             URI uri = URI.create(taskURL);
             try {
                 // OOM
-                httpInterface.uploadTaskStatus(updateResponse, uri, webCredentialsUtils.getCredentials(uri));
+                // Serialize TaskResponse to JSON
+                Gson gson = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd HH:mm").create();
+                String taskResponseJson = gson.toJson(updateResponse);
+                httpInterface.uploadTaskStatus(taskResponseJson, uri, webCredentialsUtils.getCredentials(uri));
             } catch (Exception e) {
                 results.put(Collect.getInstance().getString(R.string.smap_get_tasks),
                         e.getMessage());

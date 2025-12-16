@@ -13,7 +13,7 @@ import org.odk.collect.android.formmanagement.ServerFormDetails;
 import org.odk.collect.forms.Form;
 import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.forms.MediaFile;
-import org.odk.collect.android.listeners.FormDownloaderListener;
+import au.smap.fieldTask.listeners.FormDownloaderListener;
 import org.odk.collect.android.logic.FileReferenceFactory;
 import org.odk.collect.metadata.PropertyManager;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
@@ -28,7 +28,7 @@ import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.FormNameUtils;
 import org.odk.collect.android.utilities.STFileUtils;
 import au.smap.fieldTask.utilities.Utilities;
-import org.odk.collect.android.utilities.Validator;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
