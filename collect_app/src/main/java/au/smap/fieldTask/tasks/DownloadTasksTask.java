@@ -845,7 +845,6 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             Timber.i("=================================  delete forms");
             mf.deleteForms(formMap, results);
 
-            OpenRosaHttpInterface httpInterface = Collect.getInstance().getComponent().openRosaHttpInterface();
             MultiFormDownloaderSmap multiFormDownloader = new MultiFormDownloaderSmap(
                     new OpenRosaXmlFetcher(httpInterface, webCredentialsUtils),
                     propertyManager);
