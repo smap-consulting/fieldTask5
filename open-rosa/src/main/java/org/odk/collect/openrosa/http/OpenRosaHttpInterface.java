@@ -22,6 +22,8 @@ import androidx.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 
 public interface OpenRosaHttpInterface {
@@ -36,7 +38,7 @@ public interface OpenRosaHttpInterface {
      * @throws Exception various Exceptions such as IOException can be thrown
      */
     @NonNull
-    HttpGetResult executeGetRequest(@NonNull URI uri, @Nullable String contentType, @NonNull HttpCredentialsInterface credentials) throws Exception;
+    HttpGetResult executeGetRequest(@NonNull URI uri, @Nullable String contentType, @Nullable HttpCredentialsInterface credentials) throws Exception;
 
     /**
      * Performs a Http Head request.
@@ -47,7 +49,7 @@ public interface OpenRosaHttpInterface {
      * @throws Exception various Exceptions such as IOException can be thrown
      */
     @NonNull
-    HttpHeadResult executeHeadRequest(@NonNull URI uri, @NonNull HttpCredentialsInterface credentials) throws Exception;
+    HttpHeadResult executeHeadRequest(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials) throws Exception;
 
     /**
      * Uploads submission files and then list of other files to server
@@ -60,11 +62,82 @@ public interface OpenRosaHttpInterface {
      * @throws IOException can be thrown if files do not exist
      */
     @NonNull
-    HttpPostResult uploadSubmissionAndFiles(@NonNull File submissionFile,
-                                            @NonNull List<File> fileList,
+    HttpPostResult uploadSubmissionAndFiles(@NonNull List<File> fileList,
+                                            @NonNull File submissionFile,
                                             @NonNull URI uri,
-                                            @NonNull HttpCredentialsInterface credentials,
+                                            @Nullable HttpCredentialsInterface credentials,
+                                            String status,               // smap
+                                            String location_trigger,     // smap
+                                            String survey_notes,         // smap
+                                            String assignment_id,        // smap
                                             @NonNull long contentLength) throws Exception;
+
+    /**
+     * smap
+     * Updates tasks on a Server.
+     *
+     * @param taskResponseJson Task data to be updated (as JSON string)
+     * @param uri where to send the submissionFile and fileList
+     * @return ResponseMessageParser object that contains the response XML
+     * @throws IOException can be thrown if files do not exist
+     */
+    @NonNull
+    HttpPostResult uploadTaskStatus(@NonNull String taskResponseJson,
+                                            @NonNull URI uri,
+                                            @Nullable HttpCredentialsInterface credentials
+                                          ) throws IOException, URISyntaxException;
+
+    /**
+     * smap
+     * Updates location
+     *
+     * @param lat Latitude
+     * @param lon longitude
+     * @param uri where to send the submissionFile and fileList
+     * @return ResponseMessageParser object that contains the response XML
+     * @throws IOException can be thrown if files do not exist
+     */
+    @NonNull
+    HttpPostResult uploadLocation(String lat,
+                                   String lon,
+                                   @NonNull URI uri,
+                                   @Nullable HttpCredentialsInterface credentials
+    ) throws IOException, URISyntaxException;
+
+    /**
+     * smap
+     * Updates tasks on a Server.
+     *
+     * @param fileName Name of file to be submitted
+     * @param file file to be submitted
+     * @return ResponseMessageParser object that contains the response XML
+     * @throws IOException can be thrown if files do not exist
+     */
+    @NonNull
+    String SubmitFileForResponse(@NonNull String fileName,
+                                           @NonNull File file,
+                                           @NonNull URI uri,
+                                           @Nullable HttpCredentialsInterface credentials
+    ) throws IOException, URISyntaxException;
+
+    /**
+     * Creates a http connection and sets up an input stream. Thats all it does as opposed to the
+     * odk service that expects an xml form in the response
+     * smap
+     *
+     * @param uri of the stream
+     * @param contentType check the returned Mime Type to ensure it matches. "text/xml" causes a Hash to be calculated
+     * @return HttpGetResult - An object containing the Stream, Hash and Headers
+     * @throws Exception a multitude of Exceptions such as IOException can be thrown
+     */
+    @NonNull
+    String getRequest(@NonNull URI uri, @Nullable String contentType,
+                      @Nullable HttpCredentialsInterface credentials,
+                      HashMap<String, String> headers) throws Exception;
+
+    // smap
+    @NonNull
+    String loginRequest(@NonNull URI uri, @Nullable String contentType, @Nullable HttpCredentialsInterface credentials) throws Exception;
 
     interface FileToContentTypeMapper {
 

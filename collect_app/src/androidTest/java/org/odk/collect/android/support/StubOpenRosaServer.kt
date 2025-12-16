@@ -117,10 +117,14 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
     }
 
     override fun uploadSubmissionAndFiles(
-        submissionFile: File,
         fileList: List<File>,
+        submissionFile: File,
         uri: URI,
-        credentials: HttpCredentialsInterface,
+        credentials: HttpCredentialsInterface?,
+        status: String?,
+        location_trigger: String?,
+        survey_notes: String?,
+        assignment_id: String?,
         contentLength: Long
     ): HttpPostResult {
         accesses += 1
@@ -139,6 +143,50 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
         } else {
             return HttpPostResult("", 404, "")
         }
+    }
+
+    // smap
+    override fun uploadTaskStatus(
+        taskResponseJson: String,
+        uri: URI,
+        credentials: HttpCredentialsInterface?
+    ): HttpPostResult {
+        return HttpPostResult("", 200, "")
+    }
+
+    override fun uploadLocation(
+        lat: String,
+        lon: String,
+        uri: URI,
+        credentials: HttpCredentialsInterface?
+    ): HttpPostResult {
+        return HttpPostResult("", 200, "")
+    }
+
+    override fun SubmitFileForResponse(
+        fileName: String,
+        file: File,
+        uri: URI,
+        credentials: HttpCredentialsInterface?
+    ): String {
+        return ""
+    }
+
+    override fun getRequest(
+        uri: URI,
+        contentType: String?,
+        credentials: HttpCredentialsInterface?,
+        headers: HashMap<String, String>
+    ): String {
+        return ""
+    }
+
+    override fun loginRequest(
+        uri: URI,
+        contentType: String?,
+        credentials: HttpCredentialsInterface?
+    ): String {
+        return "success"
     }
 
     fun setCredentials(username: String?, password: String?) {
