@@ -30,7 +30,7 @@ public class OpenRosaXmlFetcher {
     private final OpenRosaHttpInterface httpInterface;
     private WebCredentialsProvider webCredentialsUtils;
 
-    OpenRosaXmlFetcher(OpenRosaHttpInterface httpInterface, WebCredentialsProvider webCredentialsUtils) {
+    public OpenRosaXmlFetcher(OpenRosaHttpInterface httpInterface, WebCredentialsProvider webCredentialsUtils) {
         this.httpInterface = httpInterface;
         this.webCredentialsUtils = webCredentialsUtils;
     }

@@ -61,7 +61,7 @@ import au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap;
 import org.odk.collect.android.formmanagement.FormFillingIntentFactory;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.projects.ProjectsDataService;
-import au.smap.fieldTask.listeners.InstanceUploaderListener;
+
 import au.smap.fieldTask.listeners.NFCListener;
 import au.smap.fieldTask.listeners.TaskDownloaderListener;
 import au.smap.fieldTask.loaders.SurveyData;
@@ -104,7 +104,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.viewpager.widget.ViewPager;
+
 import org.odk.collect.android.databinding.SmapMainLayoutBinding;
 import timber.log.Timber;
 
