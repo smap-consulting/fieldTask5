@@ -512,7 +512,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                         try {
                             ta.task.phone = values.getString("Phone");
                             ContentValues contentValues = new ContentValues();
-                            contentValues.put(InstanceColumns.PHONE, ta.task.phone);
+                            contentValues.put(InstanceProviderAPI.InstanceColumns.PHONE, ta.task.phone);
                             String where = "tTitle = ?";
                             dao.updateInstance(contentValues, where, new String[]{ta.task.title});
                         } catch (Exception e) {
@@ -526,9 +526,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
     private InstanceUploaderTask.Outcome submitCompletedForms() {
 
-        String selection = InstanceColumns.SOURCE + "=? and (" + InstanceColumns.STATUS + "=? or " +
-        		InstanceColumns.STATUS + "=?)" +
-                " and " + InstanceColumns.DELETED_DATE + " is null ";
+        String selection = InstanceProviderAPI.InstanceColumns.SOURCE + "=? and (" + InstanceProviderAPI.InstanceColumns.STATUS + "=? or " +
+        		InstanceProviderAPI.InstanceColumns.STATUS + "=?)" +
+                " and " + InstanceProviderAPI.InstanceColumns.DELETED_DATE + " is null ";
         String selectionArgs[] = {
         		Utilities.getSource(),
         		Instance.STATUS_COMPLETE,
@@ -538,13 +538,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         ArrayList<Long> toUpload = new ArrayList<Long>();
         Cursor c = null;
         try {
-            c = Collect.getInstance().getContentResolver().query(InstanceColumns.CONTENT_URI, null, selection,
+            c = Collect.getInstance().getContentResolver().query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection,
                 selectionArgs, null);
 
             if (c != null && c.getCount() > 0) {
                 c.move(-1);
                 while (c.moveToNext()) {
-                    Long l = c.getLong(c.getColumnIndexOrThrow(InstanceColumns._ID));
+                    Long l = c.getLong(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns._ID));
                     toUpload.add(Long.valueOf(l));
                 }
             }
