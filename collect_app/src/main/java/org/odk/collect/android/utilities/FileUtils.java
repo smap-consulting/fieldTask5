@@ -28,6 +28,9 @@ import androidx.annotation.Nullable;
 import com.google.common.base.CharMatcher;
 
 import org.apache.commons.io.IOUtils;
+import org.javarosa.core.model.FormDef;
+import org.javarosa.xform.parse.XFormParser;
+import org.javarosa.xform.util.XFormUtils;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.async.OngoingWorkListener;
 
@@ -43,6 +46,7 @@ import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -277,6 +281,41 @@ public final class FileUtils {
     /*
      * Smap
      */
+
+    /**
+     * Given a form definition file, return a map containing form metadata. The form ID is required
+     * by the specification and will always be included. Title and version are optionally included.
+     * If the form definition contains a submission block, any or all of submission URI, base 64 RSA
+     * public key, auto-delete and auto-send may be included.
+     */
+    public static HashMap<String, String> getMetadataFromFormDefinition(File formDefinitionXml) throws XFormParser.ParseException {
+        FormDef formDef = XFormUtils.getFormFromFormXml(formDefinitionXml.getAbsolutePath(), "jr://file/" + LAST_SAVED_FILENAME);
+
+        final HashMap<String, String> fields = new HashMap<>();
+
+        fields.put(TITLE, formDef.getTitle());
+        fields.put(FORMID, formDef.getMainInstance().getRoot().getAttributeValue(null, "id"));
+        String version = formDef.getMainInstance().getRoot().getAttributeValue(null, "version");
+        if (version != null && version.trim().isEmpty()) {
+            version = null;
+        }
+        fields.put(VERSION, version);
+
+        if (formDef.getSubmissionProfile() != null) {
+            fields.put(SUBMISSIONURI, formDef.getSubmissionProfile().getAction());
+
+            final String key = formDef.getSubmissionProfile().getAttribute("base64RsaPublicKey");
+            if (key != null && key.trim().length() > 0) {
+                fields.put(BASE64_RSA_PUBLIC_KEY, key.trim());
+            }
+
+            fields.put(AUTO_DELETE, formDef.getSubmissionProfile().getAttribute("auto-delete"));
+            fields.put(AUTO_SEND, formDef.getSubmissionProfile().getAttribute("auto-send"));
+        }
+
+        //fields.put(GEOMETRY_XPATH, getOverallFirstGeoPoint(formDef));  // smap
+        return fields;
+    }
     public static void deleteOldFile(String name, File d) {
         String path = d.getAbsolutePath() + "/" + name;
         File f = new File(path);

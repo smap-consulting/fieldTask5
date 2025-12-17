@@ -105,7 +105,7 @@ public class MultiFormDownloaderSmap {
                 break;
             } catch(Exception e) {
                 Timber.e(e);
-                result.put(fd, Collect.getInstance().getString(org.odk.collect.strings.R.string.failure) + ": " + e.getMessage());
+                result.put(fd, Collect.getInstance().getString(org.odk.collect.strings.R.string.error_occured) + ": " + e.getMessage());
             }
         }
 
