@@ -94,7 +94,7 @@ class OpenRosaClient(
 
     @Throws(FormSourceException::class)
     override fun fetchForm(formURL: String): InputStream {
-        val result = mapException { openRosaXMLFetcher.fetch(formURL, null) }
+        val result = mapException { openRosaXMLFetcher.fetch(formURL, null, true) }	// smap credentials flag
 
         if (result.inputStream == null) {
             throw FormSourceException.ServerError(result.statusCode, serverUrl)
@@ -105,7 +105,7 @@ class OpenRosaClient(
 
     @Throws(FormSourceException::class)
     override fun fetchMediaFile(mediaFileURL: String): InputStream {
-        val result = mapException { openRosaXMLFetcher.fetch(mediaFileURL, null) }
+        val result = mapException { openRosaXMLFetcher.fetch(mediaFileURL, null, true) }	// smap credentials flag
 
         if (result.inputStream == null) {
             throw FormSourceException.ServerError(result.statusCode, serverUrl)

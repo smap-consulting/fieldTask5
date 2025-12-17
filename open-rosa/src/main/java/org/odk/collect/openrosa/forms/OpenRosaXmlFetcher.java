@@ -9,6 +9,7 @@ import org.odk.collect.openrosa.http.HttpCredentialsInterface;
 import org.odk.collect.openrosa.http.HttpGetResult;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -48,7 +49,7 @@ public class OpenRosaXmlFetcher {
         Document doc;
         HttpGetResult inputStreamResult;
 
-        inputStreamResult = fetch(urlString, HTTP_CONTENT_TYPE_TEXT_XML);
+        inputStreamResult = fetch(urlString, HTTP_CONTENT_TYPE_TEXT_XML, true);	// smap credentials flag
 
         if (inputStreamResult.getStatusCode() != HttpURLConnection.HTTP_OK) {
             String error = "getXML failed while accessing "
@@ -61,6 +62,11 @@ public class OpenRosaXmlFetcher {
         return new DocumentFetchResult(doc, inputStreamResult.isOpenRosaResponse(), inputStreamResult.getHash());
     }
 
+    @Nullable
+    public InputStream getFile(@NonNull String downloadUrl, @Nullable final String contentType, boolean credentials) throws Exception {
+        return fetch(downloadUrl, contentType, credentials).getInputStream();	// smap add credentials
+    }
+
     /**
      * Creates a Http connection and input stream
      *
@@ -71,7 +77,8 @@ public class OpenRosaXmlFetcher {
      */
 
     @NonNull
-    public HttpGetResult fetch(@NonNull String downloadUrl, @Nullable final String contentType) throws Exception {
+    public HttpGetResult fetch(@NonNull String downloadUrl, @Nullable final String contentType,
+                                     boolean credentials) throws Exception {    // smap include credentials flag
         URI uri;
         try {
             // assume the downloadUrl is escaped properly
@@ -87,7 +94,11 @@ public class OpenRosaXmlFetcher {
             throw new Exception("Invalid server URL (no hostname): " + downloadUrl);
         }
 
-        return httpInterface.executeGetRequest(uri, contentType, webCredentialsUtils.getCredentials(uri));
+        if(!credentials) {       // Smap do not pass credentials if it is not required (proxyPass 400 error)
+            return httpInterface.executeGetRequest(uri, contentType, null);
+        } else {
+            return httpInterface.executeGetRequest(uri, contentType, webCredentialsUtils.getCredentials(uri));
+        }
     }
 
     public void updateWebCredentialsProvider(WebCredentialsProvider webCredentialsUtils) {

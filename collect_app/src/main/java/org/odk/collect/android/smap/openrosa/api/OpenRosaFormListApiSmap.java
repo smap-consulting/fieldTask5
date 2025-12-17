@@ -8,7 +8,7 @@ import org.odk.collect.forms.ManifestFile;
 import org.odk.collect.forms.MediaFile;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
-import org.odk.collect.android.utilities.DocumentFetchResult;
+import org.odk.collect.openrosa.forms.DocumentFetchResult;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
 import java.io.InputStream;
@@ -111,7 +111,7 @@ public class OpenRosaFormListApiSmap implements FormListApiSmap {
 
     @Override
     public void updateWebCredentialsUtils(WebCredentialsUtils webCredentialsUtils) {
-        this.openRosaXMLFetcher.updateWebCredentialsUtils(webCredentialsUtils);
+        this.openRosaXMLFetcher.updateWebCredentialsProvider(webCredentialsUtils);
     }
 
     @NotNull
