@@ -42,12 +42,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.AboutActivity;
-import org.odk.collect.android.activities.DeleteSavedFormActivity;
-import org.odk.collect.android.activities.FillBlankFormActivity;
 import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
-import org.odk.collect.android.adapters.SortDialogAdapter;
 import au.smap.fieldTask.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.loaders.SurveyData;
@@ -201,6 +198,7 @@ public class SmapFormListFragment extends ListFragment {
     }
 
     private void setupBottomSheet() {
+        /* SMAP BUILD
         bottomSheetDialog = new BottomSheetDialog(getActivity(), new ThemeUtils(getContext()).getBottomDialogTheme());
         View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
         final RecyclerView recyclerView = sheetView.findViewById(R.id.recyclerView);
@@ -218,6 +216,7 @@ public class SmapFormListFragment extends ListFragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         bottomSheetDialog.setContentView(sheetView);
+         */
     }
 
     @Override
@@ -305,10 +304,12 @@ public class SmapFormListFragment extends ListFragment {
                 .getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU, false);
 
         if (adminMenu) {
+            /* SMAP BUILD
             menu
                     .add(0, R.id.menu_admin_preferences, 0,
                             org.odk.collect.strings.R.string.admin_preferences)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+             */
         }
 
         final MenuItem sortItem = menu.findItem(R.id.menu_sort);
@@ -359,14 +360,15 @@ public class SmapFormListFragment extends ListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_about:
+            case 100:   // SMAP BUILD - menu_about
                 Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
                 startActivity(aboutIntent);
                 return true;
-            case R.id.menu_general_preferences:
+            case 101: // SMAP BUILD - menu_general_preferences
                 Intent ig = new Intent(getActivity(), ProjectPreferencesActivity.class);
                 startActivity(ig);
                 return true;
+                /* SMAP BUILD
             case R.id.menu_admin_preferences:
                 String pw = adminPreferences.getString(
                         ProtectedProjectKeys.KEY_ADMIN_PW, "");
@@ -378,7 +380,8 @@ public class SmapFormListFragment extends ListFragment {
                     ((SmapMain) getActivity()).processAdminMenu();
                 }
                 return true;
-            case R.id.menu_gettasks:
+                 */
+            case 102:   // SMAP BUILD - menu_gettasks
                 ((SmapMain) getActivity()).processGetTask(true);
                 return true;
             case MENU_ENTERDATA:
@@ -396,7 +399,7 @@ public class SmapFormListFragment extends ListFragment {
             case MENU_HISTORY:
                 ((SmapMain) getActivity()).processHistory();
                 return true;
-            case R.id.menu_sort:
+            case 103:   // SMAP BUILD - menu_sort
                 bottomSheetDialog.show();
                 return true;
             case MENU_EXIT:
@@ -419,9 +422,12 @@ public class SmapFormListFragment extends ListFragment {
 
     private void processEnterData() {
         if (MultiClickGuard.allowClick(getClass().getName())) {
+            /* SMAP BUILD
             Intent i = new Intent(getContext(),
                     FillBlankFormActivity.class);
             startActivity(i);
+
+             */
         }
     }
 
@@ -434,13 +440,19 @@ public class SmapFormListFragment extends ListFragment {
 
     // Send data
     private void processSendData() {
+        /* SMAP BUILD
         Intent i = new Intent(getContext(), org.odk.collect.android.activities.InstanceUploaderListActivity.class);
         startActivity(i);
+
+         */
     }
 
     private void processManageFiles() {
+        /* SMAP BUILD
         Intent i = new Intent(getContext(), DeleteSavedFormActivity.class);
         startActivity(i);
+
+         */
     }
 
 }
