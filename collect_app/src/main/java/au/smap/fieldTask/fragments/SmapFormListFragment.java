@@ -48,7 +48,7 @@ import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
 import org.odk.collect.android.adapters.SortDialogAdapter;
-import org.odk.collect.android.adapters.TaskListArrayAdapter;
+import au.smap.fieldTask.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
@@ -56,10 +56,10 @@ import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
-import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import org.odk.collect.android.smap.utilities.LocationRegister;
-import org.odk.collect.android.utilities.MultiClickGuard;
-import org.odk.collect.android.utilities.SnackbarUtils;
+import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
+import org.odk.collect.androidshared.ui.SnackbarUtils;
 import org.odk.collect.android.utilities.ThemeUtils;
 
 import javax.inject.Inject;
@@ -195,7 +195,7 @@ public class SmapFormListFragment extends ListFragment {
         if (new LocationRegister().locationEnabled()
                 && (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)
                 || PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, false))) {
-            SnackbarUtils.showLongSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking));
+            SnackbarUtils.showSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking), SnackbarUtils.DURATION_LONG);
         }
 
     }
@@ -364,7 +364,7 @@ public class SmapFormListFragment extends ListFragment {
                 startActivity(aboutIntent);
                 return true;
             case R.id.menu_general_preferences:
-                Intent ig = new Intent(getActivity(), PreferencesActivity.class);
+                Intent ig = new Intent(getActivity(), ProjectPreferencesActivity.class);
                 startActivity(ig);
                 return true;
             case R.id.menu_admin_preferences:

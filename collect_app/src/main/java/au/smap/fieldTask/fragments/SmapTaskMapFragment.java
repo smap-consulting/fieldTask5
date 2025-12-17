@@ -51,6 +51,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -79,7 +80,7 @@ import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
-import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import au.smap.fieldTask.utilities.KeyValueJsonFns;
 import au.smap.fieldTask.utilities.Utilities;
 
@@ -222,7 +223,7 @@ public class SmapTaskMapFragment extends Fragment
                 startActivity(aboutIntent);
                 return true;
             case R.id.menu_general_preferences:
-                Intent ig = new Intent(getActivity(), PreferencesActivity.class);
+                Intent ig = new Intent(getActivity(), ProjectPreferencesActivity.class);
                 startActivity(ig);
                 return true;
             case R.id.menu_admin_preferences:
@@ -283,15 +284,15 @@ public class SmapTaskMapFragment extends Fragment
 
             mMap.setMyLocationEnabled(true);
 
-            complete = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_finalized_circle));
-            accepted = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_saved_circle));
-            late = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_late));
-            repeat = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_repeat));
-            rejected = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_rejected));
-            newtask = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_new));
-            submitted = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_submitted_circle));
-            triggered = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_triggered));
-            triggered_repeat = getMarkerIconFromDrawable(getResources().getDrawable(R.drawable.form_state_triggered));
+            complete = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_finalized_circle, null));
+            accepted = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_saved_circle, null));
+            late = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_late, null));
+            repeat = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_repeat, null));
+            rejected = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_rejected, null));
+            newtask = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_new, null));
+            submitted = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_submitted_circle, null));
+            triggered = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_triggered, null));
+            triggered_repeat = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_triggered, null));
 
 
             mo = new MapLocationObserver(getContext(), this);

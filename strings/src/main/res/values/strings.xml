@@ -1039,6 +1039,7 @@
      ##############################################
      -->
     <string name="about_preferences">About</string>
+    <string name="general_preferences">General Settings</string>
     <string name="tell_your_friends">Share ODK Collect</string>
     <string name="tell_your_friends_msg">Are your colleagues still collecting data on paper? Share ODK Collect with them.</string>
     <string name="leave_a_review">Leave a Play Store review</string>

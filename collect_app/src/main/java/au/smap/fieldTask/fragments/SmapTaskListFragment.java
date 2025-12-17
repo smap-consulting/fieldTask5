@@ -54,6 +54,7 @@ import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
 import org.odk.collect.android.adapters.SortDialogAdapter;
 import org.odk.collect.android.adapters.TaskListArrayAdapter;
+import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.android.listeners.OnTaskOptionsClickLisener;
@@ -62,10 +63,10 @@ import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
-import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import org.odk.collect.android.smap.utilities.LocationRegister;
-import org.odk.collect.android.utilities.MultiClickGuard;
-import org.odk.collect.android.utilities.SnackbarUtils;
+import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
+import org.odk.collect.androidshared.ui.SnackbarUtils;
 import org.odk.collect.android.utilities.ThemeUtils;
 import au.smap.fieldTask.utilities.Utilities;
 
@@ -254,7 +255,7 @@ public class SmapTaskListFragment extends ListFragment {
         // Notify the user if tracking is turned on
         if (new LocationRegister().locationEnabled()
                 && PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)) {
-            SnackbarUtils.showLongSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking));
+            SnackbarUtils.showSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking), SnackbarUtils.DURATION_LONG);
         }
     }
 
@@ -459,7 +460,7 @@ public class SmapTaskListFragment extends ListFragment {
                 startActivity(new Intent(getActivity(), AboutActivity.class));
                 return true;
             case R.id.menu_general_preferences:
-                startActivity(new Intent(getActivity(), PreferencesActivity.class));
+                startActivity(new Intent(getActivity(), ProjectPreferencesActivity.class));
                 return true;
             case R.id.menu_admin_preferences:
                 String pw = adminPreferences.getString(
