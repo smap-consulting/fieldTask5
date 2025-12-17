@@ -21,30 +21,19 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 
-import org.odk.collect.android.R;
-import au.smap.fieldTask.fragments.SmapFormListFragment;
-import au.smap.fieldTask.fragments.SmapTaskListFragment;
-import au.smap.fieldTask.fragments.SmapTaskMapFragment;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.utilities.LocaleHelper;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.android.utilities.ThemeUtils;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import timber.log.Timber;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
 
 public abstract class CollectAbstractActivity extends AppCompatActivity {
 
-    private boolean isInstanceStateSaved;
     protected ThemeUtils themeUtils;
 
     @Inject
@@ -53,51 +42,19 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         themeUtils = new ThemeUtils(this);
-        setTheme((this instanceof org.odk.collect.android.activities.FormEntryActivity || this instanceof SmapMain) ? themeUtils.getFormEntryActivityTheme() : themeUtils.getAppTheme());      // smap
+        // setTheme((this instanceof org.odk.collect.android.activities.FormEntryActivity || this instanceof SmapMain) ? themeUtils.getFormEntryActivityTheme() : themeUtils.getAppTheme());      // SMAP BUILD
         super.onCreate(savedInstanceState);
         DaggerUtils.getComponent(this).inject(this);
-
-        /**
-         * If a user has revoked the storage permission then this check ensures the app doesn't quit unexpectedly and
-         * informs the user of the implications of their decision before exiting. The app can't function with these permissions
-         * so if a user wishes to grant them they just restart.
-         *
-         * This code won't run on activities that are entry points to the app because those activities
-         * are able to handle permission checks and requests by themselves.
-         */
-        if (!permissionsProvider.areStoragePermissionsGranted() && !isEntryPointActivity(this)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, com.google.android.material.R.style.Theme_AppCompat_Light_Dialog);
-
-            Timber.e("xoxoxo - storage permissions not set");    // smap
-            for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {   // smap
-                Timber.i(ste.toString());
-            }
-
-            builder.setTitle(org.odk.collect.strings.R.string.storage_runtime_permission_denied_title)
-                    .setMessage(R.string.smap_storage_runtime_permission_denied_desc)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
-                        finishAndRemoveTask();
-                    })
-                    .setIcon(R.drawable.sd)
-                    .setCancelable(false)
-                    .show();
-        }
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        isInstanceStateSaved = false;
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        isInstanceStateSaved = true;
         super.onSaveInstanceState(outState);
-    }
-
-    public boolean isInstanceStateSaved() {
-        return isInstanceStateSaved;
     }
 
     @Override
@@ -122,51 +79,14 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
             }
         }
 
-        Locale locale = new LocaleHelper().getLocale(this);
+        /*  SMAP BUILD
+        Locale locale = LocaleHelper.getLocale(this);
         if (locale != null) {
             config.setLocale(locale);
             config.setLayoutDirection(locale);
         }
+         */
         return config;
     }
 
-    public void initToolbar(CharSequence title) {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            toolbar.setTitle(title);
-            setSupportActionBar(toolbar);
-        }
-    }
-
-    /**
-     * Checks to see if an activity is one of the entry points to the app i.e
-     * an activity that has a view action that can launch the app.
-     *
-     * @param activity that has permission requesting code.
-     * @return true if the activity is an entry point to the app.
-     */
-    public static boolean isEntryPointActivity(CollectAbstractActivity activity) {
-
-        List<Class<?>> activities = new ArrayList<>();
-        activities.add(org.odk.collect.android.activities.FormEntryActivity.class);
-        activities.add(org.odk.collect.android.activities.InstanceChooserList.class);
-        activities.add(org.odk.collect.android.activities.FillBlankFormActivity.class);
-        activities.add(org.odk.collect.android.activities.InstanceUploaderListActivity.class);
-        activities.add(org.odk.collect.android.activities.SplashScreenActivity.class);
-        activities.add(org.odk.collect.android.activities.FormDownloadListActivity.class);
-        activities.add(org.odk.collect.android.activities.InstanceUploaderActivity.class);
-        activities.add(org.odk.collect.android.activities.SmapLoginActivity.class);    // smap
-        activities.add(SmapMain.class);             // smap
-        activities.add(SmapFormListFragment.class);             // smap
-        activities.add(SmapTaskListFragment.class);             // smap
-        activities.add(SmapTaskMapFragment.class);             // smap
-
-        for (Class<?> act : activities) {
-            if (activity.getClass().equals(act)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 
 import org.odk.collect.android.application.Collect;
 import au.smap.fieldTask.listeners.SmapLoginListener;
-import org.odk.collect.android.openrosa.HttpCredentials;
-import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
+import org.odk.collect.openrosa.http.HttpCredentials;
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
 import java.net.URI;

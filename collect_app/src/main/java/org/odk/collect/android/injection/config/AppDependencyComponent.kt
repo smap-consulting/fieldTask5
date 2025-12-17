@@ -157,6 +157,8 @@ interface AppDependencyComponent {
 
     fun inject(smapMain: au.smap.fieldTask.activities.SmapMain)
 
+    fun inject(SmapLoginTask: au.smap.fieldTask.tasks.SmapLoginTask)
+
     fun inject(smapTaskMapFragment: au.smap.fieldTask.fragments.SmapTaskMapFragment)
 
     fun inject(smapFormListFragment: au.smap.fieldTask.fragments.SmapFormListFragment)
@@ -318,4 +320,5 @@ interface AppDependencyComponent {
     fun webPageService(): WebPageService
 
     fun uniqueIdGenerator(): UniqueIdGenerator
+
 }
