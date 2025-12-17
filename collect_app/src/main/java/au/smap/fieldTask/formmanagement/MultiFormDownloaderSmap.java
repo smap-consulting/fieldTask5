@@ -27,6 +27,8 @@ import org.odk.collect.android.storage.StorageSubdirectory;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.FormNameUtils;
 import org.odk.collect.android.utilities.STFileUtils;
+import org.odk.collect.shared.strings.Md5;
+
 import au.smap.fieldTask.utilities.Utilities;
 
 
@@ -207,7 +209,7 @@ public class MultiFormDownloaderSmap {
     private void cleanUp(FileResult fileResult, File fileOnCancel, String mediaPath, String tempMediaPath, String orgTempMediaPath) {     // smap add org
         // Delete the XML File
         if (fileResult != null && fileResult.file.exists()) {
-            String md5Hash = FileUtils.getMd5Hash(fileResult.file);
+            String md5Hash = Md5.getMd5Hash(fileResult.file);
             if (md5Hash != null) {
                 formsRepository.deleteByMd5Hash(md5Hash);
             }
@@ -253,11 +255,11 @@ public class MultiFormDownloaderSmap {
             uri = saveNewForm(formInfo, formFile, mediaPath, tasks_only, read_only, searchLocalData, source, project);       // smap add tasks_only and source
             return new UriResult(uri, mediaPath, true);
         } else {
-            uri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, form.getId().toString());
+            uri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, form.getDbId().toString());
             mediaPath = new StoragePathProvider().getAbsoluteFormFilePath(form.getFormMediaPath());
 
             if (form.isDeleted()) {
-                formsRepository.restore(form.getId());
+                formsRepository.restore(form.getDbId());
             }
 
             return new UriResult(uri, mediaPath, false);
@@ -271,8 +273,8 @@ public class MultiFormDownloaderSmap {
                 .formFilePath(formFile.getAbsolutePath())
                 .formMediaPath(mediaPath)
                 .displayName(formInfo.get(FileUtils.TITLE))
-                .jrVersion(formInfo.get(FileUtils.VERSION))
-                .jrFormId(formInfo.get(FileUtils.FORMID))
+                .version(formInfo.get(FileUtils.VERSION))
+                .formId(formInfo.get(FileUtils.FORMID))
                 .project(project)      // smap
                 .tasksOnly(tasks_only ? "yes" : "no")   // smap
                 .readOnly(read_only ? "yes" : "no")   // smap
@@ -492,7 +494,7 @@ public class MultiFormDownloaderSmap {
                 if (!finalMediaFile.exists()) {
                     needToDownload = true;
                 } else {
-                    String currentFileHash = FileUtils.getMd5Hash(finalMediaFile);
+                    String currentFileHash = Md5.getMd5Hash(finalMediaFile);
                     String downloadFileHash = getMd5Hash(toDownload.getHash());
 
                     if (currentFileHash != null && downloadFileHash != null && !currentFileHash.contentEquals(downloadFileHash)) {

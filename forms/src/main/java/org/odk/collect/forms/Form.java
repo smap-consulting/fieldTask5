@@ -33,6 +33,11 @@ public final class Form {
     private final String description;
     private final String formId;
     private final String version;
+    private final String project;       // smap
+    private final String tasksOnly;     // smap
+    private final String readOnly;      // smap
+    private final String searchLocalData;     // smap
+    private final String source;        // smap
     private final String formFilePath;
     private final String submissionUri;
     private final String base64RSAPublicKey;
@@ -54,6 +59,11 @@ public final class Form {
         description = builder.description;
         formId = builder.formId;
         version = builder.version;
+        project = builder.project;  // smap
+        tasksOnly = builder.tasksOnly;  // smap
+        readOnly = builder.readOnly;  // smap
+        searchLocalData = builder.searchLocalData;  // smap
+        source = builder.source;        // smap
         formFilePath = builder.formFilePath;
         submissionUri = builder.submissionUri;
         base64RSAPublicKey = builder.base64RSAPublicKey;
@@ -76,6 +86,11 @@ public final class Form {
         private String description;
         private String formId;
         private String version;
+        private String project;     // smap
+        private String tasksOnly;   // smap
+        private String readOnly;    // smap
+        private String searchLocalData;  // smap
+        private String source;      // smap
         private String formFilePath;
         private String submissionUri;
         private String base64RSAPublicKey;
@@ -100,6 +115,11 @@ public final class Form {
             description = form.description;
             formId = form.formId;
             version = form.version;
+            project = form.project;         // smap
+            tasksOnly = form.tasksOnly;     // smap
+            readOnly = form.readOnly;       // smap
+            searchLocalData = form.searchLocalData;  // smap
+            source = form.source;           // smap
             formFilePath = form.formFilePath;
             submissionUri = form.submissionUri;
             base64RSAPublicKey = form.base64RSAPublicKey;
@@ -138,6 +158,36 @@ public final class Form {
 
         public Builder version(String version) {
             this.version = version;
+            return this;
+        }
+
+        // smap
+        public Builder project(String project) {
+            this.project = project;
+            return this;
+        }
+
+        // smap
+        public Builder tasksOnly(String tasksOnly) {
+            this.tasksOnly = tasksOnly;
+            return this;
+        }
+
+        // smap
+        public Builder readOnly(String readOnly) {
+            this.readOnly = readOnly;
+            return this;
+        }
+
+        // smap
+        public Builder searchLocalData(String searchLocalData) {
+            this.searchLocalData = searchLocalData;
+            return this;
+        }
+
+        // smap
+        public Builder source(String source) {
+            this.source = source;
             return this;
         }
 
@@ -237,6 +287,26 @@ public final class Form {
         return version;
     }
 
+    public String getProject() {
+        return project;
+    }       // smap
+
+    public String getTasksOnly() {
+        return tasksOnly;
+    }     // smap
+
+    public String getReadOnly() {
+        return readOnly;
+    }     // smap
+
+    public String getSearchLocalData() {
+        return searchLocalData;
+    }     // smap
+
+    public String getSource() {
+        return source;
+    }     // smap
+
     public String getFormFilePath() {
         return formFilePath;
     }
@@ -313,6 +383,11 @@ public final class Form {
                 Objects.equals(description, form.description) &&
                 Objects.equals(formId, form.formId) &&
                 Objects.equals(version, form.version) &&
+                Objects.equals(project, form.project) &&  // smap
+                Objects.equals(tasksOnly, form.tasksOnly) &&  // smap
+                Objects.equals(readOnly, form.readOnly) &&  // smap
+                Objects.equals(searchLocalData, form.searchLocalData) &&  // smap
+                Objects.equals(source, form.source) &&  // smap
                 Objects.equals(formFilePath, form.formFilePath) &&
                 Objects.equals(submissionUri, form.submissionUri) &&
                 Objects.equals(base64RSAPublicKey, form.base64RSAPublicKey) &&
@@ -330,10 +405,10 @@ public final class Form {
 
     @Override
     public int hashCode() {
-        return Objects.hash(dbId, displayName, description, formId, version, formFilePath,
-                submissionUri, base64RSAPublicKey, md5Hash, date, jrCacheFilePath, formMediaPath,
-                language, autoSend, autoDelete, geometryXPath, deleted, lastDetectedAttachmentsUpdateDate,
-                usesEntities);
+        return Objects.hash(dbId, displayName, description, formId, version, project, tasksOnly, readOnly,
+                searchLocalData, source, formFilePath, submissionUri, base64RSAPublicKey, md5Hash, date,
+                jrCacheFilePath, formMediaPath, language, autoSend, autoDelete, geometryXPath, deleted,
+                lastDetectedAttachmentsUpdateDate, usesEntities);
     }
 
     @Override

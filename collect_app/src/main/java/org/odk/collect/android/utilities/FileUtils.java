@@ -62,6 +62,14 @@ public final class FileUtils {
     /** Valid XML stub that can be parsed without error. */
     public static final String STUB_XML = "<?xml version='1.0' ?><stub />";
 
+    public static final String SOURCE = "source"; // smap (shouldn't be null but for migration can be)
+    public static final String TITLE = "title";                 // smap
+    public static final String VERSION = "version";             // smap. arbitrary string in OpenRosa 1.0
+    public static final String FORMID = "formid";               // smap
+    public static final String SUBMISSIONURI = "submission";    // smap
+    public static final String BASE64_RSA_PUBLIC_KEY = "base64RsaPublicKey";    // smap
+    public static final String AUTO_DELETE = "autoDelete";      // smap
+    public static final String AUTO_SEND = "autoSend";          // smap
     private FileUtils() {
     }
 
@@ -233,6 +241,48 @@ public final class FileUtils {
         }
 
         deleteAndReport(tempMediaFolder);
+    }
+
+    /*
+     * Smap
+     */
+    public static void moveMediaFiles(String tempMediaPath, File formMediaPath) throws IOException {
+        File tempMediaFolder = new File(tempMediaPath);
+        File[] mediaFiles = tempMediaFolder.listFiles();
+        if (mediaFiles == null || mediaFiles.length == 0) {
+            deleteAndReport(tempMediaFolder);
+        } else {
+            for (File mediaFile : mediaFiles) {
+                deleteOldFile(mediaFile.getName(), formMediaPath);
+                org.apache.commons.io.FileUtils.moveFileToDirectory(mediaFile, formMediaPath, true);
+            }
+            deleteAndReport(tempMediaFolder);
+        }
+    }
+
+    /*
+     * Smap
+     */
+    public static void copyMediaFiles(String tempMediaPath, File formMediaPath) throws IOException {
+        File tempMediaFolder = new File(tempMediaPath);
+        File[] mediaFiles = tempMediaFolder.listFiles();
+        if (mediaFiles != null && mediaFiles.length > 0) {
+            for (File mediaFile : mediaFiles) {
+                deleteOldFile(mediaFile.getName(), formMediaPath);
+                org.apache.commons.io.FileUtils.copyFileToDirectory(mediaFile, formMediaPath, false);
+            }
+        }
+    }
+
+    /*
+     * Smap
+     */
+    public static void deleteOldFile(String name, File d) {
+        String path = d.getAbsolutePath() + "/" + name;
+        File f = new File(path);
+        if(f.exists()) {
+            f.delete();
+        }
     }
 
     public static byte[] read(File file) {
