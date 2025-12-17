@@ -3,10 +3,6 @@ package au.smap.fieldTask.tasks;
 
 import android.os.AsyncTask;
 
-import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
-
-import org.odk.collect.android.amazonaws.mobile.AWSMobileClient;
-import org.odk.collect.android.amazonaws.models.nosql.DevicesDO;
 import org.odk.collect.android.application.Collect;
 
 import timber.log.Timber;
@@ -31,6 +27,7 @@ public class SmapRegisterForMessagingTask extends AsyncTask<String, Void, String
             Timber.i("    token: %s", token);
             Timber.i("    server: %s", server);
             Timber.i("    user: %s", username);
+            /* SMAP BUILD
             AWSMobileClient.initializeMobileClientIfNecessary(Collect.getInstance());
             final DynamoDBMapper mapper = AWSMobileClient.defaultMobileClient().getDynamoDBMapper();
             DevicesDO devices = new DevicesDO();
@@ -39,6 +36,7 @@ public class SmapRegisterForMessagingTask extends AsyncTask<String, Void, String
             devices.setUserIdent(username);
             mapper.save(devices);
             Timber.i("================================================== Notifying server of messaging update done");
+            */
 
         } catch (Exception e) {
             Timber.e(e);

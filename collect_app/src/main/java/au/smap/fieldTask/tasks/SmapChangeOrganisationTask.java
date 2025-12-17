@@ -4,7 +4,7 @@ package au.smap.fieldTask.tasks;
 import android.os.AsyncTask;
 
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
 import java.io.InputStream;
