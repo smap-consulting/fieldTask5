@@ -173,6 +173,8 @@ interface AppDependencyComponent {
 
     fun inject(utilities: au.smap.fieldTask.utilities.Utilities)
 
+    fun inject(SmapRemoteWebServiceTask: au.smap.fieldTask.tasks.SmapRemoteWebServiceTask)
+
     fun inject(qrCodeTabsActivity: QRCodeTabsActivity)
 
     fun inject(showQRCodeFragment: ShowQRCodeFragment)

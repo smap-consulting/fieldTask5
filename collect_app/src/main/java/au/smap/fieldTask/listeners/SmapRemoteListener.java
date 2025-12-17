@@ -14,7 +14,7 @@
 
 package au.smap.fieldTask.listeners;
 
-import org.odk.collect.android.external.handler.SmapRemoteDataItem;
+import au.smap.fieldTask.external.handler.SmapRemoteDataItem;
 
 /**
  * @author Smap
