@@ -6,9 +6,9 @@ import static com.google.common.io.Files.getFileExtension;
 import android.os.AsyncTask;
 
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.external.handler.SmapRemoteDataItem;
-import org.odk.collect.android.listeners.SmapRemoteListener;
-import org.odk.collect.android.openrosa.OpenRosaHttpInterface;
+import au.smap.fieldTask.external.handler.SmapRemoteDataItem;
+import au.smap.fieldTask.listeners.SmapRemoteListener;
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
 import java.io.File;
@@ -56,8 +56,7 @@ public class SmapRemoteWebServicePostTask extends AsyncTask<String, Void, SmapRe
         }
 
         try {
-            String filePath = Collect.getInstance().getFormController().getInstanceFile().getParent() +
-                    File.separator + fileName;
+            String filePath = null;  // SMAP BUILD
             File file = new File(filePath);
             String extension = getFileExtension(fileName);
             if(file.exists() && extension.equals("jpg")) {

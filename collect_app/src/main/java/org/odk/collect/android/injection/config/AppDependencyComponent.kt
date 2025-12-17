@@ -163,6 +163,8 @@ interface AppDependencyComponent {
 
     fun inject(smapFormListFragment: au.smap.fieldTask.fragments.SmapFormListFragment)
 
+    fun inject(SmapRemoteWebServicePostTask: au.smap.fieldTask.tasks.SmapRemoteWebServicePostTask)
+
     fun inject(adminPreferencesActivitySmap: au.smap.fieldTask.preferences.AdminPreferencesActivitySmap)
 
     fun inject(requestLocationPermissionsDialogSmap: au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap)
