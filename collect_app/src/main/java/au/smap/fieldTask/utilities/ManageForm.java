@@ -28,6 +28,7 @@ import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import org.odk.collect.android.utilities.STFileUtils;
+import org.odk.collect.android.utilities.FileUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -38,6 +39,7 @@ import java.util.HashMap;
 import timber.log.Timber;
 
 import static org.odk.collect.androidshared.utils.PathUtils.getAbsoluteFilePath;
+import static org.odk.collect.strings.localization.LocalizedApplicationKt.getLocalizedString;
 
 public class ManageForm {
 
@@ -324,7 +326,7 @@ public class ManageForm {
                  } catch (Exception e) {
                      e.printStackTrace();
                      mfResponse.isError = true;
-                     mfResponse.statusMsg = TranslationHandler.getString(Collect.getInstance(), R.string.smap_media_download, initialDataURL,instancePath )
+                     mfResponse.statusMsg = getLocalizedString(Collect.getInstance(), R.string.smap_media_download, initialDataURL, instancePath)
                              + " " + e.getMessage();
                      return mfResponse;
                  }
@@ -388,7 +390,7 @@ public class ManageForm {
         }
         values.put(InstanceColumns.FORM_PATH, formPath);
         values.put(InstanceColumns.T_ADDRESS, ta.task.address);
-        values.put(InstanceColumns.T_IS_SYNC, Instance.STATUS_SYNC_YES);
+        values.put(InstanceColumns.T_IS_SYNC, Utilities.STATUS_SYNC_YES);
         values.put(InstanceColumns.T_TASK_TYPE, ta.task.type);
 
         // Add target location

@@ -25,8 +25,9 @@ import android.preference.PreferenceManager;
 import au.smap.fieldTask.database.TraceProviderAPI.TraceColumns;
 import org.odk.collect.android.application.Collect;
 import au.smap.fieldTask.loaders.PointEntry;
-import org.odk.collect.android.preferences.GeneralKeys;
 import org.odk.collect.android.utilities.STFileUtils;
+import org.odk.collect.settings.keys.ProjectKeys;
+
 import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.List;
@@ -57,7 +58,7 @@ public class TraceUtilities {
                 .getDefaultSharedPreferences(Collect.getInstance()
                         .getBaseContext());
         String serverUrl = settings.getString(
-                GeneralKeys.KEY_SERVER_URL, null);
+                ProjectKeys.KEY_SERVER_URL, null);
         return STFileUtils.getSource(serverUrl);
     }
 
