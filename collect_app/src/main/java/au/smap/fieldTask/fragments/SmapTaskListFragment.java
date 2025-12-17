@@ -53,11 +53,10 @@ import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
 import org.odk.collect.android.adapters.SortDialogAdapter;
-import org.odk.collect.android.adapters.TaskListArrayAdapter;
-import org.odk.collect.android.application.Collect;
+import au.smap.fieldTask.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
 import org.odk.collect.forms.instances.Instance;
-import org.odk.collect.android.listeners.OnTaskOptionsClickLisener;
+import au.smap.fieldTask.listeners.OnTaskOptionsClickListener;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
@@ -127,7 +126,7 @@ public class SmapTaskListFragment extends ListFragment {
     public void onActivityCreated(Bundle b) {
         super.onActivityCreated(b);
 
-        OnTaskOptionsClickLisener taskClickLisener = new OnTaskOptionsClickLisener() {
+        OnTaskOptionsClickListener taskClickListener = new OnTaskOptionsClickListener() {
             final DatabaseInstancesRepository di = new DatabaseInstancesRepository();
 
             @Override
@@ -227,7 +226,7 @@ public class SmapTaskListFragment extends ListFragment {
             }
         };
 
-        mAdapter = new TaskListArrayAdapter(getActivity(), false, taskClickLisener);
+        mAdapter = new TaskListArrayAdapter(getActivity(), false, taskClickListener);
         setListAdapter(mAdapter);
 
         adminPreferences = getActivity().getSharedPreferences(

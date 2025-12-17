@@ -36,7 +36,7 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.database.DatabaseInstancesRepository;
+import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
 import org.odk.collect.android.instances.Instance;
 import org.odk.collect.android.listeners.OnTaskOptionsClickLisener;
 import au.smap.fieldTask.loaders.TaskEntry;

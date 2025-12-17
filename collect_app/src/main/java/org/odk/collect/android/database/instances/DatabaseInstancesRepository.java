@@ -8,11 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.StrictMode;
 
+import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.db.sqlite.DatabaseConnection;
 import org.odk.collect.android.database.DatabaseConstants;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 import org.odk.collect.shared.files.FileExt;
+
+import au.smap.fieldTask.dao.InstancesDao;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,6 +52,8 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
     private final Supplier<Long> clock;
     private final String instancesPath;
 
+    private final InstancesDao dao = new InstancesDao();    // Smap
+
     public DatabaseInstancesRepository(Context context, String dbPath, String instancesPath, Supplier<Long> clock) {
         this.databaseConnection = new DatabaseConnection(
                 context,
@@ -61,6 +66,13 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
         this.clock = clock;
         this.instancesPath = instancesPath;
     }
+
+    // SMAP BUILD - remove and align smap's use of repository to collect's
+    public DatabaseInstancesRepository() {
+        databaseConnection = null;
+        clock = null;
+        instancesPath = null;
+    };
 
     @Override
     public Instance get(Long databaseId) {
@@ -233,6 +245,22 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
         return query(projection, selection, selectionArgs, sortOrder);
     }
 
+    /*
+     * Start Smap
+     */
+    @Override
+    public Instance getInstanceByTaskId(long taskId) {
+        Cursor c = dao.getInstancesCursor(InstanceProviderAPI.InstanceColumns.T_ASS_ID + "=?",
+                new String[]{String.valueOf(taskId)});
+        List<Instance> instances = dao.getInstancesFromCursor(c);
+        if (instances.size()==1) {
+            return instances.get(0);
+        }
+        else return null;
+    }
+    /*
+     * End Smap
+     */
     private Cursor getCursorForAllByStatus(String[] status) {
         StringBuilder selection = new StringBuilder(STATUS + "=?");
         for (int i = 1; i < status.length; i++) {

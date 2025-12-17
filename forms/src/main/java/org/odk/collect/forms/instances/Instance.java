@@ -208,6 +208,8 @@ public final class Instance {
         return displayName;
     }
 
+    public String getPhone() { return null; }  // smap  - SMAP BUILD - does this need to actually return the phone number
+
     public String getSubmissionUri() {
         return submissionUri;
     }

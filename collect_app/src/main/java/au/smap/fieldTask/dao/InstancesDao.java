@@ -390,14 +390,14 @@ public class InstancesDao {
                             .submissionUri(cursor.getString(submissionUriColumnIndex))
                             .canEditWhenComplete(Boolean.valueOf(cursor.getString(canEditWhenCompleteIndex)))
                             .instanceFilePath(cursor.getString(instanceFilePathIndex))
-                            .jrFormId(cursor.getString(jrFormIdColumnIndex))
-                            .jrVersion(cursor.getString(jrVersionColumnIndex))
+                            .formId(cursor.getString(jrFormIdColumnIndex))
+                            .formVersion(cursor.getString(jrVersionColumnIndex))
                             .status(cursor.getString(statusColumnIndex))
                             .lastStatusChangeDate(cursor.getLong(lastStatusChangeDateColumnIndex))
                             .deletedDate(cursor.isNull(deletedDateColumnIndex) ? null : cursor.getLong(deletedDateColumnIndex))
                             .geometryType(cursor.getString(geometryTypeColumnIndex))
                             .geometry(cursor.getString(geometryColumnIndex))
-                            .phone(cursor.getString(phoneColumnIndex))
+                            //.phone(cursor.getString(phoneColumnIndex))
                             .repeat(cursor.getInt(repeatColumnIndex) > 0)                       // smap
                             .updateid(cursor.getString(updateidColumnIndex))                    // smap
                             .location_trigger(cursor.getString(locationTriggerColumnIndex))     // smap

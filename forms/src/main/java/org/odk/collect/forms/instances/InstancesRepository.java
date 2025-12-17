@@ -53,4 +53,9 @@ public interface InstancesRepository {
             super(message);
         }
     }
+
+    /*
+     * Start Smap
+     */
+    Instance getInstanceByTaskId(long taskId);
 }
