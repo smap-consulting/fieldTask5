@@ -78,6 +78,7 @@ object ProjectKeys {
     const val KEY_BLANK_FORM_SORT_ORDER = "formChooserListSortingOrder"
 
     // smap preferences
+    const val KEY_SAVED_USERS = "saved_users" // Saved user credentials for offline login
     const val KEY_SMAP_USE_TOKEN = "smap_use_token" // Use token for logon
     const val KEY_SMAP_SCAN_TOKEN = "smap_scan_token" // Scan the token
     const val KEY_SMAP_AUTH_TOKEN = "auth_token" // Authentication Token
