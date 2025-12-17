@@ -80,7 +80,7 @@ import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.utilities.KeyValueJsonFns;
+import au.smap.fieldTask.utilities.KeyValueJsonFns;
 import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.ArrayList;
