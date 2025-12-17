@@ -446,6 +446,11 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
         return usedSavepoint;
     }
 
+    // smap
+    public void publishExternalDataLoadingProgress(String message) {
+        publishProgress(message);
+    }
+
     @Override
     protected void onProgressUpdate(String... values) {
         synchronized (this) {

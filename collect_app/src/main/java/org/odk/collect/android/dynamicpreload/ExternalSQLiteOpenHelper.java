@@ -67,9 +67,12 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
     private ExternalDataReader externalDataReader;
     private Supplier<Boolean> isCancelled;
     private Consumer<Function<Resources, String>> progressReporter;
+    private double sortIdx;     // smap
+    private org.odk.collect.android.tasks.FormLoaderTask formLoaderTask;     // smap
 
     ExternalSQLiteOpenHelper(File dbFile) {
         super(new AltDatabasePathContext(dbFile.getParentFile().getAbsolutePath(), Collect.getInstance()), dbFile.getName(), null, VERSION);
+        sortIdx = 0.0;     // smap
     }
 
     void importFromCSV(File dataSetFile, ExternalDataReader externalDataReader,
@@ -350,5 +353,62 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
      */
     private String removeByteOrderMark(String bomCheckString) {
         return bomCheckString.startsWith("\uFEFF") ? bomCheckString.substring(1) : bomCheckString;
+    }
+
+    // smap - Add local data
+    public void append(ArrayList<ContentValues> data, org.odk.collect.android.tasks.FormLoaderTask formLoaderTask) throws java.lang.Exception {
+        this.formLoaderTask = formLoaderTask;
+
+        SQLiteDatabase db = null;
+        try {
+            db = getWritableDatabase();
+
+            appendLocal(db, ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, data);
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    // smap - Delete local data
+    public void deleteLocal(org.odk.collect.android.tasks.FormLoaderTask formLoaderTask) throws java.lang.Exception {
+        this.formLoaderTask = formLoaderTask;
+
+        SQLiteDatabase db = null;
+        try {
+            db = getWritableDatabase();
+
+            // make sure the local column exists - it may not if the user has just upgraded from an older version of fieldTask
+            SQLiteUtils.addColumn(db, ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, ExternalDataUtil.LOCAL_COLUMN_NAME, "integer");
+
+            // Delete existing local data
+            String selection = ExternalDataUtil.LOCAL_COLUMN_NAME + " = 1";
+            db.delete(ExternalDataUtil.EXTERNAL_DATA_TABLE_NAME, selection, null);
+
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    // smap - Append local data to database
+    private void appendLocal(SQLiteDatabase db, String tableName, ArrayList<ContentValues> data) throws Exception {
+
+        onProgressSmap(getLocalizedString(Collect.getInstance(), org.odk.collect.android.R.string.smap_local_data));
+
+        for (ContentValues values : data) {
+            values.put(ExternalDataUtil.LOCAL_COLUMN_NAME, 1);    // Set local indicator
+            values.put(ExternalDataUtil.SORT_COLUMN_NAME, sortIdx--);
+            db.insertOrThrow(tableName, null, values);
+        }
+    }
+
+    // smap - Report progress to FormLoaderTask
+    private void onProgressSmap(String message) {
+        if (formLoaderTask != null) {
+            formLoaderTask.publishExternalDataLoadingProgress(message);
+        }
     }
 }

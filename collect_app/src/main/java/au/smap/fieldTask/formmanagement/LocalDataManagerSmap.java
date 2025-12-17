@@ -8,9 +8,9 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import org.kxml2.io.KXmlParser;
 import au.smap.fieldTask.dao.InstancesDao;
 import au.smap.fieldTask.dao.SmapReferencesDao;
-import org.odk.collect.android.external.ExternalDataUtil;
+import org.odk.collect.android.dynamicpreload.ExternalDataUtil;
+import org.odk.collect.android.dynamicpreload.ExternalSQLiteOpenHelper;
 import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.smap.local.LocalSQLiteOpenHelperSmap;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import au.smap.fieldTask.models.LinkedInstance;
@@ -67,8 +67,8 @@ public class LocalDataManagerSmap {
                     if (!dbFile.exists()) {
                         FirebaseCrashlytics.getInstance().log("LocalCSV: csv table does not exist: " + dbFile.getAbsolutePath());
                     }
-                    LocalSQLiteOpenHelperSmap localSQLiteOpenHelper = new LocalSQLiteOpenHelperSmap(dbFile);
-                    localSQLiteOpenHelper.deleteLocal(formLoaderTask);
+                    ExternalSQLiteOpenHelper externalSQLiteOpenHelper = new ExternalSQLiteOpenHelper(dbFile);
+                    externalSQLiteOpenHelper.deleteLocal(formLoaderTask);
                 }
 
                 // 3. Process each instance
@@ -148,8 +148,8 @@ public class LocalDataManagerSmap {
                         if (!dbFile.exists()) {
                             FirebaseCrashlytics.getInstance().log("LocalCSV: csv table does not exist: " + dbFile.getAbsolutePath());
                         }
-                        LocalSQLiteOpenHelperSmap localSQLiteOpenHelper = new LocalSQLiteOpenHelperSmap(dbFile);
-                        localSQLiteOpenHelper.append(dataSets.get(tableName), formLoaderTask);
+                        ExternalSQLiteOpenHelper externalSQLiteOpenHelper = new ExternalSQLiteOpenHelper(dbFile);
+                        externalSQLiteOpenHelper.append(dataSets.get(tableName), formLoaderTask);
                     }
                 }
 
