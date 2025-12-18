@@ -35,6 +35,8 @@ public final class Instance {
     public static final String STATUS_COMPLETE = "complete";
     public static final String STATUS_SUBMITTED = "submitted";
     public static final String STATUS_SUBMISSION_FAILED = "submissionFailed";
+    public static final String STATUS_SYNC_YES = "synchronized";        // smap
+    public static final String STATUS_SYNC_NO = "not synchronized";     // smap
 
     public static final String GEOMETRY_TYPE_POINT = "Point";
 
@@ -52,6 +54,13 @@ public final class Instance {
     private final String geometry;
     private final Long editOf;
     private final Long editNumber;
+    private final boolean repeat;           // smap
+    private final String updateid;          // smap
+    private final String location_trigger;  // smap
+    private final String survey_notes;      // smap
+    private final boolean isCase;           // smap
+    private final String assignment_id;     // smap
+    private final String phone;             // smap
 
     private final Long dbId;
     private final boolean canDeleteBeforeSend;
@@ -71,6 +80,13 @@ public final class Instance {
         geometry = builder.geometry;
         editOf = builder.editOf;
         editNumber = builder.editNumber;
+        repeat = builder.repeat;                        // smap
+        updateid = builder.updateid;                    // smap
+        location_trigger = builder.location_trigger;    // smap
+        survey_notes = builder.survey_notes;            // smap
+        assignment_id = builder.assignment_id;          // smap
+        isCase = builder.isCase;                        // smap
+        phone = builder.phone;                          // smap
         canDeleteBeforeSend = builder.canDeleteBeforeSend;
 
         dbId = builder.dbId;
@@ -91,6 +107,13 @@ public final class Instance {
         private String geometry;
         private Long editOf;
         private Long editNumber;
+        private boolean repeat;             // smap
+        private String updateid;            // smap
+        private String location_trigger;    // smap
+        private String survey_notes;        // smap
+        private String assignment_id;       // smap
+        private boolean isCase;             // smap
+        private String phone;               // smap
 
         private Long dbId;
         private boolean canDeleteBeforeSend = true;
@@ -115,6 +138,13 @@ public final class Instance {
             geometry = instance.geometry;
             editOf = instance.editOf;
             editNumber = instance.editNumber;
+            repeat = instance.repeat;                       // smap
+            updateid = instance.updateid;                   // smap
+            location_trigger = instance.location_trigger;   // smap
+            survey_notes = instance.survey_notes;           // smap
+            assignment_id = instance.assignment_id;         // smap
+            isCase = instance.isCase;                       // smap
+            phone = instance.phone;                         // smap
             canDeleteBeforeSend = instance.canDeleteBeforeSend;
         }
 
@@ -199,6 +229,48 @@ public final class Instance {
             return this;
         }
 
+        // smap
+        public Builder repeat(boolean repeat) {
+            this.repeat = repeat;
+            return this;
+        }
+
+        // smap
+        public Builder updateid(String updateid) {
+            this.updateid = updateid;
+            return this;
+        }
+
+        // smap
+        public Builder location_trigger(String location_trigger) {
+            this.location_trigger = location_trigger;
+            return this;
+        }
+
+        // smap
+        public Builder survey_notes(String survey_notes) {
+            this.survey_notes = survey_notes;
+            return this;
+        }
+
+        // smap
+        public Builder assignment_id(String assignment_id) {
+            this.assignment_id = assignment_id;
+            return this;
+        }
+
+        // smap
+        public Builder isCase(boolean isCase) {
+            this.isCase = isCase;
+            return this;
+        }
+
+        // smap
+        public Builder phone(String phone) {
+            this.phone = phone;
+            return this;
+        }
+
         public Instance build() {
             return new Instance(this);
         }
@@ -208,7 +280,9 @@ public final class Instance {
         return displayName;
     }
 
-    public String getPhone() { return null; }  // smap  - SMAP BUILD - does this need to actually return the phone number
+    public String getPhone() {
+        return phone;  // smap
+    }
 
     public String getSubmissionUri() {
         return submissionUri;
@@ -274,6 +348,36 @@ public final class Instance {
         return canDeleteBeforeSend;
     }
 
+    // smap
+    public boolean getRepeat() {
+        return repeat;
+    }
+
+    // smap
+    public String getUpdateid() {
+        return updateid;
+    }
+
+    // smap
+    public String getLocationTrigger() {
+        return location_trigger;
+    }
+
+    // smap
+    public String getSurveyNotes() {
+        return survey_notes;
+    }
+
+    // smap
+    public String getAssignmentId() {
+        return assignment_id;
+    }
+
+    // smap
+    public boolean isCase() {
+        return isCase;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -285,11 +389,11 @@ public final class Instance {
         }
 
         Instance instance = (Instance) o;
-        return canEditWhenComplete == instance.canEditWhenComplete && Objects.equals(displayName, instance.displayName) && Objects.equals(submissionUri, instance.submissionUri) && Objects.equals(instanceFilePath, instance.instanceFilePath) && Objects.equals(formId, instance.formId) && Objects.equals(formVersion, instance.formVersion) && Objects.equals(status, instance.status) && Objects.equals(lastStatusChangeDate, instance.lastStatusChangeDate) && Objects.equals(finalizationDate, instance.finalizationDate) && Objects.equals(deletedDate, instance.deletedDate) && Objects.equals(geometryType, instance.geometryType) && Objects.equals(geometry, instance.geometry) && Objects.equals(editOf, instance.editOf) && Objects.equals(editNumber, instance.editNumber) && Objects.equals(dbId, instance.dbId);
+        return canEditWhenComplete == instance.canEditWhenComplete && repeat == instance.repeat && isCase == instance.isCase && Objects.equals(displayName, instance.displayName) && Objects.equals(submissionUri, instance.submissionUri) && Objects.equals(instanceFilePath, instance.instanceFilePath) && Objects.equals(formId, instance.formId) && Objects.equals(formVersion, instance.formVersion) && Objects.equals(status, instance.status) && Objects.equals(lastStatusChangeDate, instance.lastStatusChangeDate) && Objects.equals(finalizationDate, instance.finalizationDate) && Objects.equals(deletedDate, instance.deletedDate) && Objects.equals(geometryType, instance.geometryType) && Objects.equals(geometry, instance.geometry) && Objects.equals(editOf, instance.editOf) && Objects.equals(editNumber, instance.editNumber) && Objects.equals(updateid, instance.updateid) && Objects.equals(location_trigger, instance.location_trigger) && Objects.equals(survey_notes, instance.survey_notes) && Objects.equals(assignment_id, instance.assignment_id) && Objects.equals(phone, instance.phone) && Objects.equals(dbId, instance.dbId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, submissionUri, canEditWhenComplete, instanceFilePath, formId, formVersion, status, lastStatusChangeDate, finalizationDate, deletedDate, geometryType, geometry, editOf, editNumber, dbId);
+        return Objects.hash(displayName, submissionUri, canEditWhenComplete, instanceFilePath, formId, formVersion, status, lastStatusChangeDate, finalizationDate, deletedDate, geometryType, geometry, editOf, editNumber, repeat, updateid, location_trigger, survey_notes, isCase, assignment_id, phone, dbId);
     }
 }

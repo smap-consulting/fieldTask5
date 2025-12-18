@@ -404,7 +404,7 @@ public class InstancesDao {
                             .survey_notes(cursor.getString(surveyNotesColumnIndex))             // smap
                             .assignment_id(cursor.getString(assignmentIdColumnIndex))           // smap
                             .isCase(cursor.getString(taskTypeColumnIndex) != null && cursor.getString(taskTypeColumnIndex).equals("case"))           // smap
-                            .id(cursor.getLong(databaseIdIndex))
+                            .dbId(cursor.getLong(databaseIdIndex))
                             .build();
 
                     instances.add(instance);
@@ -428,8 +428,8 @@ public class InstancesDao {
         values.put(InstanceColumns.SUBMISSION_URI, instance.getSubmissionUri());
         values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(instance.canEditWhenComplete()));
         values.put(InstanceColumns.INSTANCE_FILE_PATH, instance.getInstanceFilePath());
-        values.put(InstanceColumns.JR_FORM_ID, instance.getJrFormId());
-        values.put(InstanceColumns.JR_VERSION, instance.getJrVersion());
+        values.put(InstanceColumns.JR_FORM_ID, instance.getFormId());
+        values.put(InstanceColumns.JR_VERSION, instance.getFormVersion());
         values.put(InstanceColumns.STATUS, instance.getStatus());
         values.put(InstanceColumns.LAST_STATUS_CHANGE_DATE, instance.getLastStatusChangeDate());
         values.put(InstanceColumns.DELETED_DATE, instance.getDeletedDate());
