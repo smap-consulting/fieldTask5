@@ -24,6 +24,9 @@ public class ApplicationConstants {
 
     }
     public static final int SQLITE_MAX_VARIABLE_NUMBER = 999;   // smap
+    public static final float GPS_ACCURACY = (float) 30.0;      // smap
+    public static final float GPS_DISTANCE = (float) 40.0;      // smap
+    public static final int GPS_INTERVAL = 10000;               // smap - Milli seconds
 
     public abstract static class BundleKeys {
         public static final String FORM_MODE = "formMode"; // smap

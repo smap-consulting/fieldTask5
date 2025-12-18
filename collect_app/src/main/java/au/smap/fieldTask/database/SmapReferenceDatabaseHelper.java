@@ -122,7 +122,7 @@ public class SmapReferenceDatabaseHelper extends SQLiteOpenHelper {
     public static void recreateDatabase() {
 
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(FormsDatabaseHelper.getDatabasePath(), null, SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(getDatabasePath(), null, SQLiteDatabase.OPEN_READWRITE);
             SQLiteUtils.dropTable(db, TABLE_NAME);
             createLatestVersion(db);
             db.close();
