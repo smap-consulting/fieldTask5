@@ -53,6 +53,14 @@
     <string name="sort_by_name_desc">Name, Z-A</string>
     <string name="sort_by_date_desc">Date, newest first</string>
     <string name="sort_by_date_asc">Date, oldest first</string>
+    <!-- smap -->
+    <string name="sort_by_status_asc">Status, finalized first</string>
+    <!-- smap -->
+    <string name="sort_by_status_desc">Status, unfinalized first</string>
+    <!-- smap -->
+    <string name="sort_by_distance_asc">Distance, closest first</string>
+    <!-- smap -->
+    <string name="sort_by_distance_desc">Distance, farthest first</string>
     <!-- A sort option for blank forms. When this option is selected, the form for which a filled instance was last filled will go first. -->
     <string name="sort_by_last_saved">Last saved first</string>
     <string name="filter_the_list">Filter the list</string>

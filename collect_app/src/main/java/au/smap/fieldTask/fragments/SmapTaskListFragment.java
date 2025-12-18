@@ -48,11 +48,9 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.AboutActivity;
-import org.odk.collect.android.activities.FillBlankFormActivity;
 import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
-import org.odk.collect.android.adapters.SortDialogAdapter;
 import au.smap.fieldTask.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
 import org.odk.collect.forms.instances.Instance;
@@ -67,6 +65,9 @@ import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
 import org.odk.collect.androidshared.ui.SnackbarUtils;
 import org.odk.collect.android.utilities.ThemeUtils;
+
+import java.util.Locale;
+
 import au.smap.fieldTask.utilities.Utilities;
 
 import timber.log.Timber;
@@ -206,7 +207,7 @@ public class SmapTaskListFragment extends ListFragment {
 
             @Override
             public void onDirectionsClicked(TaskEntry taskEntry) {
-                String uri = String.format(
+                String uri = String.format(Locale.ROOT,
                         "geo:0,0?q=%f,%f (%s)",
                         taskEntry.schedLat,
                         taskEntry.schedLon,
@@ -282,6 +283,7 @@ public class SmapTaskListFragment extends ListFragment {
     }
 
     private void setupBottomSheet() {
+        /* SMAP BUILD - sort
         bottomSheetDialog = new BottomSheetDialog(getActivity(), new ThemeUtils(getContext()).getBottomDialogTheme());
         View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
         final RecyclerView recyclerView = sheetView.findViewById(R.id.recyclerView);
@@ -299,6 +301,7 @@ public class SmapTaskListFragment extends ListFragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         bottomSheetDialog.setContentView(sheetView);
+         */
     }
 
     @Override
@@ -401,10 +404,12 @@ public class SmapTaskListFragment extends ListFragment {
                 .getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU, false);
 
         if (adminMenu) {
+            /* SMAP BUILD - preferences
             menu
                     .add(0, R.id.menu_admin_preferences, 0,
                             org.odk.collect.strings.R.string.admin_preferences)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+             */
         }
 
         final MenuItem sortItem = menu.findItem(R.id.menu_sort);
@@ -455,12 +460,13 @@ public class SmapTaskListFragment extends ListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_about:
+            case 100:   // SMAP BUILD - menu_about
                 startActivity(new Intent(getActivity(), AboutActivity.class));
                 return true;
-            case R.id.menu_general_preferences:
+            case 101: // SMAP BUILD - menu_general_preferences
                 startActivity(new Intent(getActivity(), ProjectPreferencesActivity.class));
                 return true;
+                /* SMAP BUILD - preferences
             case R.id.menu_admin_preferences:
                 String pw = adminPreferences.getString(
                         ProtectedProjectKeys.KEY_ADMIN_PW, "");
@@ -472,7 +478,8 @@ public class SmapTaskListFragment extends ListFragment {
                     ((SmapMain) getActivity()).processAdminMenu();
                 }
                 return true;
-            case R.id.menu_gettasks:
+                 */
+            case 102:   // SMAP BUILD - menu_gettasks
                 ((SmapMain) getActivity()).processGetTask(true);
                 return true;
             case MENU_ENTERDATA:
@@ -490,7 +497,7 @@ public class SmapTaskListFragment extends ListFragment {
             case MENU_HISTORY:
                 ((SmapMain) getActivity()).processHistory();
                 return true;
-            case R.id.menu_sort:
+            case 103:   // SMAP BUILD - menu_sort
                 bottomSheetDialog.show();
                 return true;
             case MENU_EXIT:
@@ -512,11 +519,14 @@ public class SmapTaskListFragment extends ListFragment {
     }
 
     private void processEnterData() {
+        /* SMAP BUILD
         if (MultiClickGuard.allowClick(getClass().getName())) {
             Intent i = new Intent(getContext(),
                     FillBlankFormActivity.class);
             startActivity(i);
         }
+
+         */
     }
 
     // Get new forms
@@ -528,13 +538,19 @@ public class SmapTaskListFragment extends ListFragment {
 
     // Send data
     private void processSendData() {
+        /* SMAP BUILD
         Intent i = new Intent(getContext(), org.odk.collect.android.activities.InstanceUploaderListActivity.class);
         startActivity(i);
+
+         */
     }
 
     private void processManageFiles() {
+        /* SMAP BUILD
         Intent i = new Intent(getContext(), org.odk.collect.android.activities.DeleteSavedFormActivity.class);
         startActivity(i);
+
+         */
     }
 
     private void rejectTask(String reason, TaskEntry taskEntry) {

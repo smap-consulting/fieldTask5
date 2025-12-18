@@ -40,6 +40,10 @@
   <string name="sort_by_name_desc">Descendente por Nombre, Z-A</string>
   <string name="sort_by_date_desc">Fecha, más reciente de primero</string>
   <string name="sort_by_date_asc">Fecha, más antiguo de primero</string>
+    <!-- smap -->
+    <string name="sort_by_status_asc">Por status, primero los finalizados</string>
+    <!-- smap -->
+    <string name="sort_by_status_desc">Por Status, primero los no finalizados</string>
   <!--A sort option for blank forms. When this option is selected, the form for which a filled instance was last filled will go first.-->
   <string name="sort_by_last_saved">Último guardado primero</string>
   <string name="filter_the_list">Filtrar la lista</string>
