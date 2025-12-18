@@ -78,7 +78,7 @@ android {
         applicationId('org.smap.smapTask.android')
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
-        versionCode project.hasProperty('versionCode') ? project.getProperties()['versionCode'].toInteger() : 5112
+        versionCode project.hasProperty('versionCode') ? project.getProperties()['versionCode'].toInteger() : 7000  // smap
         versionName getVersionName()
         testInstrumentationRunner('androidx.test.runner.AndroidJUnitRunner')
         vectorDrawables.useSupportLibrary = true
@@ -88,6 +88,7 @@ android {
         archivesName = "ODK-Collect"
     }
 
+    // smap
     flavorDimensions "flavour"
 
     productFlavors {

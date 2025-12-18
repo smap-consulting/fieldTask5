@@ -16,21 +16,8 @@
         android:layout_below="@id/appBarLayout"
         android:orientation="vertical">
 
-        <org.odk.collect.material.MaterialBanner
-            android:id="@+id/storageMigrationBannerSmap"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone"
-            custom:text="blah"
-            custom:secondaryActionColor="true" />
-
-        <fragment
-            android:name="org.odk.collect.android.fragments.MapBoxInitializationFragment"
-            android:id="@+id/map_box_initialization_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="1dp">
-        </fragment>
+        <!-- SMAP BUILD - Material Banner -->
+        <!-- SMAP BUILD - MapBox initialisation fragment -->
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
