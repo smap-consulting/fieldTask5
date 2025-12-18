@@ -44,6 +44,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
+import org.odk.collect.android.utilities.ApplicationConstants;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
@@ -85,7 +86,6 @@ import au.smap.fieldTask.models.FormRestartDetails;
 import au.smap.fieldTask.models.NfcTrigger;
 import au.smap.fieldTask.tasks.DownloadTasksTask;
 import au.smap.fieldTask.tasks.NdefReaderTask;
-import au.smap.fieldTask.utilities.ApplicationConstants;
 import au.smap.fieldTask.utilities.ManageForm;
 import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
 import org.odk.collect.androidshared.ui.SnackbarUtils;

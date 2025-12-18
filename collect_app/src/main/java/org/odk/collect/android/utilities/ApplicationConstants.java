@@ -23,8 +23,10 @@ public class ApplicationConstants {
     private ApplicationConstants() {
 
     }
+    public static final int SQLITE_MAX_VARIABLE_NUMBER = 999;   // smap
 
     public abstract static class BundleKeys {
+        public static final String FORM_MODE = "formMode"; // smap
         public static final String SUCCESS_KEY = "SUCCESSFUL";
         public static final String FORM_IDS = "FORM_IDS";
         public static final String MESSAGE = "MESSAGE";
@@ -32,6 +34,12 @@ public class ApplicationConstants {
         public static final String PASSWORD = "PASSWORD";
         public static final String URL = "URL";
         public static final String DELETE_INSTANCE_AFTER_SUBMISSION = "DELETE_INSTANCE_AFTER_SUBMISSION";
+    }
+
+    // smap
+    public abstract static class FormModes {
+        public static final String EDIT_SAVED = "editSaved";
+        public static final String VIEW_SENT = "viewSent";
     }
 
     public abstract static class SortingOrder {
@@ -72,6 +80,12 @@ public class ApplicationConstants {
         public static final int EX_AUDIO_CHOOSER  = 26;
         public static final int CHANGE_SETTINGS = 27;
         public static final int MEDIA_FILE_PATH = 28;
+        public static final int NFC_CAPTURE = 50;                           // smap
+        public static final int GEOCOMPOUND_CAPTURE = 51;                   // smap
+        public static final int LOCATION_PERMISSIONS = 52;                   // smap
+        public static final int FORMS_UPLOADED_NOTIFICATION = 97;           // smap
+        public static final int FORMS_DOWNLOADED_NOTIFICATION = 98;         // smap
+        public static final int FORM_UPDATES_AVAILABLE_NOTIFICATION = 99;   // smap
     }
 
     public abstract static class Namespaces {
