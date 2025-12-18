@@ -15,13 +15,12 @@
 package au.smap.fieldTask.utilities;
 
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.T_TASK_STATUS;
-import static au.smap.fieldTask.utilities.ApplicationConstants.SortingOrder.BY_DISTANCE_ASC;
-import static au.smap.fieldTask.utilities.ApplicationConstants.SortingOrder.BY_DISTANCE_DESC;
 import static org.odk.collect.android.utilities.FileUtils.LAST_SAVED_FILENAME;
 import static org.odk.collect.android.utilities.FileUtils.STUB_XML;
 import static org.odk.collect.android.utilities.FileUtils.write;
 import static java.lang.StrictMath.abs;
 
+import org.odk.collect.android.utilities.ApplicationConstants;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -48,13 +47,14 @@ import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
-import au.smap.fieldTask.provider.InstanceProvider;
+import org.odk.collect.android.external.InstanceProvider;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import au.smap.fieldTask.models.InstanceXML;
-import org.odk.collect.android.tasks.SmapRegisterForMessagingTask;
+import au.smap.fieldTask.tasks.SmapRegisterForMessagingTask;
+import org.odk.collect.android.utilities.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -547,7 +547,7 @@ public class Utilities {
             }
             Collect.getInstance().setGeofences(geofences);
 
-            if (sortOrder == BY_DISTANCE_ASC || sortOrder == BY_DISTANCE_DESC) {
+            if (sortOrder == ApplicationConstants.SortingOrder.BY_DISTANCE_ASC || sortOrder == ApplicationConstants.SortingOrder.BY_DISTANCE_DESC) {
                 if (location != null) {
                     Collections.sort(tasks, (t1, t2) -> {
                         Location location1 = new Location("");
@@ -561,9 +561,9 @@ public class Utilities {
                         float distanceFromTask2 = location.distanceTo(location2);
 
                         switch (sortOrder) {
-                            case BY_DISTANCE_ASC:
+                            case ApplicationConstants.SortingOrder.BY_DISTANCE_ASC:
                                 return (int) (distanceFromTask1 - distanceFromTask2);
-                            case BY_DISTANCE_DESC:
+                            case ApplicationConstants.SortingOrder.BY_DISTANCE_DESC:
                                 return (int) (distanceFromTask2 - distanceFromTask1);
                             default:
                                 throw new IllegalStateException("must be one of BY_DISTANCE_ASC or BY_DISTANCE_DESC");

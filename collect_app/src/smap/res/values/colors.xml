@@ -4,4 +4,17 @@
     <color name="blue_500">#2196F3</color>
     <color name="green_500">#4CAF50</color>
     <color name="deep_purple_500">#673AB7</color>
+
+    <!-- Colors for recorded points and lines drawn on the map. -->
+    <color name="mapPointCircle">#ff000000</color>
+    <color name="mapPointFill">#ffffffff</color>
+    <color name="mapPointCirclePit">#ff0000ff</color>
+    <color name="mapPointFillPit">#ff0000ff</color>
+    <color name="mapPointCircleFault">#ffff0000</color>
+    <color name="mapPointFillFault">#ffff0000</color>
+    <color name="prevMapPointCircle">#ffff0000</color>
+    <color name="prevMapPointFill">#ff0000ff</color>
+    <color name="mapLine">#ffff0000</color>
+    <color name="prevMapLine">#ff0000ff</color>
+    <color name="disabled_view">#4D000000</color>
 </resources>

@@ -30,6 +30,7 @@ import androidx.annotation.NonNull;
 
 import org.odk.collect.android.analytics.AnalyticsEvents;
 import org.odk.collect.android.analytics.AnalyticsUtils;
+import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.dao.CursorLoaderFactory;
 import org.odk.collect.android.database.instances.DatabaseInstanceColumns;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
@@ -42,6 +43,8 @@ import org.odk.collect.android.utilities.InstancesRepositoryProvider;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.projects.ProjectsRepository;
 import org.odk.collect.settings.SettingsProvider;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -218,5 +221,27 @@ public class InstanceProvider extends ContentProvider {
     static {
         URI_MATCHER.addURI(InstancesContract.AUTHORITY, "instances", INSTANCES);
         URI_MATCHER.addURI(InstancesContract.AUTHORITY, "instances/#", INSTANCE_ID);
+    }
+
+    // smap
+    public void deleteAllFilesInDirectory(File directory) {
+        if (directory.exists()) {
+            // do not delete the directory if it might be an
+            // ODK Tables instance data directory. Let ODK Tables
+            // manage the lifetimes of its filled-in form data
+            // media attachments.
+            if (directory.isDirectory() && !Collect.isODKTablesInstanceDataDirectory(directory)) {
+                // delete all the files in the directory
+                File[] files = directory.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        // should make this recursive if we get worried about
+                        // the media directory containing directories
+                        f.delete();
+                    }
+                }
+            }
+            directory.delete();
+        }
     }
 }

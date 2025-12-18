@@ -49,6 +49,8 @@ public class ApplicationConstants {
         public static final int BY_DATE_ASC = 3;
         public static final int BY_STATUS_ASC = 4;
         public static final int BY_STATUS_DESC = 5;
+        public static final int BY_DISTANCE_ASC = 6;
+        public static final int BY_DISTANCE_DESC = 7;
     }
 
     public abstract static class RequestCodes {
