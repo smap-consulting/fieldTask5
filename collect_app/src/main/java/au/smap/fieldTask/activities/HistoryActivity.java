@@ -28,7 +28,7 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.adapters.InstanceListCursorAdapter;
 import au.smap.fieldTask.dao.InstancesDao;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.tasks.InstanceSyncTask;
+import au.smap.fieldTask.tasks.InstanceSyncTask;
 
 /**
  * Responsible for showing a history of:
@@ -52,13 +52,13 @@ public class HistoryActivity extends SmapHistoryListActivity implements
 
         setTitle(getString(R.string.smap_history));       // smap change to history
 
-        ((TextView) findViewById(android.R.id.empty)).setText(org.odk.collect.strings.R.string.no_items_display);
+        ((TextView) findViewById(android.R.id.empty)).setText(org.odk.collect.strings.R.string.empty_list_of_questions);
 
         init();
     }
 
     private void init() {
-        hideSort = true;
+        // hideSort = true;    SMAP BUILD
         setupAdapter();
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
