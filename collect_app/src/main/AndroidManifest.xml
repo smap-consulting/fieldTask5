@@ -99,9 +99,7 @@ the specific language governing permissions and limitations under the License.
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <activity
-            android:name=".activities.FirstLaunchActivity">
-        </activity>
+        <!-- SMAP: FirstLaunchActivity removed - SmapMain auto-creates default project -->
 
         <activity
             android:name="au.smap.fieldTask.activities.SmapMain"

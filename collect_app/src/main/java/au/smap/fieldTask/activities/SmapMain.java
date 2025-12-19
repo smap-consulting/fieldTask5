@@ -162,6 +162,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Inject
     ProjectsDataService projectsDataService;
 
+    @Inject
+    org.odk.collect.projects.ProjectsRepository projectsRepository;
+
     /*
      * Start scoped storage
      */
@@ -191,6 +194,24 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         }
     }
 
+    private void ensureDefaultProject() {
+        // Check if any projects exist
+        if (projectsRepository.getAll().isEmpty()) {
+            // Create a default project
+            org.odk.collect.projects.Project.New defaultProject = new org.odk.collect.projects.Project.New(
+                    "Default",  // name
+                    "D",        // icon
+                    "#3e9fcc"   // color (ODK blue)
+            );
+            org.odk.collect.projects.Project.Saved savedProject = projectsRepository.save(defaultProject);
+            projectsDataService.setCurrentProject(savedProject.getUuid());
+        } else if (projectsDataService.getCurrentProject() == null) {
+            // Projects exist but no current project is set - set the first one as current
+            org.odk.collect.projects.Project.Saved firstProject = projectsRepository.getAll().get(0);
+            projectsDataService.setCurrentProject(firstProject.getUuid());
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         initSplashScreen();
@@ -200,6 +221,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         LocationRegister lr = new LocationRegister();
         DaggerUtils.getComponent(this).inject(this);
+
+        // Ensure a default project exists before proceeding
+        ensureDefaultProject();
 
         String[] tabNames = {getString(R.string.smap_forms), getString(R.string.smap_tasks), getString(R.string.smap_map)};
         // Get the ViewPager and set its PagerAdapter so that it can display items
