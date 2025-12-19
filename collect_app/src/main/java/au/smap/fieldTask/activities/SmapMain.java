@@ -102,6 +102,7 @@ import javax.inject.Inject;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -178,8 +179,21 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         setSupportActionBar(toolbar);
     }
 
+    private void initSplashScreen() {
+        /*
+        We don't need the installSplashScreen call on Android 12+ (the system handles the
+        splash screen for us) and it causes problems if we later switch between dark/light themes.
+         */
+        if (Build.VERSION.SDK_INT < 31) {
+            SplashScreen.installSplashScreen(this);
+        } else {
+            setTheme(R.style.Theme_Collect);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        initSplashScreen();
         super.onCreate(savedInstanceState);
         binding = SmapMainLayoutBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
