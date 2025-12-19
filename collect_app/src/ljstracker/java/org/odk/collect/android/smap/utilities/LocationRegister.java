@@ -13,7 +13,7 @@ import org.odk.collect.android.R;
 import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.TraceUtilities;
-import org.odk.collect.android.listeners.PermissionListener;
+import import org.odk.collect.permissions.PermissionListener;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.smap.tasks.SubmitLocationTask;

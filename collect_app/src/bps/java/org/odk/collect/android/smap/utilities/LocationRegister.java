@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.listeners.PermissionListener;
+import org.odk.collect.permissions.PermissionListener;
 
 import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.permissions.PermissionsProvider;
