@@ -120,8 +120,8 @@ public class DatabaseFormsRepositorySmap implements FormsRepositorySmap {
         v.put(FORM_FILE_PATH, storagePathProvider.getFormDbPath(form.getFormFilePath()));
         v.put(FORM_MEDIA_PATH, storagePathProvider.getFormDbPath(form.getFormMediaPath()));
         v.put(DISPLAY_NAME, form.getDisplayName());
-        v.put(JR_VERSION, form.getJrVersion());
-        v.put(JR_FORM_ID, form.getJrFormId());
+        v.put(JR_VERSION, form.getVersion());
+        v.put(JR_FORM_ID, form.getFormId());
         v.put(PROJECT, form.getProject());      // smap
         v.put(TASKS_ONLY, form.getTasksOnly());      // smap
         v.put(READ_ONLY, form.getReadOnly());      // smap

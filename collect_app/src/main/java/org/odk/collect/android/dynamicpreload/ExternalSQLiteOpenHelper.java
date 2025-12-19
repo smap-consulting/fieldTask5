@@ -70,7 +70,7 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
     private double sortIdx;     // smap
     private org.odk.collect.android.tasks.FormLoaderTask formLoaderTask;     // smap
 
-    ExternalSQLiteOpenHelper(File dbFile) {
+    public ExternalSQLiteOpenHelper(File dbFile) {
         super(new AltDatabasePathContext(dbFile.getParentFile().getAbsolutePath(), Collect.getInstance()), dbFile.getName(), null, VERSION);
         sortIdx = 0.0;     // smap
     }

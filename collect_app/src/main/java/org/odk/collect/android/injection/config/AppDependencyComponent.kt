@@ -179,6 +179,10 @@ interface AppDependencyComponent {
 
     fun inject(LocationReceiver: au.smap.fieldTask.receivers.LocationReceiver)
 
+    fun inject(SubmitLocationTask: org.odk.collect.android.smap.tasks.SubmitLocationTask)
+
+    fun inject(SmapChangeOrganisationTask: au.smap.fieldTask.tasks.SmapChangeOrganisationTask)
+
     fun inject(qrCodeTabsActivity: QRCodeTabsActivity)
 
     fun inject(showQRCodeFragment: ShowQRCodeFragment)

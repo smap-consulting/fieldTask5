@@ -218,14 +218,15 @@ public class SmapTaskMapFragment extends Fragment
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.menu_about:
+            case 100:   // SMAP BUILD - menu_about
                 Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
                 startActivity(aboutIntent);
                 return true;
-            case R.id.menu_general_preferences:
+            case 101: // SMAP BUILD - menu_general_preferences
                 Intent ig = new Intent(getActivity(), ProjectPreferencesActivity.class);
                 startActivity(ig);
                 return true;
+                /* SMAP BUILD
             case R.id.menu_admin_preferences:
                 String pw = adminPreferences.getString(
                         ProtectedProjectKeys.KEY_ADMIN_PW, "");
@@ -237,13 +238,15 @@ public class SmapTaskMapFragment extends Fragment
                     ((SmapMain) getActivity()).processAdminMenu();
                 }
                 return true;
-            case R.id.menu_gettasks:
+
+                 */
+            case 102:   // SMAP BUILD - menu_gettasks
                 ((SmapMain) getActivity()).processGetTask(true);
                 return true;
-            case R.id.menu_history:
+            case 103:   // SMAP BUILD - menu_history
                 ((SmapMain) getActivity()).processHistory();
                 return true;
-            case R.id.menu_exit:
+            case 104:   // SMAP BUILD - menu_exit
                 ((SmapMain) getActivity()).exit();
                 return true;
 

@@ -29,7 +29,7 @@ public class NotificationActivity extends CollectAbstractActivity {
         showDialog(getIntent().getStringExtra(NOTIFICATION_TITLE),
                 getIntent().getStringExtra(NOTIFICATION_MESSAGE) != null
                         ? getIntent().getStringExtra(NOTIFICATION_MESSAGE)
-                        : getString(org.odk.collect.strings.R.string.notification_error));
+                        : getString(org.odk.collect.strings.R.string.error_occured));
     }
 
     private void makeTheActivityTransparent() {
