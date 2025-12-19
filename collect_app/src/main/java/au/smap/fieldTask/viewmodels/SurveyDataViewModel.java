@@ -84,7 +84,7 @@ public class SurveyDataViewModel extends ViewModel {
 
         String selectClause = "(lower(" + FormsProviderAPI.FormsColumns.SOURCE + ")='" + Utilities.getSource() + "' or " +
                 FormsProviderAPI.FormsColumns.SOURCE + " is null)" +
-                " and " + FormsProviderAPI.FormsColumns.TASKS_ONLY + " = 'no'";
+                " and (" + FormsProviderAPI.FormsColumns.TASKS_ONLY + " = 'no' or " + FormsProviderAPI.FormsColumns.TASKS_ONLY + " is null)";
 
         String[] selectArgs = null;
         if (filter.toString().trim().length() > 0) {

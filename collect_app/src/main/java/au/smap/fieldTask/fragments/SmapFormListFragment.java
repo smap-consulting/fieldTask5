@@ -359,31 +359,25 @@ public class SmapFormListFragment extends ListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case 100:   // SMAP BUILD - menu_about
-                Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
-                startActivity(aboutIntent);
-                return true;
-            case 101: // SMAP BUILD - menu_general_preferences
-                Intent ig = new Intent(getActivity(), ProjectPreferencesActivity.class);
-                startActivity(ig);
-                return true;
-                /* SMAP BUILD
-            case R.id.menu_admin_preferences:
-                String pw = adminPreferences.getString(
-                        ProtectedProjectKeys.KEY_ADMIN_PW, "");
-                if ("".equalsIgnoreCase(pw)) {
-                    Intent i = new Intent(getActivity(),
-                            AdminPreferencesActivitySmap.class);
-                    startActivity(i);
-                } else {
-                    ((SmapMain) getActivity()).processAdminMenu();
-                }
-                return true;
-                 */
-            case 102:   // SMAP BUILD - menu_gettasks
-                ((SmapMain) getActivity()).processGetTask(true);
-                return true;
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.menu_about) {
+            Intent aboutIntent = new Intent(getActivity(), AboutActivity.class);
+            startActivity(aboutIntent);
+            return true;
+        } else if (itemId == R.id.menu_general_preferences) {
+            Intent ig = new Intent(getActivity(), ProjectPreferencesActivity.class);
+            startActivity(ig);
+            return true;
+        } else if (itemId == R.id.menu_gettasks) {
+            ((SmapMain) getActivity()).processGetTask(true);
+            return true;
+        } else if (itemId == R.id.menu_sort) {
+            bottomSheetDialog.show();
+            return true;
+        }
+
+        switch (itemId) {
             case MENU_ENTERDATA:
                 processEnterData();
                 return true;
@@ -398,9 +392,6 @@ public class SmapFormListFragment extends ListFragment {
                 return true;
             case MENU_HISTORY:
                 ((SmapMain) getActivity()).processHistory();
-                return true;
-            case 103:   // SMAP BUILD - menu_sort
-                bottomSheetDialog.show();
                 return true;
             case MENU_EXIT:
                 ((SmapMain) getActivity()).exit();
