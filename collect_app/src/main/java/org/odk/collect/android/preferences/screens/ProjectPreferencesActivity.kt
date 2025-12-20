@@ -77,6 +77,14 @@ class ProjectPreferencesActivity :
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_preferences_layout)
+
+        // smap: Add fragment programmatically like AdminPreferencesActivitySmap does
+        if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.preferences_fragment_container, ProjectPreferencesFragment(intent.getBooleanExtra(EXTRA_IN_FORM_ENTRY, false)))
+                .commit()
+        }
     }
 
     override fun onPause() {
