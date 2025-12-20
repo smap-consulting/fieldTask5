@@ -17,7 +17,10 @@ package org.odk.collect.android.activities
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,7 +38,6 @@ import javax.inject.Inject
 
 class AboutActivity : LocalizedActivity(), AboutItemClickListener {
     private lateinit var websiteUri: Uri
-    private lateinit var forumUri: Uri
 
     @Inject
     lateinit var intentLauncher: IntentLauncher
@@ -49,48 +51,45 @@ class AboutActivity : LocalizedActivity(), AboutItemClickListener {
         DaggerUtils.getComponent(this).inject(this)
         initToolbar()
 
+        // smap: use smap website URL
+        websiteUri = Uri.parse(getString(org.odk.collect.strings.R.string.app_url))
+
+        // smap: create items array with Android version
+        val itemsWithVersion = arrayOf(
+            *ITEMS,
+            intArrayOf(
+                R.drawable.ic_phone,
+                -2, // special marker for Android version (not a string resource)
+                -1
+            )
+        )
+
         findViewById<RecyclerView>(R.id.recyclerView).apply {
             layoutManager = LinearLayoutManager(this@AboutActivity)
-            adapter = AboutListAdapter(ITEMS, this@AboutActivity)
+            adapter = AboutListAdapter(itemsWithVersion, this@AboutActivity,
+                getString(R.string.smap_android_version, Build.VERSION.RELEASE))
             itemAnimator = DefaultItemAnimator()
         }
-
-        websiteUri = Uri.parse(getString(org.odk.collect.strings.R.string.app_url))
-        forumUri = Uri.parse(getString(org.odk.collect.strings.R.string.forum_url))
     }
 
     private fun initToolbar() {
         val toolbar = findViewById<Toolbar>(org.odk.collect.androidshared.R.id.toolbar)
-        title = getString(org.odk.collect.strings.R.string.about_preferences)
+        // smap: include version in title
+        title = getString(org.odk.collect.strings.R.string.about_preferences) +
+                " " +
+                getString(org.odk.collect.strings.R.string.version) +
+                " " +
+                getString(org.odk.collect.strings.R.string.app_version)
         setSupportActionBar(toolbar)
     }
 
     override fun onClick(position: Int) {
         if (allowClick(javaClass.name)) {
             when (position) {
-                0 -> webPageService.openWebPage(this, websiteUri)
-                1 -> webPageService.openWebPage(this, forumUri)
-                2 -> shareApp()
-                3 -> addReview()
-                4 -> startActivity(Intent(this, OssLicensesMenuActivity::class.java))
+                0 -> webPageService.openWebPage(this, websiteUri) // smap: visit website
+                1 -> addReview() // smap: leave a review
             }
         }
-    }
-
-    private fun shareApp() {
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(
-                Intent.EXTRA_TEXT,
-                getString(org.odk.collect.strings.R.string.tell_your_friends_msg) + " " + GOOGLE_PLAY_URL + packageName
-            )
-        }
-        startActivity(
-            Intent.createChooser(
-                shareIntent,
-                getString(org.odk.collect.strings.R.string.tell_your_friends)
-            )
-        )
     }
 
     private fun addReview() {
@@ -111,31 +110,17 @@ class AboutActivity : LocalizedActivity(), AboutItemClickListener {
 
     companion object {
         private const val GOOGLE_PLAY_URL = "https://play.google.com/store/apps/details?id="
+        // smap: only show visit website and leave a review
         private val ITEMS = arrayOf(
             intArrayOf(
                 R.drawable.ic_outline_website_24,
-                org.odk.collect.strings.R.string.odk_website,
-                org.odk.collect.strings.R.string.odk_website_summary
-            ),
-            intArrayOf(
-                R.drawable.ic_outline_forum_24,
-                org.odk.collect.strings.R.string.odk_forum,
-                org.odk.collect.strings.R.string.odk_forum_summary
-            ),
-            intArrayOf(
-                R.drawable.ic_outline_share_24,
-                org.odk.collect.strings.R.string.tell_your_friends,
-                org.odk.collect.strings.R.string.tell_your_friends_msg
+                R.string.smap_visit_website,
+                -1 // no summary
             ),
             intArrayOf(
                 R.drawable.ic_outline_rate_review_24,
                 org.odk.collect.strings.R.string.leave_a_review,
-                org.odk.collect.strings.R.string.leave_a_review_msg
-            ),
-            intArrayOf(
-                R.drawable.ic_outline_stars_24,
-                org.odk.collect.strings.R.string.all_open_source_licenses,
-                org.odk.collect.strings.R.string.all_open_source_licenses_msg
+                -1 // no summary
             )
         )
     }

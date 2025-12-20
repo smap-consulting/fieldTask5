@@ -20,7 +20,8 @@ import org.odk.collect.android.databinding.AboutItemLayoutBinding
 
 class AboutListAdapter(
     private val items: Array<IntArray>,
-    private val listener: AboutItemClickListener
+    private val listener: AboutItemClickListener,
+    private val androidVersionText: String? = null // smap: for Android version display
 ) : RecyclerView.Adapter<AboutListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,13 +31,35 @@ class AboutListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.apply {
-            binding.root.setOnClickListener {
-                listener.onClick(position)
+            val titleResId = items[position][1]
+
+            // smap: special handling for Android version (titleResId == -2)
+            if (titleResId == -2 && androidVersionText != null) {
+                // Android version item - not clickable
+                binding.root.setOnClickListener(null)
+                binding.root.isClickable = false
+                binding.imageView.setImageResource(items[position][0])
+                binding.imageView.tag = items[position][0]
+                binding.title.text = androidVersionText
+                binding.summary.visibility = android.view.View.GONE
+            } else {
+                // Regular clickable item
+                binding.root.setOnClickListener {
+                    listener.onClick(position)
+                }
+                binding.imageView.setImageResource(items[position][0])
+                binding.imageView.tag = items[position][0]
+                binding.title.text = holder.binding.root.context.getString(titleResId)
+
+                // smap: hide summary if resource ID is -1
+                val summaryResId = items[position][2]
+                if (summaryResId != -1) {
+                    binding.summary.text = holder.binding.root.context.getString(summaryResId)
+                    binding.summary.visibility = android.view.View.VISIBLE
+                } else {
+                    binding.summary.visibility = android.view.View.GONE
+                }
             }
-            binding.imageView.setImageResource(items[position][0])
-            binding.imageView.tag = items[position][0]
-            binding.title.text = holder.binding.root.context.getString(items[position][1])
-            binding.summary.text = holder.binding.root.context.getString(items[position][2])
         }
     }
 
