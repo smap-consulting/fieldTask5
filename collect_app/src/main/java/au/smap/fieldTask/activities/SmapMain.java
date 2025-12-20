@@ -177,7 +177,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
     private void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setTitle(getString(R.string.app_name));
+        setTitle(getString(org.odk.collect.strings.R.string.app_name));
         toolbar.setNavigationIcon(R.mipmap.ic_nav);
         setSupportActionBar(toolbar);
     }

@@ -93,7 +93,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             manager.createNotificationChannel(chan);
 
             Notification.Builder builder = new Notification.Builder(this, FG_CHANNEL_ID)
-                    .setContentTitle(getString(R.string.app_name))
+                    .setContentTitle(getString(org.odk.collect.strings.R.string.app_name))
                     .setContentText("some text")
                     .setAutoCancel(true);
 

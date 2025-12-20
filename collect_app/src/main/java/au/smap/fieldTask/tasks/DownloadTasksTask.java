@@ -204,10 +204,11 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     public HashMap<String, String> doInBackground(Void... values) {
 
 		results = new HashMap<String,String>();
+        // smap: use settingsProvider instead of deprecated PreferenceManager
         sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(Collect.getInstance().getBaseContext());
         source = Utilities.getSource();
-        serverUrl = sharedPreferences.getString(ProjectKeys.KEY_SERVER_URL, null);
+        serverUrl = settingsProvider.getUnprotectedSettings().getString(ProjectKeys.KEY_SERVER_URL);
         taskURL = serverUrl + "/surveyKPI/myassignments?orgs=true&noprojects=true&linked=true&manifests=true";
 
         // Initialize repositories from providers (needed for setRepositories call)
@@ -227,7 +228,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             NotificationCompat.Builder builder = new NotificationCompat.Builder(
                     Collect.getInstance(),
                     NotificationManagerNotifier.COLLECT_NOTIFICATION_CHANNEL)
-                    .setContentTitle(Collect.getInstance().getString(R.string.app_name))
+                    .setContentTitle(Collect.getInstance().getString(org.odk.collect.strings.R.string.app_name))
                     .setContentText(Collect.getInstance().getBaseContext().getString(R.string.smap_refresh_started))
                     .setSmallIcon(org.odk.collect.icons.R.drawable.ic_notification_small)
                     .setAutoCancel(true);
@@ -248,7 +249,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             NotificationCompat.Builder completeBuilder = new NotificationCompat.Builder(
                     Collect.getInstance(),
                     NotificationManagerNotifier.COLLECT_NOTIFICATION_CHANNEL)
-                    .setContentTitle(Collect.getInstance().getString(R.string.app_name))
+                    .setContentTitle(Collect.getInstance().getString(org.odk.collect.strings.R.string.app_name))
                     .setContentText(message.toString().trim())
                     .setSmallIcon(org.odk.collect.icons.R.drawable.ic_notification_small)
                     .setContentIntent(pendingNotify)
