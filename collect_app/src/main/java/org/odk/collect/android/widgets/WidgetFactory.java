@@ -56,6 +56,11 @@ import org.odk.collect.android.widgets.range.RangePickerIntegerWidget;
 import org.odk.collect.android.widgets.utilities.ActivityGeoDataRequester;
 import org.odk.collect.android.widgets.video.ExVideoWidget;
 import org.odk.collect.android.widgets.video.VideoWidget;
+
+// smap chart widgets
+import au.smap.fieldTask.widgets.SmapChartLineWidget;
+import au.smap.fieldTask.widgets.SmapChartHorizontalBarWidget;
+
 import org.odk.collect.audioclips.AudioPlayer;
 import org.odk.collect.android.widgets.utilities.AudioRecorderRecordingStatusHandler;
 import org.odk.collect.android.widgets.utilities.DateTimeWidgetUtils;
@@ -202,6 +207,18 @@ public class WidgetFactory {
                             questionWidget = new StringNumberWidget(activity, questionDetails, dependencies);
                         } else if (appearance.equals(Appearances.URL)) {
                             questionWidget = new UrlWidget(activity, questionDetails, CustomTabsWebPageService.INSTANCE, dependencies);
+                        } else if (appearance.contains("chart")) {        // smap chart
+                            String chartType = questionDetails.getPrompt().getQuestion().getAdditionalAttribute(null, "chart_type");
+                            if(chartType == null) {
+                                chartType = "line";
+                            }
+                            if(chartType.equals("line")) {
+                                questionWidget = new SmapChartLineWidget(activity, questionDetails, appearance, dependencies);
+                            } else if(chartType.equals("horizontal_bar")){
+                                questionWidget = new SmapChartHorizontalBarWidget(activity, questionDetails, appearance, dependencies);
+                            } else {
+                                questionWidget = new SmapChartLineWidget(activity, questionDetails, appearance, dependencies);
+                            }
                         } else {
                             questionWidget = new StringWidget(activity, questionDetails, dependencies);
                         }

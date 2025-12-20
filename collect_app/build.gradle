@@ -380,6 +380,7 @@ dependencies {
     implementation libs.persianJodaTime
     implementation libs.myanmarCalendar
     implementation files('libs/bikram-sambat-1.8.0.jar')
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'  // smap chart widgets
     implementation libs.commonsIo
     implementation (libs.opencsv) {
         exclude group: 'commons-logging'
