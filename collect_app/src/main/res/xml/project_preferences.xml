@@ -69,7 +69,11 @@ limitations under the License.
             android:key="admin_password"
             android:title="@string/set_admin_password" />
 
-        <!-- SMAP: Removed project_management preference - single project mode -->
+        <Preference
+            android:icon="@drawable/ic_outline_settings_accent_24"
+            android:key="project_management"
+            android:title="@string/project_management_section_title"
+            android:summary="@string/project_management_section_subtext"/>
 
         <Preference
             android:icon="@drawable/ic_outline_lock_accent_24"
