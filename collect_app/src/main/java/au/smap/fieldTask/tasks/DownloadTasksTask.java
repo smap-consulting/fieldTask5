@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Cloudtec Pty Ltd
+ * Copyright (C) 2025 Smap Consulting Pty Ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
@@ -204,7 +204,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     public HashMap<String, String> doInBackground(Void... values) {
 
 		results = new HashMap<String,String>();
-        // smap: use settingsProvider instead of deprecated PreferenceManager
+        // smap: use settingsProvider instead of deprecated PreferenceManager - TODO preferenceManager null?
         sharedPreferences = PreferenceManager
                 .getDefaultSharedPreferences(Collect.getInstance().getBaseContext());
         source = Utilities.getSource();

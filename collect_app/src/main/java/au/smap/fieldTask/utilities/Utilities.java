@@ -106,13 +106,9 @@ public class Utilities {
 
     // Get the task source
     public static String getSource() {
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(Collect.getInstance()
-                        .getBaseContext());
-        String serverUrl = sharedPreferences.getString(
-                ProjectKeys.KEY_SERVER_URL, null);
+        String serverUrl = (String) GeneralSharedPreferencesSmap.getInstance()
+                .get(ProjectKeys.KEY_SERVER_URL);
         String source = STFileUtils.getSource(serverUrl);
-
 
         return source;
     }
