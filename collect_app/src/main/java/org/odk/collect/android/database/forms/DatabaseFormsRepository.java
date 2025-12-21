@@ -274,7 +274,12 @@ public class DatabaseFormsRepository implements FormsRepository {
                     GEOMETRY_XPATH,
                     DELETED_DATE,
                     LAST_DETECTED_ATTACHMENTS_UPDATE_DATE,
-                    USES_ENTITIES
+                    USES_ENTITIES,
+                    DatabaseFormColumns.PROJECT,
+                    DatabaseFormColumns.TASKS_ONLY,
+                    DatabaseFormColumns.READ_ONLY,
+                    DatabaseFormColumns.SEARCH_LOCAL_DATA,
+                    DatabaseFormColumns.SOURCE
             };
         }
 

@@ -316,7 +316,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
     	Timber.i("Synchronise()");
 
-        if(source != null) {
+        if(source != null && !source.equals("none")) {
 	        try {
 
                 /*
@@ -358,10 +358,6 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 	        	 * Get new forms and tasks from the server
 	        	 */
                 publishProgress(Collect.getInstance().getString(R.string.smap_new_forms));
-
-                if(taskURL.startsWith("null")) {
-                    throw new Exception(Collect.getInstance().getString(R.string.smap_no_server));
-                }
 
                 Uri u = Uri.parse(taskURL);
 
@@ -851,6 +847,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
             MultiFormDownloaderSmap multiFormDownloader = new MultiFormDownloaderSmap(
                     new OpenRosaXmlFetcher(httpInterface, webCredentialsUtils),
+                    formsRepository,
                     propertyManager);
             Timber.i("Downloading " + toDownload.size() + " forms");
             if(toDownload.size() > 0) {

@@ -18,8 +18,6 @@ import org.odk.collect.android.logic.FileReferenceFactory;
 import org.odk.collect.metadata.PropertyManager;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.smap.database.DatabaseFormsRepositorySmap;
-import org.odk.collect.android.smap.forms.FormsRepositorySmap;
 import org.odk.collect.android.smap.openrosa.api.FormListApiSmap;
 import org.odk.collect.android.smap.openrosa.api.OpenRosaFormListApiSmap;
 import org.odk.collect.android.storage.StoragePathProvider;
@@ -58,11 +56,11 @@ public class MultiFormDownloaderSmap {
     private static final String TEMP_DOWNLOAD_EXTENSION = ".tempDownload";
 
     private final FormListApiSmap formListApi;
-    private final FormsRepositorySmap formsRepository;
+    private final FormsRepository formsRepository;
     private final PropertyManager propertyManager;
 
-    public MultiFormDownloaderSmap(OpenRosaXmlFetcher openRosaXmlFetcher, PropertyManager propertyManager) {
-        this.formsRepository = new DatabaseFormsRepositorySmap();
+    public MultiFormDownloaderSmap(OpenRosaXmlFetcher openRosaXmlFetcher, FormsRepository formsRepository, PropertyManager propertyManager) {
+        this.formsRepository = formsRepository;
         this.formListApi = new OpenRosaFormListApiSmap(openRosaXmlFetcher);
         this.propertyManager = propertyManager;
     }
@@ -252,7 +250,8 @@ public class MultiFormDownloaderSmap {
         Form form = formsRepository.getOneByPath(formFile.getAbsolutePath());
 
         if (form == null) {
-            uri = saveNewForm(formInfo, formFile, mediaPath, tasks_only, read_only, searchLocalData, source, project);       // smap add tasks_only and source
+            Form savedForm = saveNewForm(formInfo, formFile, mediaPath, tasks_only, read_only, searchLocalData, source, project);       // smap add tasks_only and source
+            uri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, savedForm.getDbId().toString());
             return new UriResult(uri, mediaPath, true);
         } else {
             uri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, form.getDbId().toString());
@@ -266,7 +265,7 @@ public class MultiFormDownloaderSmap {
         }
     }
 
-    private Uri saveNewForm(Map<String, String> formInfo, File formFile, String mediaPath,
+    private Form saveNewForm(Map<String, String> formInfo, File formFile, String mediaPath,
                             boolean tasks_only, boolean read_only,
                             boolean searchLocalData, String source, String project) {    // smap add tasks_only, searchLocalData, source project
         Form form = new Form.Builder()

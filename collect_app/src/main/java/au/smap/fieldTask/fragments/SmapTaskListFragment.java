@@ -537,11 +537,8 @@ public class SmapTaskListFragment extends ListFragment {
     }
 
     private void processManageFiles() {
-        /* SMAP BUILD
-        Intent i = new Intent(getContext(), org.odk.collect.android.activities.DeleteSavedFormActivity.class);
+        Intent i = new Intent(getContext(), org.odk.collect.android.activities.DeleteFormsActivity.class);
         startActivity(i);
-
-         */
     }
 
     private void rejectTask(String reason, TaskEntry taskEntry) {

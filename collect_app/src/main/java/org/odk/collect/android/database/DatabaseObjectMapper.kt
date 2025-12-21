@@ -37,6 +37,12 @@ object DatabaseObjectMapper {
         values.put(DatabaseFormColumns.GEOMETRY_XPATH, form.geometryXpath)
         values.put(DatabaseFormColumns.LAST_DETECTED_ATTACHMENTS_UPDATE_DATE, form.lastDetectedAttachmentsUpdateDate)
         values.put(DatabaseFormColumns.USES_ENTITIES, Boolean.toString(form.usesEntities()))
+        // Smap-specific columns
+        values.put(DatabaseFormColumns.PROJECT, form.project)
+        values.put(DatabaseFormColumns.TASKS_ONLY, form.tasksOnly)
+        values.put(DatabaseFormColumns.READ_ONLY, form.readOnly)
+        values.put(DatabaseFormColumns.SEARCH_LOCAL_DATA, form.searchLocalData)
+        values.put(DatabaseFormColumns.SOURCE, form.source)
         return values
     }
 
@@ -67,6 +73,12 @@ object DatabaseObjectMapper {
         val deletedDateColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.DELETED_DATE)
         val lastDetectedAttachmentsUpdateDateColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.LAST_DETECTED_ATTACHMENTS_UPDATE_DATE)
         val usesEntitiesColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.USES_ENTITIES)
+        // Smap-specific column indices
+        val projectColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.PROJECT)
+        val tasksOnlyColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.TASKS_ONLY)
+        val readOnlyColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.READ_ONLY)
+        val searchLocalDataColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.SEARCH_LOCAL_DATA)
+        val sourceColumnIndex = cursor.getColumnIndex(DatabaseFormColumns.SOURCE)
         return Form.Builder()
             .dbId(cursor.getLong(idColumnIndex))
             .displayName(cursor.getString(displayNameColumnIndex))
@@ -102,6 +114,12 @@ object DatabaseObjectMapper {
             .deleted(!cursor.isNull(deletedDateColumnIndex))
             .lastDetectedAttachmentsUpdateDate(cursor.getLongOrNull(lastDetectedAttachmentsUpdateDateColumnIndex))
             .usesEntities(Boolean.valueOf(cursor.getString(usesEntitiesColumnIndex)))
+            // Smap-specific columns
+            .project(cursor.getString(projectColumnIndex))
+            .tasksOnly(cursor.getString(tasksOnlyColumnIndex))
+            .readOnly(cursor.getString(readOnlyColumnIndex))
+            .searchLocalData(cursor.getString(searchLocalDataColumnIndex))
+            .source(cursor.getString(sourceColumnIndex))
             .build()
     }
 
