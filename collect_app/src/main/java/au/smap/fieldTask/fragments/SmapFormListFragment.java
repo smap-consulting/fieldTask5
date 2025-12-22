@@ -431,11 +431,8 @@ public class SmapFormListFragment extends ListFragment {
 
     // Send data
     private void processSendData() {
-        /* SMAP BUILD
-        Intent i = new Intent(getContext(), org.odk.collect.android.activities.InstanceUploaderListActivity.class);
+        Intent i = new Intent(getContext(), org.odk.collect.android.instancemanagement.send.InstanceUploaderListActivity.class);
         startActivity(i);
-
-         */
     }
 
     private void processManageFiles() {

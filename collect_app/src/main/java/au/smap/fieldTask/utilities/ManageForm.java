@@ -413,6 +413,7 @@ public class ManageForm {
 
 
         //values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(false));
+        values.put(InstanceColumns.CAN_DELETE_BEFORE_SEND, Boolean.toString(true));
 
     	return Collect.getInstance().getContentResolver()
     			.insert(InstanceColumns.CONTENT_URI, values);

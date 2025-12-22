@@ -189,7 +189,7 @@ object DatabaseObjectMapper {
             .geometryType(cursor.getString(geometryTypeColumnIndex))
             .geometry(cursor.getString(geometryColumnIndex))
             .dbId(cursor.getLong(databaseIdIndex))
-            .canDeleteBeforeSend(Boolean.valueOf(cursor.getString(canDeleteBeforeSendIndex)))
+            .canDeleteBeforeSend(cursor.getString(canDeleteBeforeSendIndex)?.let { Boolean.valueOf(it) } ?: true)
             .editOf(cursor.getLongOrNull(editOfColumnIndex))
             .editNumber(cursor.getLongOrNull(editNumberColumnIndex))
             .build()

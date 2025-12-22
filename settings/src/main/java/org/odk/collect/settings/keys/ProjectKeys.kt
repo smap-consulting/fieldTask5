@@ -89,7 +89,7 @@ object ProjectKeys {
     const val KEY_SMAP_LOCATION_TRIGGER = "location_trigger" // Enable triggering of forms by location
     const val KEY_SMAP_ODK_STYLE_MENUS = "odk_style_menus" // Show ODK style menus as well as refresh
     const val KEY_SMAP_ODK_INSTANCENAME = "odk_instancename" // Allow user to change instance name
-    const val KEY_SMAP_ODK_MARK_FINALIZED = "odk_mark_finalized" // Allow user to change instance name
+    const val KEY_SMAP_ODK_MARK_FINALIZED = "odk_mark_finalized" // Allow user to mark an instance as incomplete
     const val KEY_SMAP_PREVENT_DISABLE_TRACK = "disable_prevent_track" // Prevent the user from disabling tracking
     const val KEY_SMAP_ENABLE_GEOFENCE = "enable_geofence" // Monitor location for geofence
     const val KEY_SMAP_ODK_ADMIN_MENU = "odk_admin_menu" // Show ODK admin menu

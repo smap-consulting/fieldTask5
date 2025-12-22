@@ -57,6 +57,8 @@ class FormEndView(
             binding.markFinished.visibility = android.view.View.VISIBLE
         } else {
             binding.markFinished.visibility = android.view.View.GONE
+            // When checkbox is hidden, set it to instanceComplete so it's used correctly
+            binding.markFinished.isChecked = instanceComplete
         }
 
         // Setup save/exit button

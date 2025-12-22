@@ -1186,14 +1186,15 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         }
         boolean readOnly = form != null && "yes".equals(form.getReadOnly());
 
-        // Check if instance is complete (smap)
-        boolean instanceComplete = formController.isSubmissionEntireForm();
-
         // Get smap settings for showing instance name and mark finalized checkbox (smap)
         boolean showInstanceName = (boolean) au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap.getInstance()
                 .get(org.odk.collect.settings.keys.ProjectKeys.KEY_SMAP_ODK_INSTANCENAME);
         boolean showMarkFinalized = (boolean) au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap.getInstance()
                 .get(org.odk.collect.settings.keys.ProjectKeys.KEY_SMAP_ODK_MARK_FINALIZED);
+
+        // Default to finalizing the survey (smap behavior)
+        // If checkbox is shown, user can uncheck to save as incomplete
+        boolean instanceComplete = true;
 
         final String finalSaveName = saveName;
         return new FormEndView(
