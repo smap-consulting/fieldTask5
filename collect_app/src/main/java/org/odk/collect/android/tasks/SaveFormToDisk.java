@@ -58,6 +58,7 @@ import org.odk.collect.android.utilities.FormsRepositoryProvider;
 import org.odk.collect.android.utilities.MediaUtils;
 import org.odk.collect.entities.storage.EntitiesRepository;
 import org.odk.collect.forms.Form;
+import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 import org.odk.collect.shared.files.FileExt;
@@ -203,6 +204,7 @@ public class SaveFormToDisk {
 
         instanceBuilder.canEditWhenComplete(canEditAfterCompleted);
 
+        Form form = null;
         if (instance != null) {
             String geometryXpath = getGeometryXpathForInstance(instance);
             Pair<String, String> geometryContentValues = extractGeometryContentValues(formInstance, geometryXpath);
@@ -210,12 +212,9 @@ public class SaveFormToDisk {
                 instanceBuilder.geometryType(geometryContentValues.first);
                 instanceBuilder.geometry(geometryContentValues.second);
             }
-
-            Instance newInstance = instancesRepository.save(instanceBuilder.build());
-            uri = InstancesContract.getUri(currentProjectId, newInstance.getDbId());
         } else {
             Timber.i("No instance found, creating");
-            Form form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(uri));
+            form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(uri));
             if (form == null) {
                 throw new FileNotFoundException();
             }
@@ -241,6 +240,62 @@ public class SaveFormToDisk {
 
         Instance newInstance = instancesRepository.save(instanceBuilder.build());
         uri = InstancesContract.getUri(currentProjectId, newInstance.getDbId());
+
+        // Update smap-specific columns in the database
+        if (form == null) {
+            // Get the form if we didn't already retrieve it above (for existing instances)
+            // Use the formId and version from the instance to find the form
+            FormsRepository formsRepository = new FormsRepositoryProvider(Collect.getInstance()).create();
+            form = formsRepository.getLatestByFormIdAndVersion(newInstance.getFormId(), newInstance.getFormVersion());
+        }
+
+        if (form != null) {
+            ContentValues smapValues = new ContentValues();
+
+            // Set source from form, or use current source if form doesn't have one
+            String source = form.getSource();
+            if (source == null || source.isEmpty()) {
+                source = au.smap.fieldTask.utilities.Utilities.getSource();
+            }
+            smapValues.put(DatabaseInstanceColumns.SOURCE, source);
+
+            // Set task status based on state (smap)
+            if (shouldFinalize) {
+                smapValues.put(DatabaseInstanceColumns.T_TASK_STATUS, "complete");
+            } else {
+                smapValues.put(DatabaseInstanceColumns.T_TASK_STATUS, "accepted");
+            }
+
+            // Add UUID (smap)
+            smapValues.put(DatabaseInstanceColumns.UUID, formController.getSubmissionMetadata().instanceId);
+
+            // Add actual location (smap)
+            double lon = 0.0;
+            double lat = 0.0;
+            android.location.Location location = Collect.getInstance().getLocation();
+            if (location != null) {
+                lon = location.getLongitude();
+                lat = location.getLatitude();
+            }
+            smapValues.put(DatabaseInstanceColumns.ACT_LON, lon);
+            smapValues.put(DatabaseInstanceColumns.ACT_LAT, lat);
+
+            // Add timestamp and sync status (smap)
+            smapValues.put(DatabaseInstanceColumns.T_ACT_FINISH, java.util.Calendar.getInstance().getTime().getTime());
+            smapValues.put(DatabaseInstanceColumns.T_IS_SYNC, au.smap.fieldTask.utilities.Utilities.STATUS_SYNC_NO);
+
+            // Add other smap fields
+            smapValues.put(DatabaseInstanceColumns.T_REPEAT, 0);  // When saved it is no longer a repeat task
+            smapValues.put(DatabaseInstanceColumns.T_UPDATED, 1);
+
+            Collect.getInstance().getContentResolver().update(
+                    uri,
+                    smapValues,
+                    null,
+                    null
+            );
+        }
+
         return newInstance;
     }
 

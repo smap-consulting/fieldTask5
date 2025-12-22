@@ -438,7 +438,7 @@ public class Utilities {
         } else {
             selectClause = "(lower(" + InstanceColumns.SOURCE + ") = ?" +
                     " or " + InstanceColumns.SOURCE + " = 'local')" +
-                    " and " + InstanceColumns.T_TASK_STATUS + " != ? ";
+                    " and (" + InstanceColumns.T_TASK_STATUS + " != ? or " + InstanceColumns.T_TASK_STATUS + " is null)";
         }
         if (!getDeletedTasks) {
             selectClause += " and (" + InstanceColumns.DELETED_DATE + " is null or "

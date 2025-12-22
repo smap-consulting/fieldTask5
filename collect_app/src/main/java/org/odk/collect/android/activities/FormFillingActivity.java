@@ -1178,12 +1178,48 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             updateNavigationButtonVisibility();
         }
 
+        // Get form to check if it's read-only (smap)
+        Form form = null;
+        Uri formUri = getIntent().getData();
+        if (formUri != null) {
+            form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri));
+        }
+        boolean readOnly = form != null && "yes".equals(form.getReadOnly());
+
+        // Check if instance is complete (smap)
+        boolean instanceComplete = formController.isSubmissionEntireForm();
+
+        // Get smap settings for showing instance name and mark finalized checkbox (smap)
+        boolean showInstanceName = (boolean) au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap.getInstance()
+                .get(org.odk.collect.settings.keys.ProjectKeys.KEY_SMAP_ODK_INSTANCENAME);
+        boolean showMarkFinalized = (boolean) au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap.getInstance()
+                .get(org.odk.collect.settings.keys.ProjectKeys.KEY_SMAP_ODK_MARK_FINALIZED);
+
+        final String finalSaveName = saveName;
         return new FormEndView(
                 this,
-                userVisibleInstanceName != null ? userVisibleInstanceName : saveName,
-                formEntryViewModel.isFormEditableAfterFinalization(),
-                formEndViewModel,
-                markAsFinalized -> saveForm(true, markAsFinalized, saveName, false)
+                formSaveViewModel.getFormName(),
+                finalSaveName,
+                readOnly,
+                instanceComplete,
+                showInstanceName,
+                showMarkFinalized,
+                new FormEndView.Listener() {
+                    @Override
+                    public void onSaveAsChanged(String saveAs) {
+                        saveName = saveAs;
+                    }
+
+                    @Override
+                    public void onSaveClicked(boolean markAsFinalized) {
+                        saveForm(true, markAsFinalized, saveName, false);
+                    }
+
+                    @Override
+                    public void onExitClicked() {
+                        finishAndRemoveTask();
+                    }
+                }
         );
     }
 

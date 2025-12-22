@@ -1,18 +1,22 @@
 package org.odk.collect.android.formentry
 
 import android.content.Context
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextWatcher
 import android.view.LayoutInflater
-import android.view.View
-import androidx.core.view.isVisible
-import androidx.core.widget.NestedScrollView
-import org.odk.collect.android.R
+import android.widget.ScrollView
 import org.odk.collect.android.databinding.FormEntryEndBinding
+import org.odk.collect.android.utilities.FormNameUtils
 
 class FormEndView(
     context: Context,
     formTitle: String,
-    isFormEditableAfterFinalization: Boolean,
-    formEndViewModel: FormEndViewModel,
+    defaultInstanceName: String,
+    readOnly: Boolean,
+    instanceComplete: Boolean,
+    showInstanceName: Boolean,
+    showMarkFinalized: Boolean,
     private val listener: Listener
 ) : SwipeHandler.View(context) {
 
@@ -21,104 +25,64 @@ class FormEndView(
     init {
         binding.description.text = context.getString(org.odk.collect.strings.R.string.save_enter_data_description, formTitle)
 
-        binding.saveAsDraft.isVisible = formEndViewModel.isSaveDraftEnabled()
-        binding.saveAsDraft.setOnClickListener {
-            listener.onSaveClicked(false)
-        }
-
-        binding.finalize.isVisible = formEndViewModel.isFinalizeEnabled()
-        binding.finalize.setOnClickListener {
-            listener.onSaveClicked(true)
-        }
-
-        binding.divider.isVisible = binding.saveAsDraft.isVisible && binding.finalize.isVisible
-
-        val shouldFormBeSentAutomatically = formEndViewModel.shouldFormBeSentAutomatically()
-        if (shouldFormBeSentAutomatically) {
-            binding.finalize.text = context.getString(org.odk.collect.strings.R.string.send)
-        }
-
-        if (binding.saveAsDraft.isVisible && binding.finalize.isVisible) {
-            if (shouldFormBeSentAutomatically) {
-                if (isFormEditableAfterFinalization) {
-                    setWarning(
-                        icon = R.drawable.ic_edit_24,
-                        title = org.odk.collect.strings.R.string.form_editing_enabled_after_sending,
-                        hint = org.odk.collect.strings.R.string.form_editing_enabled_after_sending_hint
-                    )
-                } else {
-                    setWarning(
-                        icon = R.drawable.ic_edit_off_24,
-                        title = org.odk.collect.strings.R.string.form_editing_disabled_after_sending,
-                        hint = org.odk.collect.strings.R.string.form_editing_disabled_hint
-                    )
-                }
-            } else {
-                if (isFormEditableAfterFinalization) {
-                    setWarning(
-                        icon = R.drawable.ic_edit_24,
-                        title = org.odk.collect.strings.R.string.form_editing_enabled_after_finalizing,
-                        hint = org.odk.collect.strings.R.string.form_editing_enabled_after_finalizing_hint
-                    )
-                } else {
-                    setWarning(
-                        icon = R.drawable.ic_edit_off_24,
-                        title = org.odk.collect.strings.R.string.form_editing_disabled_after_finalizing,
-                        hint = org.odk.collect.strings.R.string.form_editing_disabled_hint
-                    )
-                }
+        // Setup save name edit text (smap: conditionally show based on setting)
+        if (showInstanceName) {
+            // Disallow carriage returns in the name
+            val returnFilter = InputFilter { source, start, end, _, _, _ ->
+                FormNameUtils.normalizeFormName(source.toString().substring(start, end), true)
             }
-        } else if (binding.finalize.isVisible) {
-            if (shouldFormBeSentAutomatically) {
-                if (isFormEditableAfterFinalization) {
-                    setWarning(
-                        icon = R.drawable.ic_edit_24,
-                        title = org.odk.collect.strings.R.string.form_editing_enabled_after_sending,
-                        hint = org.odk.collect.strings.R.string.form_editing_enabled_after_sending_hint
-                    )
-                } else {
-                    setWarning(
-                        icon = R.drawable.ic_edit_off_24,
-                        title = org.odk.collect.strings.R.string.form_editing_disabled_after_sending,
-                        hint = null
-                    )
+            binding.saveName.filters = arrayOf(returnFilter)
+            binding.saveName.setText(defaultInstanceName)
+            binding.saveName.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                    listener.onSaveAsChanged(s.toString())
                 }
-            } else {
-                if (isFormEditableAfterFinalization) {
-                    setWarning(
-                        icon = R.drawable.ic_edit_24,
-                        title = org.odk.collect.strings.R.string.form_editing_enabled_after_finalizing,
-                        hint = org.odk.collect.strings.R.string.form_editing_enabled_after_finalizing_hint
-                    )
-                } else {
-                    setWarning(
-                        icon = R.drawable.ic_edit_off_24,
-                        title = org.odk.collect.strings.R.string.form_editing_disabled_after_finalizing,
-                        hint = null
-                    )
+
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                }
+            })
+            binding.saveFormAs.visibility = android.view.View.VISIBLE
+            binding.saveName.visibility = android.view.View.VISIBLE
+        } else {
+            binding.saveFormAs.visibility = android.view.View.GONE
+            binding.saveName.visibility = android.view.View.GONE
+        }
+
+        // Setup mark finished checkbox (smap: conditionally show based on setting)
+        if (showMarkFinalized) {
+            binding.markFinished.isChecked = instanceComplete
+            binding.markFinished.visibility = android.view.View.VISIBLE
+        } else {
+            binding.markFinished.visibility = android.view.View.GONE
+        }
+
+        // Setup save/exit button
+        if (!readOnly) {
+            // Note even instances that cannot be updated have to be saved as the comments are saved
+            binding.saveExitButton.setOnClickListener {
+                listener.onSaveClicked(binding.markFinished.isChecked)
             }
         } else {
-            binding.formEditsWarning.visibility = View.GONE
-        }
-    }
-
-    private fun setWarning(icon: Int, title: Int, hint: Int?) {
-        binding.formEditsIcon.setImageResource(icon)
-        binding.formEditsWarningTitle.setText(title)
-
-        if (hint != null) {
-            binding.formEditsWarningMessage.setText(hint)
+            // Readonly do not save
+            binding.saveExitButton.setText(org.odk.collect.strings.R.string.exit)
+            binding.saveExitButton.setOnClickListener {
+                listener.onExitClicked()
+            }
         }
     }
 
     override fun shouldSuppressFlingGesture() = false
 
-    override fun verticalScrollView(): NestedScrollView? {
-        return findViewById(R.id.scroll_view)
+    override fun verticalScrollView(): androidx.core.widget.NestedScrollView? {
+        return null
     }
 
     interface Listener {
+        fun onSaveAsChanged(string: String)
         fun onSaveClicked(markAsFinalized: Boolean)
+        fun onExitClicked()
     }
 }
