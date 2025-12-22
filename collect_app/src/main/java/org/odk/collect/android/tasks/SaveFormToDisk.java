@@ -249,52 +249,54 @@ public class SaveFormToDisk {
             form = formsRepository.getLatestByFormIdAndVersion(newInstance.getFormId(), newInstance.getFormVersion());
         }
 
+        // Always set smap fields, even if form lookup failed
+        ContentValues smapValues = new ContentValues();
+
+        // Set source from form, or use current source if form doesn't have one
+        String source = null;
         if (form != null) {
-            ContentValues smapValues = new ContentValues();
-
-            // Set source from form, or use current source if form doesn't have one
-            String source = form.getSource();
-            if (source == null || source.isEmpty()) {
-                source = au.smap.fieldTask.utilities.Utilities.getSource();
-            }
-            smapValues.put(DatabaseInstanceColumns.SOURCE, source);
-
-            // Set task status based on state (smap)
-            if (shouldFinalize) {
-                smapValues.put(DatabaseInstanceColumns.T_TASK_STATUS, "complete");
-            } else {
-                smapValues.put(DatabaseInstanceColumns.T_TASK_STATUS, "accepted");
-            }
-
-            // Add UUID (smap)
-            smapValues.put(DatabaseInstanceColumns.UUID, formController.getSubmissionMetadata().instanceId);
-
-            // Add actual location (smap)
-            double lon = 0.0;
-            double lat = 0.0;
-            android.location.Location location = Collect.getInstance().getLocation();
-            if (location != null) {
-                lon = location.getLongitude();
-                lat = location.getLatitude();
-            }
-            smapValues.put(DatabaseInstanceColumns.ACT_LON, lon);
-            smapValues.put(DatabaseInstanceColumns.ACT_LAT, lat);
-
-            // Add timestamp and sync status (smap)
-            smapValues.put(DatabaseInstanceColumns.T_ACT_FINISH, java.util.Calendar.getInstance().getTime().getTime());
-            smapValues.put(DatabaseInstanceColumns.T_IS_SYNC, au.smap.fieldTask.utilities.Utilities.STATUS_SYNC_NO);
-
-            // Add other smap fields
-            smapValues.put(DatabaseInstanceColumns.T_REPEAT, 0);  // When saved it is no longer a repeat task
-            smapValues.put(DatabaseInstanceColumns.T_UPDATED, 1);
-
-            Collect.getInstance().getContentResolver().update(
-                    uri,
-                    smapValues,
-                    null,
-                    null
-            );
+            source = form.getSource();
         }
+        if (source == null || source.isEmpty()) {
+            source = au.smap.fieldTask.utilities.Utilities.getSource();
+        }
+        smapValues.put(DatabaseInstanceColumns.SOURCE, source);
+
+        // Set task status based on state (smap)
+        if (shouldFinalize) {
+            smapValues.put(DatabaseInstanceColumns.T_TASK_STATUS, "complete");
+        } else {
+            smapValues.put(DatabaseInstanceColumns.T_TASK_STATUS, "accepted");
+        }
+
+        // Add UUID (smap)
+        smapValues.put(DatabaseInstanceColumns.UUID, formController.getSubmissionMetadata().instanceId);
+
+        // Add actual location (smap)
+        double lon = 0.0;
+        double lat = 0.0;
+        android.location.Location location = Collect.getInstance().getLocation();
+        if (location != null) {
+            lon = location.getLongitude();
+            lat = location.getLatitude();
+        }
+        smapValues.put(DatabaseInstanceColumns.ACT_LON, lon);
+        smapValues.put(DatabaseInstanceColumns.ACT_LAT, lat);
+
+        // Add timestamp and sync status (smap)
+        smapValues.put(DatabaseInstanceColumns.T_ACT_FINISH, java.util.Calendar.getInstance().getTime().getTime());
+        smapValues.put(DatabaseInstanceColumns.T_IS_SYNC, au.smap.fieldTask.utilities.Utilities.STATUS_SYNC_NO);
+
+        // Add other smap fields
+        smapValues.put(DatabaseInstanceColumns.T_REPEAT, 0);  // When saved it is no longer a repeat task
+        smapValues.put(DatabaseInstanceColumns.T_UPDATED, 1);
+
+        Collect.getInstance().getContentResolver().update(
+                uri,
+                smapValues,
+                null,
+                null
+        );
 
         return newInstance;
     }
