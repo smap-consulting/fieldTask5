@@ -826,9 +826,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                     }
                 } else {
                     Timber.e("Task not found for instance path: %s", instancePath);
-                    SnackbarUtils.showSnackbar(binding.pager,
-                            getString(org.odk.collect.strings.R.string.loading_error),
-                            SnackbarUtils.DURATION_LONG);
                 }
 
                 cInstanceProvider.close();
