@@ -150,13 +150,18 @@ public class Utilities {
 
         };
 
-        String selectClause = InstanceColumns._ID + " = " + id;
+        String selectClause;
+        String[] selectionArgs;
         if (instancePath != null) {
-            selectClause = InstanceColumns.INSTANCE_FILE_PATH + " = '" + instancePath + "'";
+            selectClause = InstanceColumns.INSTANCE_FILE_PATH + " = ?";
+            selectionArgs = new String[]{instancePath};
+        } else {
+            selectClause = InstanceColumns._ID + " = ?";
+            selectionArgs = new String[]{String.valueOf(id)};
         }
 
         final ContentResolver resolver = Collect.getInstance().getContentResolver();
-        Cursor c = resolver.query(InstanceColumns.CONTENT_URI, proj, selectClause, null, null);
+        Cursor c = resolver.query(InstanceColumns.CONTENT_URI, proj, selectClause, selectionArgs, null);
 
         try {
             c.moveToFirst();

@@ -277,7 +277,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         String asked = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
         if (asked != null && asked.equals("no")) {
             (new RequestLocationPermissionsDialogSmap()).show(this.getSupportFragmentManager(), RequestLocationPermissionsDialogSmap.TAG);
-        } else if ((hasFineLocation || hasCoarseLocation) && (asked.equals("accept"))){
+        } else if ((hasFineLocation || hasCoarseLocation) && ("accept".equals(asked))){
             lr.locationStart(this, permissionsProvider);
         }
 
@@ -327,8 +327,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         model = new ViewModelProvider(this, viewModelFactory).get(SurveyDataViewModel.class);
         model.getSurveyData().observe(this, surveyData -> {
-            // update U
-            Timber.i("-------------------------------------- Smap Main Activity got Data ");
+            Timber.d("SmapMain: Survey data updated");
             updateData(surveyData);
         });
     }
@@ -441,7 +440,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                                 // Refresh the task list
                                 Intent intent = new Intent("org.smap.smapTask.refresh");
                                 LocalBroadcastManager.getInstance(Collect.getInstance()).sendBroadcast(intent);
-                                Timber.i("######## send org.smap.smapTask.refresh from smapMain");  // smap
+                                Timber.d("SmapMain: Sent task refresh broadcast");
                             }
                         };
                 mProgressDialog.setTitle(getString(org.odk.collect.strings.R.string.downloading_data));
@@ -522,15 +521,13 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      */
     @Override
     public void formsDownloadingComplete(Map<ServerFormDetailsSmap, String> result) {
-        // TODO Auto-generated method stub
         // Ignore formsDownloading is called synchronously from taskDownloader
     }
 
     @Override
     public void progressUpdate(String currentFile, int progress, int total) {
-        // TODO Auto-generated method stub
         mProgressMsg = getString(R.string.smap_checking_file, currentFile, String.valueOf(progress), String.valueOf(total));
-        if(mProgressDialog != null) {
+        if(mProgressDialog != null && !isFinishing() && !isDestroyed()) {
             mProgressDialog.setMessage(mProgressMsg);
         }
     }
@@ -546,7 +543,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     // Download tasks progress update
     public void progressUpdate(String progress) {
-        if(mProgressMsg != null && mProgressDialog != null) {
+        if(mProgressMsg != null && mProgressDialog != null && !isFinishing() && !isDestroyed()) {
             mProgressMsg = progress;
             mProgressDialog.setMessage(mProgressMsg);
         }
@@ -560,8 +557,10 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         try {
             dismissDialog(PROGRESS_DIALOG);
             removeDialog(PROGRESS_DIALOG);
+        } catch (IllegalArgumentException e) {
+            // Dialog not showing - expected, ignore
         } catch (Exception e) {
-            // tried to close a dialog not open. don't care.
+            Timber.w(e, "Unexpected error dismissing dialog");
         }
 
         if (result != null) {
@@ -569,19 +568,17 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             Set<String> keys = result.keySet();
             Iterator<String> it = keys.iterator();
 
-            if(it != null) {
-                while (it.hasNext()) {
-                    String key = it.next();
-                    String m = result.get(key);
-                    if (key.equals("err_not_enabled")) {
-                        message.append(this.getString(R.string.smap_tasks_not_enabled));
-                    } else if (key.equals("err_no_tasks")) {
-                        // No tasks is fine, in fact its the most common state
-                    } else if (key.equals("Error:") && m != null && m.startsWith("403")) {
-                        message.append(this.getString(R.string.smap_unauth));
-                    } else {
-                        message.append(key + " - " + m + "\n\n");
-                    }
+            while (it.hasNext()) {
+                String key = it.next();
+                String m = result.get(key);
+                if (key.equals("err_not_enabled")) {
+                    message.append(this.getString(R.string.smap_tasks_not_enabled));
+                } else if (key.equals("err_no_tasks")) {
+                    // No tasks is fine, in fact its the most common state
+                } else if (key.equals("Error:") && m != null && m.startsWith("403")) {
+                    message.append(this.getString(R.string.smap_unauth));
+                } else {
+                    message.append(key).append(" - ").append(m).append("\n\n");
                 }
             }
 
@@ -599,7 +596,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                         mAlertDialog.setTitle(getString(R.string.smap_get_tasks));
                     }
                     mAlertDialog.setMessage(mAlertMsg);
-                    mAlertDialog.show();
+                    if (!isFinishing() && !isDestroyed()) {
+                        mAlertDialog.show();
+                    }
                 } catch (Exception e) {
                     Timber.e(e);
                     // Tried to show a dialog but the activity may have been closed don't care
@@ -615,20 +614,20 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      */
     @Override
     public void uploadingComplete(HashMap<String, String> result) {
-        // TODO Auto-generated method stub
-
+        // Upload complete - no action needed here
     }
 
     @Override
     public void progressUpdate(int progress, int total) {
         mAlertMsg = getString(org.odk.collect.strings.R.string.sending_items, String.valueOf(progress), String.valueOf(total));
-        mProgressDialog.setMessage(mAlertMsg);
+        if(mProgressDialog != null && !isFinishing() && !isDestroyed()) {
+            mProgressDialog.setMessage(mAlertMsg);
+        }
     }
 
     @Override
     public void authRequest(Uri url, HashMap<String, String> doneSoFar) {
-        // TODO Auto-generated method stub
-
+        // Auth request - handled by parent class
     }
 
     /*
@@ -817,21 +816,25 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                         }
                         startActivityForResult(i, COMPLETE_FORM);
 
-                        // If More than one instance is found pointing towards a single file path then report the error and delete the extrat
+                        // If more than one instance is found pointing towards a single file path then report the error
                         int instanceCount = cInstanceProvider.getCount();
                         if (instanceCount > 1) {
-                            Timber.e(new Exception("Unique instance not found: deleting extra, count is:" +
-                                    cInstanceProvider.getCount()));
+                            Timber.e("Unique instance not found: found %d instances for path: %s", 
+                                    instanceCount, instancePath);
+                            // TODO: Implement cleanup of duplicate instances to prevent data corruption
                         }
                     }
                 } else {
-                    Timber.e(new Exception("Task not found for instance path:" + instancePath));
+                    Timber.e("Task not found for instance path: %s", instancePath);
+                    SnackbarUtils.showSnackbar(binding.pager,
+                            getString(org.odk.collect.strings.R.string.loading_error),
+                            SnackbarUtils.DURATION_LONG);
                 }
 
                 cInstanceProvider.close();
             }
         } else {
-            Timber.i("##################: Task launch blocked");
+            Timber.d("Task launch blocked: activity is paused");
         }
 
     }
@@ -856,7 +859,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             }
             startActivityForResult(i, COMPLETE_FORM);
         } else {
-            Timber.i("################# form launch blocked");
+            Timber.d("Form launch blocked: activity is paused");
         }
     }
 
