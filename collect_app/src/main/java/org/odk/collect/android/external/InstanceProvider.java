@@ -110,6 +110,10 @@ public class InstanceProvider extends ContentProvider {
         return ((DatabaseInstancesRepository) instancesRepositoryProvider.create(projectId)).rawQuery(projection, selection, selectionArgs, sortOrder, null);
     }
 
+    private int dbUpdate(String projectId, ContentValues values, String selection, String[] selectionArgs) {
+        return ((DatabaseInstancesRepository) instancesRepositoryProvider.create(projectId)).rawUpdate(values, selection, selectionArgs);
+    }
+
     @Override
     public String getType(@NonNull Uri uri) {
         switch (URI_MATCHER.match(uri)) {
@@ -201,7 +205,28 @@ public class InstanceProvider extends ContentProvider {
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String where, String[] whereArgs) {
-        return 0;
+        DaggerUtils.getComponent(getContext()).inject(this);
+
+        String projectId = getProjectId(uri);
+        logServerEvent(projectId, AnalyticsEvents.INSTANCE_PROVIDER_UPDATE);
+
+        int count;
+        switch (URI_MATCHER.match(uri)) {
+            case INSTANCES:
+                count = dbUpdate(projectId, values, where, whereArgs);
+                break;
+
+            case INSTANCE_ID:
+                String id = String.valueOf(ContentUriHelper.getIdFromUri(uri));
+                count = dbUpdate(projectId, values, _ID + "=?", new String[]{id});
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 
     private String getProjectId(@NonNull Uri uri) {

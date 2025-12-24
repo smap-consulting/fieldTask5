@@ -61,6 +61,7 @@ public final class Instance {
     private final boolean isCase;           // smap
     private final String assignment_id;     // smap
     private final String phone;             // smap
+    private final String source;            // smap
 
     private final Long dbId;
     private final boolean canDeleteBeforeSend;
@@ -87,6 +88,7 @@ public final class Instance {
         assignment_id = builder.assignment_id;          // smap
         isCase = builder.isCase;                        // smap
         phone = builder.phone;                          // smap
+        source = builder.source;                        // smap
         canDeleteBeforeSend = builder.canDeleteBeforeSend;
 
         dbId = builder.dbId;
@@ -114,6 +116,7 @@ public final class Instance {
         private String assignment_id;       // smap
         private boolean isCase;             // smap
         private String phone;               // smap
+        private String source;              // smap
 
         private Long dbId;
         private boolean canDeleteBeforeSend = true;
@@ -145,6 +148,7 @@ public final class Instance {
             assignment_id = instance.assignment_id;         // smap
             isCase = instance.isCase;                       // smap
             phone = instance.phone;                         // smap
+            source = instance.source;                       // smap
             canDeleteBeforeSend = instance.canDeleteBeforeSend;
         }
 
@@ -271,6 +275,12 @@ public final class Instance {
             return this;
         }
 
+        // smap
+        public Builder source(String source) {
+            this.source = source;
+            return this;
+        }
+
         public Instance build() {
             return new Instance(this);
         }
@@ -282,6 +292,11 @@ public final class Instance {
 
     public String getPhone() {
         return phone;  // smap
+    }
+
+    // smap
+    public String getSource() {
+        return source;
     }
 
     public String getSubmissionUri() {
@@ -389,11 +404,11 @@ public final class Instance {
         }
 
         Instance instance = (Instance) o;
-        return canEditWhenComplete == instance.canEditWhenComplete && repeat == instance.repeat && isCase == instance.isCase && Objects.equals(displayName, instance.displayName) && Objects.equals(submissionUri, instance.submissionUri) && Objects.equals(instanceFilePath, instance.instanceFilePath) && Objects.equals(formId, instance.formId) && Objects.equals(formVersion, instance.formVersion) && Objects.equals(status, instance.status) && Objects.equals(lastStatusChangeDate, instance.lastStatusChangeDate) && Objects.equals(finalizationDate, instance.finalizationDate) && Objects.equals(deletedDate, instance.deletedDate) && Objects.equals(geometryType, instance.geometryType) && Objects.equals(geometry, instance.geometry) && Objects.equals(editOf, instance.editOf) && Objects.equals(editNumber, instance.editNumber) && Objects.equals(updateid, instance.updateid) && Objects.equals(location_trigger, instance.location_trigger) && Objects.equals(survey_notes, instance.survey_notes) && Objects.equals(assignment_id, instance.assignment_id) && Objects.equals(phone, instance.phone) && Objects.equals(dbId, instance.dbId);
+        return canEditWhenComplete == instance.canEditWhenComplete && repeat == instance.repeat && isCase == instance.isCase && Objects.equals(displayName, instance.displayName) && Objects.equals(submissionUri, instance.submissionUri) && Objects.equals(instanceFilePath, instance.instanceFilePath) && Objects.equals(formId, instance.formId) && Objects.equals(formVersion, instance.formVersion) && Objects.equals(status, instance.status) && Objects.equals(lastStatusChangeDate, instance.lastStatusChangeDate) && Objects.equals(finalizationDate, instance.finalizationDate) && Objects.equals(deletedDate, instance.deletedDate) && Objects.equals(geometryType, instance.geometryType) && Objects.equals(geometry, instance.geometry) && Objects.equals(editOf, instance.editOf) && Objects.equals(editNumber, instance.editNumber) && Objects.equals(updateid, instance.updateid) && Objects.equals(location_trigger, instance.location_trigger) && Objects.equals(survey_notes, instance.survey_notes) && Objects.equals(assignment_id, instance.assignment_id) && Objects.equals(phone, instance.phone) && Objects.equals(source, instance.source) && Objects.equals(dbId, instance.dbId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(displayName, submissionUri, canEditWhenComplete, instanceFilePath, formId, formVersion, status, lastStatusChangeDate, finalizationDate, deletedDate, geometryType, geometry, editOf, editNumber, repeat, updateid, location_trigger, survey_notes, isCase, assignment_id, phone, dbId);
+        return Objects.hash(displayName, submissionUri, canEditWhenComplete, instanceFilePath, formId, formVersion, status, lastStatusChangeDate, finalizationDate, deletedDate, geometryType, geometry, editOf, editNumber, repeat, updateid, location_trigger, survey_notes, isCase, assignment_id, phone, source, dbId);
     }
 }

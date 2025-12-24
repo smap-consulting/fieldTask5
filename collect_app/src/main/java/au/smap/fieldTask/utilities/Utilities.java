@@ -1076,7 +1076,7 @@ public class Utilities {
         long theTime = 0;
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-        if (status.equals(Utilities.STATUS_T_COMPLETE) || status.equals(Utilities.STATUS_T_SUBMITTED)) {
+        if (status != null && (status.equals(Utilities.STATUS_T_COMPLETE) || status.equals(Utilities.STATUS_T_SUBMITTED))) {
             theTime = actFinish;
         } else if (taskStart > 0) {
             theTime = taskStart;

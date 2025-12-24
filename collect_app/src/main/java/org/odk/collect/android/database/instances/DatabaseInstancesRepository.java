@@ -39,6 +39,7 @@ import static org.odk.collect.android.database.instances.DatabaseInstanceColumns
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.JR_FORM_ID;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.JR_VERSION;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.LAST_STATUS_CHANGE_DATE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SOURCE;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.STATUS;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SUBMISSION_URI;
 import static org.odk.collect.shared.PathUtils.getRelativeFilePath;
@@ -245,6 +246,15 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
         return query(projection, selection, selectionArgs, sortOrder);
     }
 
+    public int rawUpdate(ContentValues values, String selection, String[] selectionArgs) {
+        return databaseConnection.getWritableDatabase().update(
+                INSTANCES_TABLE_NAME,
+                values,
+                selection,
+                selectionArgs
+        );
+    }
+
     /*
      * Start Smap
      */
@@ -299,7 +309,8 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
                     GEOMETRY_TYPE,
                     CAN_DELETE_BEFORE_SEND,
                     EDIT_OF,
-                    EDIT_NUMBER
+                    EDIT_NUMBER,
+                    SOURCE
             };
         }
 

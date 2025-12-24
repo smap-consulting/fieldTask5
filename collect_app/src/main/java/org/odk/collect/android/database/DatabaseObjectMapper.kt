@@ -168,6 +168,7 @@ object DatabaseObjectMapper {
             cursor.getColumnIndex(DatabaseInstanceColumns.CAN_DELETE_BEFORE_SEND)
         val editOfColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.EDIT_OF)
         val editNumberColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.EDIT_NUMBER)
+        val sourceColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.SOURCE)
 
         return Instance.Builder()
             .dbId(dbId)
@@ -192,6 +193,7 @@ object DatabaseObjectMapper {
             .canDeleteBeforeSend(cursor.getString(canDeleteBeforeSendIndex)?.let { Boolean.valueOf(it) } ?: true)
             .editOf(cursor.getLongOrNull(editOfColumnIndex))
             .editNumber(cursor.getLongOrNull(editNumberColumnIndex))
+            .source(cursor.getString(sourceColumnIndex))
             .build()
     }
 
@@ -223,6 +225,7 @@ object DatabaseObjectMapper {
         )
         values.put(DatabaseInstanceColumns.EDIT_OF, instance.editOf)
         values.put(DatabaseInstanceColumns.EDIT_NUMBER, instance.editNumber)
+        values.put(DatabaseInstanceColumns.SOURCE, instance.source)
 
         return values
     }

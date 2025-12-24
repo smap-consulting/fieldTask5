@@ -186,6 +186,23 @@ public class SaveFormToDisk {
             instanceBuilder = new Instance.Builder();
         }
 
+        // Set source from form, or use current source if form doesn't have one (smap)
+        Form form = null;
+        if (instance == null) {
+            form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(uri));
+        } else {
+            FormsRepository formsRepository = new FormsRepositoryProvider(Collect.getInstance()).create();
+            form = formsRepository.getLatestByFormIdAndVersion(instance.getFormId(), instance.getFormVersion());
+        }
+        String source = null;
+        if (form != null) {
+            source = form.getSource();
+        }
+        if (source == null || source.isEmpty()) {
+            source = au.smap.fieldTask.utilities.Utilities.getSource();
+        }
+        instanceBuilder.source(source);
+
         if (instanceName != null) {
             instanceBuilder.displayName(instanceName);
         }
@@ -204,7 +221,6 @@ public class SaveFormToDisk {
 
         instanceBuilder.canEditWhenComplete(canEditAfterCompleted);
 
-        Form form = null;
         if (instance != null) {
             String geometryXpath = getGeometryXpathForInstance(instance);
             Pair<String, String> geometryContentValues = extractGeometryContentValues(formInstance, geometryXpath);
@@ -214,7 +230,6 @@ public class SaveFormToDisk {
             }
         } else {
             Timber.i("No instance found, creating");
-            form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(uri));
             if (form == null) {
                 throw new FileNotFoundException();
             }
@@ -241,26 +256,8 @@ public class SaveFormToDisk {
         Instance newInstance = instancesRepository.save(instanceBuilder.build());
         uri = InstancesContract.getUri(currentProjectId, newInstance.getDbId());
 
-        // Update smap-specific columns in the database
-        if (form == null) {
-            // Get the form if we didn't already retrieve it above (for existing instances)
-            // Use the formId and version from the instance to find the form
-            FormsRepository formsRepository = new FormsRepositoryProvider(Collect.getInstance()).create();
-            form = formsRepository.getLatestByFormIdAndVersion(newInstance.getFormId(), newInstance.getFormVersion());
-        }
-
-        // Always set smap fields, even if form lookup failed
+        // Update additional smap-specific columns in the database that are not part of Instance class
         ContentValues smapValues = new ContentValues();
-
-        // Set source from form, or use current source if form doesn't have one
-        String source = null;
-        if (form != null) {
-            source = form.getSource();
-        }
-        if (source == null || source.isEmpty()) {
-            source = au.smap.fieldTask.utilities.Utilities.getSource();
-        }
-        smapValues.put(DatabaseInstanceColumns.SOURCE, source);
 
         // Set task status based on state (smap)
         if (shouldFinalize) {

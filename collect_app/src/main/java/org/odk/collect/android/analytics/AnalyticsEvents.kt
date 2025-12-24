@@ -81,6 +81,8 @@ object AnalyticsEvents {
 
     const val INSTANCE_PROVIDER_INSERT = "InstanceProviderInsert"
 
+    const val INSTANCE_PROVIDER_UPDATE = "InstanceProviderUpdate"
+
     const val INSTANCE_PROVIDER_DELETE = "InstanceProviderDelete"
 
     /**

@@ -138,7 +138,7 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
                 taskStartText.setText(item.displayName);
             } else {
                 String line2 = Utilities.getTaskTime(item.taskStatus, item.actFinish, item.taskStart);
-                if (item.taskFinish > 0 && !item.taskStatus.equals(Utilities.STATUS_T_COMPLETE) &&
+                if (item.taskFinish > 0 && item.taskStatus != null && !item.taskStatus.equals(Utilities.STATUS_T_COMPLETE) &&
                         !item.taskStatus.equals(Utilities.STATUS_T_SUBMITTED)) {
                     line2 += " - " + Utilities.getTime(item.taskFinish);
                 }
