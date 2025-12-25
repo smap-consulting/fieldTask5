@@ -227,6 +227,25 @@ the specific language governing permissions and limitations under the License.
             android:name=".external.InstanceProvider"
             android:authorities="org.odk.collect.android.provider.odk.instances.smap"
             android:exported="true" />
+        <!-- smap add trace provider -->
+        <provider
+            android:name="au.smap.fieldTask.providers.TraceProvider"
+            android:authorities="org.smap.smapTask.android.provider.trace"
+            android:exported="true" />
+
+        <!-- smap add network and location receiver -->
+        <receiver
+            android:name="au.smap.fieldTask.receivers.LocationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="au.com.smap.location_service.action.PROCESS_UPDATES" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name="au.smap.fieldTask.services.LocationService"
+            android:foregroundServiceType="location"
+            android:exported="false">
+        </service>
 
         <activity-alias
             android:name=".activities.FormEntryActivity"
