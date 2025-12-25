@@ -85,7 +85,7 @@ android {
     }
 
     base {
-        archivesName = "ODK-Collect"
+        archivesName = "FieldTask5"
     }
 
     // smap
