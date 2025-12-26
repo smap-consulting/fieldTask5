@@ -29,9 +29,9 @@ public class LocationRegister {
     /*
      * Disable permissions concerned with background location
      */
-    public void set(SharedPreferences.Editor editor, String sendLocation) {
-        editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
-        editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+    public void set(org.odk.collect.shared.settings.Settings settings, String sendLocation) {
+        settings.save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
+        settings.save(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
     }
 
     // Check that the installation is good

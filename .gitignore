@@ -101,7 +101,6 @@ collect_app/ljslocation/
 collect_app/src/ljslocation/
 collect_app/portero/
 collect_app/src/portero/
-collect_app/ljstracker/
 
 # gradle env props
 secrets.properties
@@ -110,5 +109,6 @@ collect_app/src/release/
 collect_app/src/debug/
 collect_app/standard/
 collect_app/bps/
+collect_app/ljstracker/
 
 
