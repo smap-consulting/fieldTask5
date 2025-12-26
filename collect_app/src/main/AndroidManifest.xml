@@ -122,6 +122,8 @@ the specific language governing permissions and limitations under the License.
 
         <activity android:name="org.odk.collect.android.activities.CrashHandlerActivity" />
 
+        <activity android:name="au.smap.fieldTask.activities.SmapLoginActivity" />
+
         <activity
             android:name=".activities.ScannerWithFlashlightActivity"
             android:configChanges="orientation|screenSize"/>

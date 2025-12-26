@@ -220,6 +220,13 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         // Ensure a default project exists before proceeding
         ensureDefaultProject();
 
+        // Check if login is required
+        if (checkLoginRequired()) {
+            startActivity(new Intent(SmapMain.this, SmapLoginActivity.class));
+            finish();
+            return;
+        }
+
         String[] tabNames = {getString(R.string.smap_forms), getString(R.string.smap_tasks), getString(R.string.smap_map)};
         // Get the ViewPager and set its PagerAdapter so that it can display items
         binding.pager.setOffscreenPageLimit(2);
@@ -1035,5 +1042,52 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 }
             })
             .show();
+    }
+
+    /**
+     * Check if login is required based on password policy and credentials
+     * @return true if login screen should be shown
+     */
+    private boolean checkLoginRequired() {
+        try {
+            GeneralSharedPreferencesSmap prefs = GeneralSharedPreferencesSmap.getInstance();
+
+            String url = (String) prefs.get(ProjectKeys.KEY_SERVER_URL);
+            String user = (String) prefs.get(ProjectKeys.KEY_USERNAME);
+            String password = (String) prefs.get(ProjectKeys.KEY_PASSWORD);
+
+            String pwPolicyStr = (String) prefs.get(ProjectKeys.KEY_SMAP_PASSWORD_POLICY);
+            String lastLoginStr = (String) prefs.get(ProjectKeys.KEY_SMAP_LAST_LOGIN);
+
+            // Default values if not set
+            int pwPolicy = -1;
+            long lastLogin = 0;
+
+            if (pwPolicyStr != null && !pwPolicyStr.trim().isEmpty()) {
+                pwPolicy = Integer.parseInt(pwPolicyStr);
+            }
+
+            if (lastLoginStr != null && !lastLoginStr.trim().isEmpty()) {
+                lastLogin = Long.parseLong(lastLoginStr);
+            }
+
+            Timber.i("Login check - pwPolicy: %d, lastLogin: %d, url: %s, user: %s, password: %s",
+                    pwPolicy, lastLogin, url, user, password != null ? "***" : "null");
+
+            // Show the login screen if required by password policy
+            // 0 - always login, > 0 is number of days before login is required
+            // Alternatively show the login screen if any of the login details are empty
+            boolean loginRequired = pwPolicy == 0 ||
+                   (pwPolicy > 0 && (System.currentTimeMillis() - lastLogin) > pwPolicy * 24 * 3600 * 1000) ||
+                   password == null || user == null || url == null ||
+                   password.trim().isEmpty() || user.trim().isEmpty() || url.trim().isEmpty();
+
+            Timber.i("Login required: %b", loginRequired);
+            return loginRequired;
+        } catch (Exception e) {
+            Timber.e(e, "Error checking login required");
+            // If there's an error, require login to be safe
+            return true;
+        }
     }
 }
