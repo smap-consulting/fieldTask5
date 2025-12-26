@@ -19,10 +19,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -48,7 +45,9 @@ import org.odk.collect.android.utilities.ApplicationConstants;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
+import org.odk.collect.material.MaterialProgressDialogFragment;
 
 import org.odk.collect.android.R;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
@@ -115,12 +114,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         InstanceUploaderListener,
         DownloadFormsTaskListenerSmap {
 
-    private static final int PROGRESS_DIALOG = 1;
-    private static final int ALERT_DIALOG = 2;
-    private static final int PASSWORD_DIALOG = 3;
+    private static final String PROGRESS_DIALOG_TAG = "progressDialog";
     private static final int COMPLETE_FORM = 4;
 
-    private ProgressDialog mProgressDialog;
     private String mAlertMsg;
     private boolean mPaused = false;
 
@@ -153,7 +149,6 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     private LocationRequest locationRequest;
     private FusedLocationProviderClient fusedLocationClient;
 
-    private AlertDialog mAlertDialog;
     private SmapMainLayoutBinding binding;
 
     @Inject
@@ -176,7 +171,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
 
     private void initToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setTitle(getString(org.odk.collect.strings.R.string.app_name));
         toolbar.setNavigationIcon(R.mipmap.ic_nav);
         setSupportActionBar(toolbar);
@@ -295,7 +290,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.mipmap.ic_nav);
         stateChanged();
     }
@@ -396,7 +391,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     }
 
     public void processAdminMenu() {
-        showDialog(PASSWORD_DIALOG);
+        showPasswordDialog();
     }
 
     // Get tasks and forms from the server
@@ -407,7 +402,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             if(manual) {
                 mProgressMsg = getString(R.string.smap_synchronising);
                 if (!this.isFinishing()) {
-                    showDialog(PROGRESS_DIALOG);
+                    showProgressDialog(mProgressMsg);
                 }
                 mDownloadTasks.setDownloaderListener(this, this);
             }
@@ -424,96 +419,70 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         }
     }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case PROGRESS_DIALOG:
-                mProgressDialog = new ProgressDialog(this);
-                DialogInterface.OnClickListener loadingButtonListener =
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                if (mDownloadTasks != null) {
-                                    mDownloadTasks.setDownloaderListener(null, SmapMain.this);
-                                    mDownloadTasks.cancel(true);
-                                }
-                                // Refresh the task list
-                                Intent intent = new Intent("org.smap.smapTask.refresh");
-                                LocalBroadcastManager.getInstance(Collect.getInstance()).sendBroadcast(intent);
-                                Timber.d("SmapMain: Sent task refresh broadcast");
-                            }
-                        };
-                mProgressDialog.setTitle(getString(org.odk.collect.strings.R.string.downloading_data));
-                mProgressDialog.setMessage(mProgressMsg);
-                mProgressDialog.setIcon(android.R.drawable.ic_dialog_info);
-                mProgressDialog.setIndeterminate(true);
-                mProgressDialog.setCancelable(false);
-                mProgressDialog.setButton(getString(org.odk.collect.strings.R.string.cancel), loadingButtonListener);
-                return mProgressDialog;
-            //case ALERT_DIALOG:
-            //    mAlertDialog = new AlertDialog.Builder(this).create();
-            //    mAlertDialog.setTitle(getString(R.string.smap_get_tasks));
-            //    DialogInterface.OnClickListener quitListener = new DialogInterface.OnClickListener() {
-            //        public void onClick(DialogInterface dialog, int i) {
-            //            dialog.dismiss();
-            //        }
-            //    };
-            //    mAlertDialog.setCancelable(false);
-            //    mAlertDialog.setButton(getString(R.string.ok), quitListener);
-            //    mAlertDialog.setIcon(android.R.drawable.ic_dialog_info);
-            //    return mAlertDialog;
-            case PASSWORD_DIALOG:
+    /**
+     * Show modern progress dialog with cancel support
+     */
+    private void showProgressDialog(String message) {
+        MaterialProgressDialogFragment progressDialog = new MaterialProgressDialogFragment();
+        progressDialog.setMessage(message);
+        progressDialog.setCancelable(false);
+        progressDialog.show(getSupportFragmentManager(), PROGRESS_DIALOG_TAG);
+    }
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                final AlertDialog passwordDialog = builder.create();
-                final SharedPreferences adminPreferences = this.getSharedPreferences(
-                        AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
-
-                passwordDialog.setTitle(getString(org.odk.collect.strings.R.string.enter_admin_password));
-                final EditText input = new EditText(this);
-                input.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                input.setTransformationMethod(PasswordTransformationMethod
-                        .getInstance());
-                passwordDialog.setView(input, 20, 10, 20, 10);
-
-                passwordDialog.setButton(AlertDialog.BUTTON_POSITIVE,
-                        getString(org.odk.collect.strings.R.string.ok),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                                int whichButton) {
-                                String value = input.getText().toString();
-                                String pw = adminPreferences.getString(
-                                        ProtectedProjectKeys.KEY_ADMIN_PW, "");
-                                if (pw.compareTo(value) == 0) {
-                                    Intent i = new Intent(getApplicationContext(),
-                                            AdminPreferencesActivitySmap.class);
-                                    startActivity(i);
-                                    input.setText("");
-                                    passwordDialog.dismiss();
-                                } else {
-                                    Toast.makeText(
-                                            SmapMain.this,
-                                            getString(org.odk.collect.strings.R.string.admin_password_incorrect),
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-
-                passwordDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
-                        getString(org.odk.collect.strings.R.string.cancel),
-                        new DialogInterface.OnClickListener() {
-
-                            public void onClick(DialogInterface dialog, int which) {
-                                input.setText("");
-                                return;
-                            }
-                        });
-
-                passwordDialog.getWindow().setSoftInputMode(
-                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                return passwordDialog;
+    /**
+     * Dismiss progress dialog if showing
+     */
+    private void dismissProgressDialog() {
+        MaterialProgressDialogFragment dialog =
+            (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
+        if (dialog != null) {
+            dialog.dismiss();
         }
-        return null;
+    }
+
+    /**
+     * Show admin password dialog using modern Material design
+     */
+    private void showPasswordDialog() {
+        final SharedPreferences adminPreferences = getSharedPreferences(
+                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(org.odk.collect.strings.R.string.enter_admin_password)
+                .setView(input, 20, 10, 20, 10)
+                .setPositiveButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> {
+                    String value = input.getText().toString();
+                    String pw = adminPreferences.getString(ProtectedProjectKeys.KEY_ADMIN_PW, "");
+                    if (pw.equals(value)) {
+                        Intent i = new Intent(getApplicationContext(), AdminPreferencesActivitySmap.class);
+                        startActivity(i);
+                        input.setText("");
+                    } else {
+                        Toast.makeText(
+                                SmapMain.this,
+                                getString(org.odk.collect.strings.R.string.admin_password_incorrect),
+                                Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton(org.odk.collect.strings.R.string.cancel, (dialog, which) -> {
+                    input.setText("");
+                })
+                .create()
+                .show();
+
+        // Show keyboard
+        input.post(() -> {
+            input.requestFocus();
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.showSoftInput(input, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
     }
 
     /*
@@ -527,8 +496,12 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     public void progressUpdate(String currentFile, int progress, int total) {
         mProgressMsg = getString(R.string.smap_checking_file, currentFile, String.valueOf(progress), String.valueOf(total));
-        if(mProgressDialog != null && !isFinishing() && !isDestroyed()) {
-            mProgressDialog.setMessage(mProgressMsg);
+        if (!isFinishing() && !isDestroyed()) {
+            MaterialProgressDialogFragment dialog =
+                (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
+            if (dialog != null) {
+                dialog.setMessage(mProgressMsg);
+            }
         }
     }
 
@@ -543,9 +516,13 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     // Download tasks progress update
     public void progressUpdate(String progress) {
-        if(mProgressMsg != null && mProgressDialog != null && !isFinishing() && !isDestroyed()) {
+        if(mProgressMsg != null && !isFinishing() && !isDestroyed()) {
             mProgressMsg = progress;
-            mProgressDialog.setMessage(mProgressMsg);
+            MaterialProgressDialogFragment dialog =
+                (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
+            if (dialog != null) {
+                dialog.setMessage(mProgressMsg);
+            }
         }
     }
 
@@ -555,8 +532,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         Timber.i("Complete - Send intent");
 
         try {
-            dismissDialog(PROGRESS_DIALOG);
-            removeDialog(PROGRESS_DIALOG);
+            dismissProgressDialog();
         } catch (IllegalArgumentException e) {
             // Dialog not showing - expected, ignore
         } catch (Exception e) {
@@ -585,24 +561,17 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             mAlertMsg = message.toString().trim();
             if (mAlertMsg.length() > 0) {
                 try {
-                    if(mAlertDialog == null) {
-                        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SmapMain.this).setCancelable(true)
-                                .setNeutralButton(getString(org.odk.collect.strings.R.string.ok), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int i) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                        mAlertDialog = dialogBuilder.create();
-                        mAlertDialog.setTitle(getString(R.string.smap_get_tasks));
-                    }
-                    mAlertDialog.setMessage(mAlertMsg);
                     if (!isFinishing() && !isDestroyed()) {
-                        mAlertDialog.show();
+                        new MaterialAlertDialogBuilder(SmapMain.this)
+                                .setTitle(R.string.smap_get_tasks)
+                                .setMessage(mAlertMsg)
+                                .setCancelable(true)
+                                .setNeutralButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> dialog.dismiss())
+                                .show();
                     }
                 } catch (Exception e) {
                     Timber.e(e);
-                    // Tried to show a dialog but the activity may have been closed don't care
-                    // However presumably this dialog showing should be replaced by use of progress bar
+                    // Tried to show a dialog but the activity may have been closed
                 }
             }
 
@@ -620,8 +589,12 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Override
     public void progressUpdate(int progress, int total) {
         mAlertMsg = getString(org.odk.collect.strings.R.string.sending_items, String.valueOf(progress), String.valueOf(total));
-        if(mProgressDialog != null && !isFinishing() && !isDestroyed()) {
-            mProgressDialog.setMessage(mAlertMsg);
+        if (!isFinishing() && !isDestroyed()) {
+            MaterialProgressDialogFragment dialog =
+                (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
+            if (dialog != null) {
+                dialog.setMessage(mAlertMsg);
+            }
         }
     }
 
@@ -1052,23 +1025,15 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     }
 
     private void createErrorDialog(String errorMsg, final boolean shouldExit) {
-        androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(this).create();
-        alertDialog.setIcon(android.R.drawable.ic_dialog_info);
-        alertDialog.setMessage(errorMsg);
-        DialogInterface.OnClickListener errorListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                switch (i) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        if (shouldExit) {
-                            finish();
-                        }
-                        break;
+        new MaterialAlertDialogBuilder(this)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setMessage(errorMsg)
+            .setCancelable(false)
+            .setPositiveButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> {
+                if (shouldExit) {
+                    finish();
                 }
-            }
-        };
-        alertDialog.setCancelable(false);
-        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, getString(org.odk.collect.strings.R.string.ok), errorListener);
-        alertDialog.show();
+            })
+            .show();
     }
 }

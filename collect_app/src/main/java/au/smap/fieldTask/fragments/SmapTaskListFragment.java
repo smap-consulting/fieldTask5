@@ -14,7 +14,7 @@
 
 package au.smap.fieldTask.fragments;
 
-import android.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -138,10 +138,9 @@ public class SmapTaskListFragment extends ListFragment {
                     LocalBroadcastManager.getInstance(requireActivity().getApplication()).sendBroadcast(intent);
                     Timber.i("######## send org.smap.smapTask.refresh from instanceUploaderActivity2");
                 } else {
-                    AlertDialog error = new AlertDialog.Builder(requireContext())
+                    new MaterialAlertDialogBuilder(requireContext())
                             .setMessage(getString(R.string.smap_cannot_accept))
-                            .create();
-                    error.show();
+                            .show();
                 }
             }
 
@@ -155,10 +154,9 @@ public class SmapTaskListFragment extends ListFragment {
                 if (number != null) {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null)));
                 } else {
-                    AlertDialog error = new AlertDialog.Builder(requireContext())
+                    new MaterialAlertDialogBuilder(requireContext())
                             .setMessage(requireContext().getString(R.string.smap_phone_number_not_found))
-                            .create();
-                    error.show();
+                            .show();
                 }
             }
 
@@ -172,10 +170,9 @@ public class SmapTaskListFragment extends ListFragment {
                         callIntent.setData(Uri.parse("tel:" + number));
                         startActivity(callIntent);
                     } else {
-                        AlertDialog error = new AlertDialog.Builder(requireContext())
+                        new MaterialAlertDialogBuilder(requireContext())
                                 .setMessage(requireContext().getString(R.string.smap_phone_number_not_found))
-                                .create();
-                        error.show();
+                                .show();
                     }
                 }
             }
@@ -183,9 +180,7 @@ public class SmapTaskListFragment extends ListFragment {
             @Override
             public void onRejectClicked(TaskEntry taskEntry) {
                 View reject_popup = getLayoutInflater().inflate(R.layout.reject_task, null);
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
-                        .setNegativeButton(null, null)
-                        .setPositiveButton(null, null)
+                androidx.appcompat.app.AlertDialog dialog = new MaterialAlertDialogBuilder(getContext())
                         .setView(reject_popup)
                         .create();
                 dialog.show();
@@ -541,10 +536,9 @@ public class SmapTaskListFragment extends ListFragment {
     private void rejectTask(String reason, TaskEntry taskEntry) {
         if (Utilities.canReject(taskEntry.taskStatus)) {
             if (!taskEntry.taskStatus.equals("new") && reason != null && reason.trim().length() < 5) {
-                AlertDialog error = new AlertDialog.Builder(requireContext())
+                new MaterialAlertDialogBuilder(requireContext())
                         .setMessage(getString(R.string.smap_reason_not_specified))
-                        .create();
-                error.show();
+                        .show();
             } else {
                 Utilities.setStatusForTask(taskEntry.id, Utilities.STATUS_T_REJECTED, reason);
                 Intent intent = new Intent("org.smap.smapTask.refresh");      // Notify map and task list of change
@@ -552,10 +546,9 @@ public class SmapTaskListFragment extends ListFragment {
                 Timber.i("######## send org.smap.smapTask.refresh from taskAddressActivity");
             }
         } else {
-            AlertDialog error = new AlertDialog.Builder(requireContext())
+            new MaterialAlertDialogBuilder(requireContext())
                     .setMessage(getString(R.string.smap_cannot_reject))
-                    .create();
-            error.show();
+                    .show();
         }
     }
 
