@@ -13,9 +13,9 @@ object Defaults {
         get() {
             val hashMap = HashMap<String, Any>()
             // odk_server_preferences.xml
-            hashMap[ProjectKeys.KEY_SERVER_URL] = "https://demo.getodk.org"
-            hashMap[ProjectKeys.KEY_USERNAME] = ""
-            hashMap[ProjectKeys.KEY_PASSWORD] = ""
+            hashMap[ProjectKeys.KEY_SERVER_URL] = "https://sg.smap.com.au"  // smap
+            hashMap[ProjectKeys.KEY_USERNAME] = "gplay"     // smap: Default username for demo/trial
+            hashMap[ProjectKeys.KEY_PASSWORD] = "gplay!34"  // smap: Default password for demo/trial
             // form_management_preferences.xml
             hashMap[ProjectKeys.KEY_AUTOSEND] = "off"
             hashMap[ProjectKeys.KEY_GUIDANCE_HINT] = "yes_collapsed"

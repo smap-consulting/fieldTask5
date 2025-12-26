@@ -95,8 +95,26 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
             case 10:
                 upgradeToVersion11(db);
             case 11:
-                // Remember to bump the database version number in {@link org.odk.collect.android.database.DatabaseConstants}
-                // upgradeToVersion12(db);
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 20:
+            case 21:
+            case 22:
+            case 23:
+            case 24:
+            case 25:
+            case 26:
+                // Versions 12-26 used by fieldTask4 - all columns already exist
+                // upgradeToVersion27 would go here for future changes
+                Timber.i("Upgrading from fieldTask4 database version %s - no changes needed", oldVersion);
+            case 27:
+                // Current version - no upgrade needed
         }
     }
 
