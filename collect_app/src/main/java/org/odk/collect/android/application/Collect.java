@@ -147,6 +147,7 @@ public class Collect extends Application implements
     private FormRestartDetails mRestartDetails;
     private String formId;
     private String searchLocalData;
+    private org.odk.collect.android.javarosawrapper.FormController formController;
 
     /**
      * @deprecated we shouldn't have to reference a static singleton of the application. Code doing this
@@ -164,6 +165,15 @@ public class Collect extends Application implements
 
     public void setExternalDataManager(ExternalDataManager externalDataManager) {
         this.externalDataManager = externalDataManager;
+    }
+
+    @Nullable
+    public org.odk.collect.android.javarosawrapper.FormController getFormController() {
+        return formController;
+    }
+
+    public void setFormController(@Nullable org.odk.collect.android.javarosawrapper.FormController controller) {
+        formController = controller;
     }
 
     @Override

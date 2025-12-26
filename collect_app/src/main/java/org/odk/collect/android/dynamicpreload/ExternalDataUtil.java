@@ -369,4 +369,53 @@ public final class ExternalDataUtil {
         }
         return filePath;
     }
+
+    /*
+     * Convert placeholders for questions into the answers of those questions
+     * Otherwise leave tokens unchanged
+     * smap - added for remote data handlers
+     */
+    public static String evaluateExpressionNodes(String in, EvaluationContext ec) {
+        StringBuilder expression = new StringBuilder("");
+        if(in != null) {
+            FormController formController = Collect.getInstance().getFormController();
+            if (formController == null) {
+                return in; // Return original if no form controller available
+            }
+            org.javarosa.core.model.FormDef formDef = formController.getFormDef();
+            FormInstance formInstance = formDef.getInstance();
+
+            String [] eList = in.split("\\s+");
+            for(String s : eList) {
+                if(s.startsWith("/main")) {
+                    try {
+                        org.javarosa.xpath.expr.XPathPathExpr pathExpr = org.javarosa.xpath.XPathReference.getPathExpr(s);
+                        org.javarosa.xpath.expr.XPathNodeset xpathNodeset = pathExpr.eval(formInstance, ec);
+                        Object o = XPathFuncExpr.unpack(xpathNodeset);
+
+                        if (o.getClass() == String.class) {
+                            s = XPathFuncExpr.toString(o);
+                            s = "'" + s + "'";
+                        } else if (o.getClass() == java.util.Date.class) {
+                            java.util.Date d = (java.util.Date) o;
+                            java.text.SimpleDateFormat sdf;
+                            sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                            sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));   // Dates on server will be in UTC
+                            s = "'" + sdf.format(d) + "'::timestamptz";
+                        } else {
+                            s = XPathFuncExpr.toString(o);
+                        }
+                    } catch (Exception e) {
+                        Timber.e(e, "Error evaluating expression node: %s", s);
+                        // Keep original value on error
+                    }
+                }
+                if(expression.length() > 0) {
+                    expression.append(" ");
+                }
+                expression.append(s);
+            }
+        }
+        return expression.toString();
+    }
 }

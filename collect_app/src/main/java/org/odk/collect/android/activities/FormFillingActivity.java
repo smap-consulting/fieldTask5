@@ -663,6 +663,9 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         formSessionRepository.set(sessionId, formController, form, instance);
         AnalyticsUtils.setForm(formController);
         backgroundLocationViewModel.formFinishedLoading();
+
+        // smap - Set formController in Collect singleton for remote data handlers
+        org.odk.collect.android.application.Collect.getInstance().setFormController(formController);
     }
 
     private void setupFields(Bundle savedInstanceState) {
@@ -1854,6 +1857,9 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             // This is the common case -- the form didn't have location audits enabled so the
             // receiver was not registered.
         }
+
+        // smap - Clear formController from Collect singleton
+        org.odk.collect.android.application.Collect.getInstance().setFormController(null);
 
         super.onDestroy();
     }
