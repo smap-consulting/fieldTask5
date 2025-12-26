@@ -103,7 +103,18 @@ the specific language governing permissions and limitations under the License.
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!-- SMAP: FirstLaunchActivity removed - SmapMain auto-creates default project -->
+        <!-- SMAP: SplashScreenActivity checks login requirements before launching SmapMain -->
+        <activity
+            android:name="au.smap.fieldTask.activities.SplashScreenActivity"
+            android:theme="@style/Theme.Collect.SplashScreen"
+            android:exported="true"
+            android:screenOrientation="unspecified">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="au.smap.fieldTask.activities.SmapMain"
@@ -113,11 +124,6 @@ the specific language governing permissions and limitations under the License.
             android:configChanges="locale"
             android:screenOrientation="unspecified"
             android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity android:name="org.odk.collect.android.activities.CrashHandlerActivity" />
