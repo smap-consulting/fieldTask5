@@ -58,20 +58,20 @@ public class LocationRegister {
         return org.odk.collect.android.R.string.smap_request_foreground_location_permission;
     }
 
-    public void set(SharedPreferences.Editor editor, String sendLocation) {
+    public void set(org.odk.collect.shared.settings.Settings settings, String sendLocation) {
         /*
          * SAVE_LOCATION is used to store the setting so that it can be restored if overriden by EXIT
          */
         if(sendLocation == null || sendLocation.equals("off")) {
-            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false);
-            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
-            editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+            settings.save(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false);
+            settings.save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
+            settings.save(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
         } else if(sendLocation.equals("on")) {
-            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, true);
-            editor.putBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, true);
-            editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
+            settings.save(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, true);
+            settings.save(ProjectKeys.KEY_SMAP_USER_LOCATION, true);
+            settings.save(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
         } else {
-            editor.putBoolean(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, false);
+            settings.save(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, false);
         }
     }
 
