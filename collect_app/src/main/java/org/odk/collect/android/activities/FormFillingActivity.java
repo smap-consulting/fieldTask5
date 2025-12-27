@@ -263,10 +263,12 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
 
     private Animation inAnimation;
     private Animation outAnimation;
+    private FormAnimationType pendingAnimationType;  // smap - Track pending navigation during remote calls
 
     private AppBarLayout appBarLayout;
     private FrameLayout questionHolder;
     private SwipeHandler.View currentView;
+    private SwipeHandler.View pendingView;  // smap - View to show after remote call completes
 
     private AlertDialog alertDialog;
     private FormError formError;
@@ -1361,6 +1363,10 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     public void showView(SwipeHandler.View next, FormAnimationType from) {
         // smap - Show progress dialog if remote calls (get_media, lookup, etc.) are in progress
         if (Collect.getInstance().inRemoteCall() && android.os.Looper.getMainLooper().getThread() == Thread.currentThread()) {
+            // Save the pending navigation to complete after download finishes
+            pendingView = next;
+            pendingAnimationType = from;
+
             org.odk.collect.material.MaterialProgressDialogFragment progressDialog = new org.odk.collect.material.MaterialProgressDialogFragment();
             progressDialog.setMessage(getString(org.odk.collect.strings.R.string.please_wait));
             org.odk.collect.androidshared.ui.DialogFragmentUtils.showIfNotShowing(progressDialog, TAG_PROGRESS_DIALOG_MEDIA_LOADING, getSupportFragmentManager());
@@ -2381,8 +2387,17 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 dialog.dismiss();
             }
 
-            // Refresh the current screen to show downloaded media
-            onScreenRefresh(false);
+            // Complete the pending navigation if user tried to advance during download
+            if (pendingView != null && pendingAnimationType != null) {
+                SwipeHandler.View viewToShow = pendingView;
+                FormAnimationType animationType = pendingAnimationType;
+                pendingView = null;
+                pendingAnimationType = null;
+                showView(viewToShow, animationType);  // Now actually show the next view
+            } else {
+                // No pending navigation, just refresh current screen to show downloaded media
+                onScreenRefresh(false);
+            }
         }
     }
 }
