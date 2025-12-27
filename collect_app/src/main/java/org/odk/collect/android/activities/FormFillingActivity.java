@@ -223,7 +223,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         WidgetValueChangedListener, FormLoadingDialogFragment.FormLoadingDialogFragmentListener,
         AudioControllerView.SwipableParent, FormIndexAnimationHandler.Listener,
         SelectMinimalDialog.SelectMinimalDialogListener, CustomDatePickerDialog.DateChangeListener,
-        CustomTimePickerDialog.TimeChangeListener {
+        CustomTimePickerDialog.TimeChangeListener, au.smap.fieldTask.listeners.SmapRemoteListener {
 
     public static final String KEY_INSTANCES = "instances";
     public static final String KEY_SUCCESS = "success";
@@ -1358,6 +1358,14 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
      * the progress bar.
      */
     public void showView(SwipeHandler.View next, FormAnimationType from) {
+        // smap - Show progress dialog if remote calls (get_media, lookup, etc.) are in progress
+        if (Collect.getInstance().inRemoteCall() && android.os.Looper.getMainLooper().getThread() == Thread.currentThread()) {
+            org.odk.collect.material.MaterialProgressDialogFragment progressDialog = new org.odk.collect.material.MaterialProgressDialogFragment();
+            progressDialog.setMessage(getString(org.odk.collect.strings.R.string.please_wait));
+            org.odk.collect.androidshared.ui.DialogFragmentUtils.showIfNotShowing(progressDialog, TAG_PROGRESS_DIALOG_MEDIA_LOADING, getSupportFragmentManager());
+            return; // Don't show the view yet; wait for remote call to complete
+        }
+
         invalidateOptionsMenu();
 
         // disable notifications...
@@ -2351,6 +2359,27 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             return currentViewIfODKView.getAnswers();
         } else {
             return new HashMap<>();
+        }
+    }
+
+    // smap - Handle completion of remote data download (get_media, lookup, etc.)
+    @Override
+    public void remoteComplete(au.smap.fieldTask.external.handler.SmapRemoteDataItem item) {
+        Collect app = Collect.getInstance();
+        app.setRemoteItem(item);
+        app.endRemoteCall();
+
+        // Dismiss progress dialog when all remote calls are complete
+        if (!app.inRemoteCall()) {
+            org.odk.collect.material.MaterialProgressDialogFragment dialog =
+                (org.odk.collect.material.MaterialProgressDialogFragment)
+                    getSupportFragmentManager().findFragmentByTag(TAG_PROGRESS_DIALOG_MEDIA_LOADING);
+            if (dialog != null) {
+                dialog.dismiss();
+            }
+
+            // Refresh the current screen to show downloaded media
+            onScreenRefresh(false);
         }
     }
 }

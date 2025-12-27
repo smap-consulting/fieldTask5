@@ -102,9 +102,7 @@ public class SmapRemoteDataHandlerGetMedia implements IFunctionHandler {
             if(!f.exists() && app.getRemoteData(url) == null) {
                 app.startRemoteCall();
                 SmapRemoteWebServiceTask task = new SmapRemoteWebServiceTask();
-                // Note: In fieldTask5, the listener may need to be set differently
-                // depending on the calling context. For now, the task will cache
-                // the result in Collect for retrieval on next evaluation.
+                task.setSmapRemoteListener(app.getFormFillingActivity());
                 task.execute(url, timeoutValue, "false", f.getAbsolutePath(), mediaName, "false");
             } else {
                 return mediaName;
