@@ -42,6 +42,15 @@ public class ExternalDataHandlerPull extends ExternalDataHandlerBase {
 
     public static final String HANDLER_NAME = "pulldata";
 
+    // smap - Function name constants for pulldata variants
+    public static final String FN_COUNT = "count";
+    public static final String FN_LIST = "list";
+    public static final String FN_INDEX = "index";
+    public static final String FN_SUM = "sum";
+    public static final String FN_MAX = "max";
+    public static final String FN_MIN = "min";
+    public static final String FN_MEAN = "mean";
+
     public ExternalDataHandlerPull(ExternalDataManager externalDataManager) {
         super(externalDataManager);
     }

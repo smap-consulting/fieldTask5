@@ -389,8 +389,9 @@ public final class ExternalDataUtil {
             for(String s : eList) {
                 if(s.startsWith("/main")) {
                     try {
-                        org.javarosa.xpath.expr.XPathPathExpr pathExpr = org.javarosa.xpath.XPathReference.getPathExpr(s);
-                        org.javarosa.xpath.expr.XPathNodeset xpathNodeset = pathExpr.eval(formInstance, ec);
+                        // smap - XPathReference moved to org.javarosa.model.xform in javarosa 5.x
+                        org.javarosa.xpath.expr.XPathPathExpr pathExpr = org.javarosa.model.xform.XPathReference.getPathExpr(s);
+                        org.javarosa.xpath.XPathNodeset xpathNodeset = pathExpr.eval(formInstance, ec);
                         Object o = XPathFuncExpr.unpack(xpathNodeset);
 
                         if (o.getClass() == String.class) {

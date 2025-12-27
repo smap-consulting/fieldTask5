@@ -385,7 +385,8 @@ dependencies {
     implementation (libs.opencsv) {
         exclude group: 'commons-logging'
     }
-    implementation(libs.javarosa) {
+    // smap - Use custom javarosa library from Maven local (v5.1.4-smap)
+    implementation('org.getodk:javarosa:5.1.4-smap') {
         exclude group: 'commons-io'
         exclude group: 'joda-time'
         exclude group: 'org.slf4j'
