@@ -410,6 +410,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Collect.getInstance().getComponent().inject(this);
+        Collect.getInstance().setFormFillingActivity(this);  // smap - Register for remote data callbacks
 
         if (savedInstanceState == null) {
             sessionId = formSessionRepository.create();
@@ -1844,6 +1845,8 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
 
     @Override
     protected void onDestroy() {
+        Collect.getInstance().setFormFillingActivity(null);  // smap - Unregister to avoid memory leaks
+
         if (formLoaderTask != null) {
             formLoaderTask.setFormLoaderListener(null);
             // We have to call cancel to terminate the thread, otherwise it
