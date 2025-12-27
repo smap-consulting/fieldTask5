@@ -268,7 +268,6 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     private AppBarLayout appBarLayout;
     private FrameLayout questionHolder;
     private SwipeHandler.View currentView;
-    private SwipeHandler.View pendingView;  // smap - View to show after remote call completes
 
     private AlertDialog alertDialog;
     private FormError formError;
@@ -1363,8 +1362,8 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     public void showView(SwipeHandler.View next, FormAnimationType from) {
         // smap - Show progress dialog if remote calls (get_media, lookup, etc.) are in progress
         if (Collect.getInstance().inRemoteCall() && android.os.Looper.getMainLooper().getThread() == Thread.currentThread()) {
-            // Save the pending navigation to complete after download finishes
-            pendingView = next;
+            // Save the animation type to complete navigation after download finishes
+            // We'll recreate the view then to pick up downloaded media
             pendingAnimationType = from;
 
             org.odk.collect.material.MaterialProgressDialogFragment progressDialog = new org.odk.collect.material.MaterialProgressDialogFragment();
@@ -2388,12 +2387,15 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             }
 
             // Complete the pending navigation if user tried to advance during download
-            if (pendingView != null && pendingAnimationType != null) {
-                SwipeHandler.View viewToShow = pendingView;
+            if (pendingAnimationType != null) {
                 FormAnimationType animationType = pendingAnimationType;
-                pendingView = null;
                 pendingAnimationType = null;
-                showView(viewToShow, animationType);  // Now actually show the next view
+
+                // Recreate the current view to re-evaluate XPath expressions (including get_media)
+                // This ensures the downloaded media is picked up
+                int event = getFormController().getEvent();
+                SwipeHandler.View newView = createView(event, false);
+                showView(newView, animationType);  // Now show with downloaded media
             } else {
                 // No pending navigation, just refresh current screen to show downloaded media
                 onScreenRefresh(false);
