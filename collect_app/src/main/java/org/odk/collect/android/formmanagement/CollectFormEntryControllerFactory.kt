@@ -14,6 +14,9 @@ import org.odk.collect.android.application.Collect
 import org.odk.collect.android.dynamicpreload.ExternalDataManagerImpl
 import org.odk.collect.android.dynamicpreload.handler.ExternalDataHandlerPull
 import org.odk.collect.android.formmanagement.finalization.EditedFormFinalizationProcessor
+import au.smap.fieldTask.external.handler.SmapRemoteDataHandlerGetMedia
+import au.smap.fieldTask.external.handler.SmapRemoteDataHandlerLookup
+import au.smap.fieldTask.external.handler.SmapRemoteDataHandlerLookupImagelabels
 import org.odk.collect.android.preferences.SettingsExt.getExperimentalOptIn
 import org.odk.collect.android.tasks.FormLoaderTask.FormEntryControllerFactory
 import org.odk.collect.androidshared.ui.ToastUtils
@@ -49,6 +52,13 @@ class CollectFormEntryControllerFactory(
             )
 
             it.addFunctionHandler(IntersectsFunctionHandler())
+
+            // smap - Register custom external data handlers
+            // Note: SmapRemoteDataHandlerSearch is registered dynamically per question, not globally
+            val formId = formDef.getID().toString()
+            it.addFunctionHandler(SmapRemoteDataHandlerGetMedia())
+            it.addFunctionHandler(SmapRemoteDataHandlerLookup(formId))
+            it.addFunctionHandler(SmapRemoteDataHandlerLookupImagelabels(formId))
 
             it.addPostProcessor(EntityFormFinalizationProcessor())
             it.addPostProcessor(EditedFormFinalizationProcessor(instance))
