@@ -38,6 +38,9 @@ class CollectFormEntryControllerFactory(
 ) :
     FormEntryControllerFactory {
     override fun create(formDef: FormDef, formMediaDir: File, instance: Instance?): FormEntryController {
+        // smap - Initialize remote service cache for get_media and other remote data functions
+        Collect.getInstance().initRemoteServiceCaches()
+
         val externalDataManager = ExternalDataManagerImpl(formMediaDir).also {
             Collect.getInstance().externalDataManager = it
         }
