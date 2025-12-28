@@ -56,7 +56,8 @@ public class SmapRemoteWebServicePostTask extends AsyncTask<String, Void, SmapRe
         }
 
         try {
-            String filePath = null;  // SMAP BUILD
+            String filePath = Collect.getInstance().getFormController().getInstanceFile().getParent() +
+                    File.separator + fileName;
             File file = new File(filePath);
             String extension = getFileExtension(fileName);
             if(file.exists() && extension.equals("jpg")) {
