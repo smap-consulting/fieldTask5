@@ -1938,6 +1938,11 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         Form form = task.getForm();
 
         if (formController != null) {
+            // smap - Set the form ID in the Collect singleton for remote data handlers (lookup_choices, etc.)
+            if (form != null) {
+                Collect.getInstance().setFormId(form.getFormId());
+            }
+
             formLoaderTask.setFormLoaderListener(null);
             FormLoaderTask t = formLoaderTask;
             formLoaderTask = null;

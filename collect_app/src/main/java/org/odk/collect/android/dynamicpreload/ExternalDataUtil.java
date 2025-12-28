@@ -66,6 +66,7 @@ public final class ExternalDataUtil {
     public static final String COLUMN_DATASET_FILENAME = "dataSetFilename";
     public static final String COLUMN_MD5_HASH = "md5Hash";
 
+    public static final Pattern REMOTE_SEARCH_FUNCTION_REGEX = Pattern.compile("lookup_choices\\(.+\\)");     // smap
     public static final Pattern SEARCH_FUNCTION_REGEX = Pattern.compile("search\\(.+\\)");
     private static final String COLUMN_SEPARATOR = ",";
     private static final String FALLBACK_COLUMN_SEPARATOR = " ";
@@ -116,7 +117,12 @@ public final class ExternalDataUtil {
         appearance = appearance.trim();
 
         Matcher matcher = SEARCH_FUNCTION_REGEX.matcher(appearance);
-        if (matcher.find()) {
+        boolean found = matcher.find(); // smap
+        if(!found) {           // smap try lookup_choices
+            matcher = REMOTE_SEARCH_FUNCTION_REGEX.matcher(appearance);
+            found = matcher.find();
+        }
+        if (found) {
 
             String function = matcher.group(0);
             try {
@@ -124,10 +130,12 @@ public final class ExternalDataUtil {
                 if (XPathFuncExpr.class.isAssignableFrom(xpathExpression.getClass())) {
                     XPathFuncExpr xpathFuncExpr = (XPathFuncExpr) xpathExpression;
                     if (xpathFuncExpr.id.name.equalsIgnoreCase(
-                            ExternalDataHandlerSearch.HANDLER_NAME)) {
-                        // also check that the args are either 1, 4 or 6.
-                        if (xpathFuncExpr.args.length == 1 || xpathFuncExpr.args.length == 4
-                                || xpathFuncExpr.args.length == 6) {
+                            ExternalDataHandlerSearch.HANDLER_NAME) ||
+                            xpathFuncExpr.id.name.equalsIgnoreCase(                 // smap
+                                    au.smap.fieldTask.external.handler.SmapRemoteDataHandlerSearch.HANDLER_NAME)) {
+                        // also check that the args are either 1, 3, 4 or 6.
+                        if (xpathFuncExpr.args.length == 1 || xpathFuncExpr.args.length == 3    // smap add 3 params as an option
+                                || xpathFuncExpr.args.length == 4 || xpathFuncExpr.args.length == 6) {
                             return xpathFuncExpr;
                         } else {
                             Toast.makeText(Collect.getInstance(),
@@ -166,13 +174,14 @@ public final class ExternalDataUtil {
 
     public static ArrayList<SelectChoice> populateExternalChoices(FormEntryPrompt formEntryPrompt,
             XPathFuncExpr xpathfuncexpr, FormController formController) throws FileNotFoundException {
+        ArrayList<SelectChoice> returnedChoices = new ArrayList<>();        // smap
         try {
             List<SelectChoice> selectChoices = formEntryPrompt.getSelectChoices();
             if (!containsConfigurationChoice(selectChoices)) {
                 String filePath = getFilePath(xpathfuncexpr, formController);
                 throw new FileNotFoundException(filePath);
             }
-            ArrayList<SelectChoice> returnedChoices = new ArrayList<>();
+            //ArrayList<SelectChoice> returnedChoices = new ArrayList<>();  // smap
             for (SelectChoice selectChoice : selectChoices) {
                 String value = selectChoice.getValue();
                 if (isAnInteger(value)) {
@@ -197,9 +206,15 @@ public final class ExternalDataUtil {
                     EvaluationContext evaluationContext = new EvaluationContext(
                             baseEvaluationContext, formEntryPrompt.getIndex().getReference());
                     // we can only add only the appropriate by querying the xPathFuncExpr.id.name
-                    evaluationContext.addFunctionHandler(
-                            new ExternalDataHandlerSearch(externalDataManager, displayColumns,
-                                    value, imageColumn));
+                    if (xpathfuncexpr.id.name.equalsIgnoreCase(ExternalDataHandlerSearch.HANDLER_NAME)) {
+                        evaluationContext.addFunctionHandler(
+                                new ExternalDataHandlerSearch(externalDataManager, displayColumns,
+                                        value, imageColumn));
+                    } else if (xpathfuncexpr.id.name.equalsIgnoreCase(au.smap.fieldTask.external.handler.SmapRemoteDataHandlerSearch.HANDLER_NAME)){       // smap
+                        evaluationContext.addFunctionHandler(
+                                new au.smap.fieldTask.external.handler.SmapRemoteDataHandlerSearch(Collect.getInstance().getFormId(), displayColumns,
+                                        value, imageColumn));
+                    }
 
                     Object eval = xpathfuncexpr.eval(formInstance, evaluationContext);
                     if (eval.getClass().isAssignableFrom(ArrayList.class)) {
@@ -217,12 +232,44 @@ public final class ExternalDataUtil {
             }
             return returnedChoices;
         } catch (Exception e) {
-            String filePath = getFilePath(xpathfuncexpr, formController);
-            if (!new File(filePath).exists()) {
-                throw new FileNotFoundException(filePath);
+
+            String fileName = String.valueOf(xpathfuncexpr.args[0].eval(null, null));
+
+            String msg = e.getMessage();        // Smap throw SQL errors
+            if(msg != null) {                   // Smap throw SQL errors
+                if(msg.contains("no such column")) {
+                    int idx1 = msg.indexOf("column:");
+                    int idx2 = msg.indexOf('(');
+                    if(idx1 > 0 && idx2 > idx1) {
+                        String columnTitle = msg.substring(idx1 + 8, idx2).trim();
+                        // Remove the c_ prefix from column name if present
+                        if(columnTitle.startsWith("c_")) {
+                            columnTitle = columnTitle.substring(2);
+                        }
+                        throw (new ExternalDataException(Collect.getInstance().getString(org.odk.collect.android.R.string.smap_csv_column_nf, columnTitle, fileName)));
+                    }
+                }
             }
 
-            throw new ExternalDataException(e.getMessage(), e);
+            if(fileName.startsWith("linked_s")) {    // smap
+                throw(e);
+            } else if (!fileName.endsWith(".csv")) {
+                fileName = fileName + ".csv";
+            }
+
+            String filePath = fileName;
+            if (formController != null) {
+                filePath = formController.getMediaFolder() + File.separator + fileName;
+            }
+            if (!new File(filePath).exists()) {
+                filePath += ".imported";    // smap
+                if (!new File(filePath).exists()) {
+                    throw new FileNotFoundException(filePath);
+                }
+            }
+
+            return returnedChoices;  // smap
+            // throw new ExternalDataException(e.getMessage(), e);  // smap
         }
     }
 
@@ -272,7 +319,50 @@ public final class ExternalDataUtil {
         return values;
     }
 
-    private static List<String> splitTrimmed(String displayColumns, String separator,
+    // smap - Overloaded version for SmapRemoteDataHandlerSearch
+    public static void createMapWithDisplayingColumns(
+            LinkedHashMap<String, String> selectColumnMap,
+            List<String> columnsToFetch,
+            String valueColumn,
+            String displayColumns) {
+        valueColumn = valueColumn.trim();
+
+        selectColumnMap.put(toSafeColumnName(valueColumn), valueColumn);
+        columnsToFetch.add(toSafeColumnName(valueColumn));
+
+        if (displayColumns != null && displayColumns.trim().length() > 0) {
+            displayColumns = displayColumns.trim();
+
+            List<String> commaSplitParts = splitTrimmed(displayColumns, COLUMN_SEPARATOR,
+                    FALLBACK_COLUMN_SEPARATOR);
+
+            for (String commaSplitPart : commaSplitParts) {
+                selectColumnMap.put(toSafeColumnName(commaSplitPart), commaSplitPart);
+                columnsToFetch.add(toSafeColumnName(commaSplitPart));
+            }
+        }
+    }
+
+    // smap
+    public static List<String> createListOfValues(String valueString, String searchType) {
+        List<String> values = new ArrayList<String>();
+
+        // Only split values for "in" and "not in" type otherwise values that contain spaces will not work
+        if(searchType.equals("in") || searchType.equals("not in")) {
+            List<String> commaSplitParts = splitTrimmed(valueString, COLUMN_SEPARATOR,
+                    FALLBACK_COLUMN_SEPARATOR);
+
+            for (String commaSplitPart : commaSplitParts) {
+                values.add(commaSplitPart);
+            }
+        } else {
+            values.add(valueString);
+        }
+
+        return values;
+    }
+
+    protected static List<String> splitTrimmed(String displayColumns, String separator,
             String fallbackSeparator) {
         List<String> commaSplitParts = splitTrimmed(displayColumns, separator);
 
