@@ -2391,11 +2391,17 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 FormAnimationType animationType = pendingAnimationType;
                 pendingAnimationType = null;
 
-                // Recreate the current view to re-evaluate XPath expressions (including get_media)
-                // This ensures the downloaded media is picked up
+                // Call the appropriate navigation method to recreate view and advance
+                // This matches fieldTask4's approach where moveScreen() was called after download
                 int event = getFormController().getEvent();
-                SwipeHandler.View newView = createView(event, false);
-                showView(newView, animationType);  // Now show with downloaded media
+                if (animationType == FormAnimationType.RIGHT) {
+                    animateToNextView(event);  // Advancing forward - createView(event, true)
+                } else if (animationType == FormAnimationType.LEFT) {
+                    animateToPreviousView(event);  // Going backward - createView(event, false)
+                } else {
+                    // FADE animation - just refresh current page
+                    onScreenRefresh(false);
+                }
             } else {
                 // No pending navigation, just refresh current screen to show downloaded media
                 onScreenRefresh(false);
