@@ -263,7 +263,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
 
     private Animation inAnimation;
     private Animation outAnimation;
-    private FormAnimationType pendingAnimationType;  // smap - Track pending navigation during remote calls
+    private Direction pendingDirection;  // smap - Track pending navigation direction during remote calls
 
     private AppBarLayout appBarLayout;
     private FrameLayout questionHolder;
@@ -1298,6 +1298,19 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
 
         switch (direction) {
             case FORWARDS:
+                // smap - Check if remote call (get_media download, etc.) was triggered during forward navigation
+                // If so, move back to current page and wait for download to complete
+                if (Collect.getInstance().inRemoteCall() && android.os.Looper.getMainLooper().getThread() == Thread.currentThread()) {
+                    Timber.d("onScreenChange: Remote call in progress, moving back to wait for download");
+                    pendingDirection = FORWARDS;  // Save that we need to move forward again
+                    formEntryViewModel.moveBackward(new java.util.HashMap<>());  // Move back to current page
+
+                    // Show progress dialog
+                    org.odk.collect.material.MaterialProgressDialogFragment progressDialog = new org.odk.collect.material.MaterialProgressDialogFragment();
+                    progressDialog.setMessage(getString(org.odk.collect.strings.R.string.please_wait));
+                    org.odk.collect.androidshared.ui.DialogFragmentUtils.showIfNotShowing(progressDialog, TAG_PROGRESS_DIALOG_MEDIA_LOADING, getSupportFragmentManager());
+                    return;  // Don't animate yet; wait for remote call to complete
+                }
                 animateToNextView(event);
                 break;
             case BACKWARDS:
@@ -1360,18 +1373,6 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
      * the progress bar.
      */
     public void showView(SwipeHandler.View next, FormAnimationType from) {
-        // smap - Show progress dialog if remote calls (get_media, lookup, etc.) are in progress
-        if (Collect.getInstance().inRemoteCall() && android.os.Looper.getMainLooper().getThread() == Thread.currentThread()) {
-            // Save the animation type to complete navigation after download finishes
-            // We'll recreate the view then to pick up downloaded media
-            pendingAnimationType = from;
-
-            org.odk.collect.material.MaterialProgressDialogFragment progressDialog = new org.odk.collect.material.MaterialProgressDialogFragment();
-            progressDialog.setMessage(getString(org.odk.collect.strings.R.string.please_wait));
-            org.odk.collect.androidshared.ui.DialogFragmentUtils.showIfNotShowing(progressDialog, TAG_PROGRESS_DIALOG_MEDIA_LOADING, getSupportFragmentManager());
-            return; // Don't show the view yet; wait for remote call to complete
-        }
-
         invalidateOptionsMenu();
 
         // disable notifications...
@@ -2386,25 +2387,13 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 dialog.dismiss();
             }
 
-            // Complete the pending navigation if user tried to advance during download
-            if (pendingAnimationType != null) {
-                FormAnimationType animationType = pendingAnimationType;
-                pendingAnimationType = null;
-
-                // Call the appropriate navigation method to recreate view and advance
-                // This matches fieldTask4's approach where moveScreen() was called after download
-                int event = getFormController().getEvent();
-                if (animationType == FormAnimationType.RIGHT) {
-                    animateToNextView(event);  // Advancing forward - createView(event, true)
-                } else if (animationType == FormAnimationType.LEFT) {
-                    animateToPreviousView(event);  // Going backward - createView(event, false)
-                } else {
-                    // FADE animation - just refresh current page
-                    onScreenRefresh(false);
-                }
-            } else {
-                // No pending navigation, just refresh current screen to show downloaded media
-                onScreenRefresh(false);
+            // Complete the pending navigation now that download is finished
+            // This will re-trigger form navigation, re-evaluating get_media() which will now find the downloaded file
+            if (pendingDirection != null) {
+                Timber.d("remoteComplete: Resuming forward navigation after download completion");
+                Direction savedDirection = pendingDirection;
+                pendingDirection = null;
+                moveScreen(savedDirection);
             }
         }
     }

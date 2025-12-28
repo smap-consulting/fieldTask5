@@ -79,8 +79,11 @@ public class SmapRemoteWebServiceTask extends AsyncTask<String, Void, SmapRemote
             if(imagePath != null) {
                 SmapInfoDownloader fd = new SmapInfoDownloader();
                 File f = new File(imagePath);
+                Timber.d("SmapRemoteWebServiceTask: Downloading to %s, exists before=%s", imagePath, f.exists());
                 if(!f.exists()) {
                     fd.downloadFile(f, is, lookupUrl);
+                    Timber.d("SmapRemoteWebServiceTask: Download complete, exists after=%s, length=%d",
+                        f.exists(), f.length());
                 }
                 item.data = imageName;
             } else {

@@ -100,14 +100,18 @@ public class SmapRemoteDataHandlerGetMedia implements IFunctionHandler {
 
             // Get the file if it does not exist and there is nothing in the cache indicating that an attempt has already been made to get it
             if(!f.exists() && app.getRemoteData(url) == null) {
+                Timber.d("get_media: Starting download for %s to %s", mediaName, f.getAbsolutePath());
                 app.startRemoteCall();
                 SmapRemoteWebServiceTask task = new SmapRemoteWebServiceTask();
                 task.setSmapRemoteListener(app.getFormFillingActivity());
                 task.execute(url, timeoutValue, "false", f.getAbsolutePath(), mediaName, "false");
             } else {
+                Timber.d("get_media: Returning mediaName=%s, fileExists=%s, cacheData=%s",
+                    mediaName, f.exists(), app.getRemoteData(url));
                 return mediaName;
             }
         }
+        Timber.d("get_media: Returning empty string (download in progress)");
         return "";
 
     }
