@@ -58,7 +58,8 @@ class CollectFormEntryControllerFactory(
 
             // smap - Register custom external data handlers
             // Note: SmapRemoteDataHandlerSearch is registered dynamically per question, not globally
-            val formId = formDef.getID().toString()
+            // The form ID is set in FormLoaderTask before this factory is called
+            val formId = Collect.getInstance().formId ?: ""
             it.addFunctionHandler(SmapRemoteDataHandlerGetMedia())
             it.addFunctionHandler(SmapRemoteDataHandlerLookup(formId))
             it.addFunctionHandler(SmapRemoteDataHandlerLookupImagelabels(formId))

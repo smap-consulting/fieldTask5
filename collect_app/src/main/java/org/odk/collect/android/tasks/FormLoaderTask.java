@@ -234,6 +234,12 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
             return null;
         }
 
+        // smap - Set the form ID in Collect singleton BEFORE creating the controller
+        // so that remote data handlers (lookup, lookup_choices, etc.) can access it during registration
+        if (form != null) {
+            Collect.getInstance().setFormId(form.getFormId());
+        }
+
         // create FormEntryController from formdef
         final FormEntryController fec = formEntryControllerFactory.create(formDef, formMediaDir, instance);
 
