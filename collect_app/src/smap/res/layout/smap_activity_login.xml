@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:textSize="64sp"
             xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:fitsSystemWindows="true">
 
     <RelativeLayout
@@ -24,34 +23,39 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="56dp"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp">
+        android:paddingTop="@dimen/margin_extra_extra_large"
+        android:paddingLeft="@dimen/margin_large"
+        android:paddingRight="@dimen/margin_large">
 
         <ImageView app:srcCompat="@drawable/ic_logo"
                    android:layout_width="100dp"
                    android:layout_height="100dp"
-                   android:layout_marginBottom="24dp"
+                   android:layout_marginBottom="@dimen/margin_large"
                    android:layout_gravity="center_horizontal" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/smap_use_token"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/smap_use_token"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/smap_use_token" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginBottom="@dimen/margin_extra_small"
+            android:text="@string/smap_use_token" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_scan"
+            style="@style/Widget.Collect.Button.FullWidth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginBottom="@dimen/margin_large"
+            android:text="@string/smap_scan_qr"/>
 
         <!--  URL Label -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginBottom="@dimen/margin_extra_small">
             <EditText android:id="@+id/input_url"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -63,8 +67,8 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginBottom="@dimen/margin_extra_small">
             <EditText android:id="@+id/input_username"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -77,8 +81,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:passwordToggleEnabled="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginBottom="@dimen/margin_extra_small">
             <com.google.android.material.textfield.TextInputEditText android:id="@+id/input_password"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -88,22 +92,12 @@
                       android:hint="@string/password"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_scan"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:padding="12dp"
-            android:background="@android:color/holo_blue_light"
-            android:text="@string/smap_scan_qr"/>
-
         <!--  Auth Token -->
         <com.google.android.material.textfield.TextInputLayout android:id="@+id/auth_token_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginBottom="@dimen/margin_extra_small">
             <com.google.android.material.textfield.TextInputEditText android:id="@+id/auth_token"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,13 +107,13 @@
                 android:hint="@string/smap_auth_token"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
-            android:layout_width="fill_parent"
+            style="@style/Widget.Collect.Button.FullWidth"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:padding="12dp"
+            android:layout_marginTop="@dimen/margin_large"
+            android:layout_marginBottom="@dimen/margin_large"
             android:text="@string/smap_login"/>
 
     </LinearLayout>
