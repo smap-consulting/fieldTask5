@@ -59,6 +59,7 @@ apks
 secrets.properties
 google-services.json
 .claude
+CLAUDE.md
 
 collect_app/collect_app.iml
 
