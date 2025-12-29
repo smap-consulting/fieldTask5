@@ -291,11 +291,11 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
         // show or hide basic authentication preferences
         binding.inputUrl.setEnabled(!useToken);
         binding.inputUsername.setEnabled(!useToken);
-        binding.inputPasswordLayout.setVisibility(useToken ? View.INVISIBLE : View.VISIBLE);
+        binding.inputPasswordLayout.setVisibility(useToken ? View.GONE : View.VISIBLE);
 
         // show or hide token authentication preferences
-        binding.btnScan.setVisibility(!useToken ? View.INVISIBLE : View.VISIBLE);
-        binding.authTokenLayout.setVisibility(!useToken ? View.INVISIBLE : View.VISIBLE);
+        binding.btnScan.setVisibility(!useToken ? View.GONE : View.VISIBLE);
+        binding.authTokenLayout.setVisibility(!useToken ? View.GONE : View.VISIBLE);
 
     }
 
