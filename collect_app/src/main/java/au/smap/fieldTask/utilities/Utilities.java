@@ -1241,30 +1241,6 @@ public class Utilities {
         }
     }
 
-    // make sure autosend is enabled on the given connected interface
-    public static boolean isFormAutoSendOptionEnabled() {
-
-        ConnectivityManager manager = (ConnectivityManager) Collect.getInstance().getBaseContext().getSystemService(
-                Context.CONNECTIVITY_SERVICE);
-        NetworkInfo currentNetworkInfo = manager.getActiveNetworkInfo();
-
-        if (currentNetworkInfo != null) {
-            String autosend = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_AUTOSEND);
-            boolean sendwifi = autosend.equals("wifi_only");
-            boolean sendnetwork = autosend.equals("cellular_only");
-            if (autosend.equals("wifi_and_cellular")) {
-                sendwifi = true;
-                sendnetwork = true;
-            }
-
-            return (currentNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI
-                    && sendwifi || currentNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE
-                    && sendnetwork);
-        } else {
-            return false;
-        }
-    }
-
     /*
      * Replace single quotes inside a functions parameter with ##
      * The objective is to prevent an error when the xpath of a function is evaluated

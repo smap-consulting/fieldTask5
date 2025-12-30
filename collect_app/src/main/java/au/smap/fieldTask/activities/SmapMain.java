@@ -167,6 +167,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Inject
     StoragePathProvider storagePathProvider;
 
+    @Inject
+    org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider autoSendSettingsProvider;
+
     // End scoped storage
 
 
@@ -376,7 +379,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     // Get tasks and forms from the server
     public void processGetTask(boolean manual) {
 
-      if(manual || Utilities.isFormAutoSendOptionEnabled()) {
+      if(manual || autoSendSettingsProvider.isAutoSendEnabledInSettings(null)) {
             mDownloadTasks = new DownloadTasksTask();
             if(manual) {
                 mProgressMsg = getString(R.string.smap_synchronising);
