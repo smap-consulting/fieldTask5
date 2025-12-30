@@ -21,4 +21,10 @@ interface GeoDataRequester {
         answerText: String?,
         waitingForDataRegistry: WaitingForDataRegistry
     )
+
+    fun requestGeoCompound(
+        prompt: FormEntryPrompt,
+        answerText: String?,
+        waitingForDataRegistry: WaitingForDataRegistry
+    )
 }

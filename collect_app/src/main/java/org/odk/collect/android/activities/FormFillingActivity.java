@@ -237,6 +237,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     public static final String KEY_READ_ONLY = "readOnly";
     public static final String KEY_INITIAL_DATA = "initialData";
     public static final String KEY_INSTANCEPATH = "instancePath";
+    public static final String NFC_RESULT = "nfc_result";
 
     private static final String TAG_MEDIA_LOADING_FRAGMENT = "media_loading_fragment";
 

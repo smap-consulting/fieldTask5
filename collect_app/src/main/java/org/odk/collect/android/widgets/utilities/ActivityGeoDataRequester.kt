@@ -11,6 +11,7 @@ import org.odk.collect.android.widgets.interfaces.GeoDataRequester
 import org.odk.collect.geo.Constants.EXTRA_DRAGGABLE_ONLY
 import org.odk.collect.geo.Constants.EXTRA_READ_ONLY
 import org.odk.collect.geo.Constants.EXTRA_RETAIN_MOCK_ACCURACY
+import org.odk.collect.geo.geocompound.GeoCompoundActivity
 import org.odk.collect.geo.geopoint.GeoPointActivity
 import org.odk.collect.geo.geopoint.GeoPointMapActivity
 import org.odk.collect.geo.geopoly.GeoPolyActivity
@@ -144,6 +145,33 @@ class ActivityGeoDataRequester(
                     activity.startActivityForResult(
                         intent,
                         ApplicationConstants.RequestCodes.GEOTRACE_CAPTURE
+                    )
+                }
+            }
+        )
+    }
+
+    override fun    requestGeoCompound(
+        prompt: FormEntryPrompt,
+        answerText: String?,
+        waitingForDataRegistry: WaitingForDataRegistry
+    ) {
+        permissionsProvider.requestEnabledLocationPermissions(
+            activity,
+            object : PermissionListener {
+                override fun granted() {
+                    waitingForDataRegistry.waitForData(prompt.index)
+
+                    val intent = Intent(activity, GeoCompoundActivity::class.java).also {
+                        it.putExtra(GeoCompoundActivity.EXTRA_POLYGON, answerText)
+                        it.putExtra(GeoCompoundActivity.EXTRA_APPEARANCE, prompt.appearanceHint)
+                        it.putExtra(EXTRA_READ_ONLY, prompt.isReadOnly)
+                        it.putExtra(EXTRA_RETAIN_MOCK_ACCURACY, getAllowMockAccuracy(prompt))
+                    }
+
+                    activity.startActivityForResult(
+                        intent,
+                        ApplicationConstants.RequestCodes.GEOCOMPOUND_CAPTURE
                     )
                 }
             }

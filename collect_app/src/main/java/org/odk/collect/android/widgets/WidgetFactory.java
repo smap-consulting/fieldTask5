@@ -57,9 +57,12 @@ import org.odk.collect.android.widgets.utilities.ActivityGeoDataRequester;
 import org.odk.collect.android.widgets.video.ExVideoWidget;
 import org.odk.collect.android.widgets.video.VideoWidget;
 
-// smap chart widgets
+// smap widgets
 import au.smap.fieldTask.widgets.SmapChartLineWidget;
 import au.smap.fieldTask.widgets.SmapChartHorizontalBarWidget;
+import au.smap.fieldTask.widgets.SmapFormWidget;
+import au.smap.fieldTask.widgets.NfcWidget;
+import au.smap.fieldTask.widgets.GeoCompoundWidget;
 
 import org.odk.collect.audioclips.AudioPlayer;
 import org.odk.collect.android.widgets.utilities.AudioRecorderRecordingStatusHandler;
@@ -192,8 +195,16 @@ public class WidgetFactory {
                         questionWidget = new GeoTraceWidget(activity, questionDetails, waitingForDataRegistry,
                                 MapConfiguratorProvider.getConfigurator(), new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
                         break;
+                    case Constants.DATATYPE_GEOCOMPOUND:    // smap custom datatype
+                        questionWidget = new GeoCompoundWidget(activity, questionDetails, waitingForDataRegistry,
+                                new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
+                        break;
                     case Constants.DATATYPE_BARCODE:
-                        questionWidget = new BarcodeWidget(activity, questionDetails, new BarcodeWidgetAnswerView(activity, answerFontSize), waitingForDataRegistry, new CameraUtils(), dependencies);
+                        if (appearance.contains("nfc")) {        // smap nfc reader
+                            questionWidget = new NfcWidget(activity, questionDetails, dependencies, waitingForDataRegistry);
+                        } else {
+                            questionWidget = new BarcodeWidget(activity, questionDetails, new BarcodeWidgetAnswerView(activity, answerFontSize), waitingForDataRegistry, new CameraUtils(), dependencies);
+                        }
                         break;
                     case Constants.DATATYPE_TEXT:
                         String query = prompt.getQuestion().getAdditionalAttribute(null, "query");
@@ -207,6 +218,8 @@ public class WidgetFactory {
                             questionWidget = new StringNumberWidget(activity, questionDetails, dependencies);
                         } else if (appearance.equals(Appearances.URL)) {
                             questionWidget = new UrlWidget(activity, questionDetails, CustomTabsWebPageService.INSTANCE, dependencies);
+                        } else if (appearance.contains("smap_form")) {        // smap form launcher
+                            questionWidget = new SmapFormWidget(activity, questionDetails, appearance, dependencies);
                         } else if (appearance.contains("chart")) {        // smap chart
                             String chartType = questionDetails.getPrompt().getQuestion().getAdditionalAttribute(null, "chart_type");
                             if(chartType == null) {

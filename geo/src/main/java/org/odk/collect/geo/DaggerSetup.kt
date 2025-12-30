@@ -8,6 +8,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import org.odk.collect.async.Scheduler
+import org.odk.collect.geo.geocompound.GeoCompoundActivity
 import org.odk.collect.geo.geopoint.GeoPointActivity
 import org.odk.collect.geo.geopoint.GeoPointDialogFragment
 import org.odk.collect.geo.geopoint.GeoPointMapActivity
@@ -46,6 +47,7 @@ interface GeoDependencyComponent {
 
     fun inject(geoPointMapActivity: GeoPointMapActivity)
     fun inject(geoPolyActivity: GeoPolyActivity)
+    fun inject(geoCompoundActivity: GeoCompoundActivity)
     fun inject(geoPointDialogFragment: GeoPointDialogFragment)
     fun inject(geoPointActivity: GeoPointActivity)
     fun inject(selectionMapFragment: SelectionMapFragment)

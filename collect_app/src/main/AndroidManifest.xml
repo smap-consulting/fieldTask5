@@ -170,6 +170,10 @@ the specific language governing permissions and limitations under the License.
             android:theme="@style/Theme.Collect"
             tools:replace="android:theme" />
         <activity
+            android:name="org.odk.collect.geo.geocompound.GeoCompoundActivity"
+            android:theme="@style/Theme.Collect"
+            tools:replace="android:theme" />
+        <activity
             android:name="org.odk.collect.errors.ErrorActivity"
             android:theme="@style/Theme.Collect"
             tools:replace="android:theme" />

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compound marker colors -->
+    <color name="mapPointCirclePit">#ff0000ff</color>
+    <color name="mapPointFillPit">#ff0000ff</color>
+    <color name="mapPointCircleFault">#ffff0000</color>
+    <color name="mapPointFillFault">#ffff0000</color>
+</resources>

@@ -409,6 +409,21 @@ public abstract class QuestionWidget extends FrameLayout implements Widget {
         setBackground(ContextCompat.getDrawable(getContext(), R.drawable.question_with_error_border));
     }
 
+    // smap
+    protected void setGeoTextLength(com.google.android.material.textview.MaterialTextView geoAnswerText, org.javarosa.form.api.FormEntryPrompt prompt) {
+        String textLength = prompt.getQuestion().getAdditionalAttribute(null, "geotextlength");
+        if (textLength != null) {
+            int l = 4;
+            try {
+                l = Integer.parseInt(textLength);
+            } catch (Exception e) {
+                // Use default value
+            }
+            geoAnswerText.setMaxLines(l);
+            geoAnswerText.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        }
+    }
+
     public static class Dependencies {
 
         private final AudioPlayer audioPlayer;
