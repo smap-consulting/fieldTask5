@@ -143,8 +143,6 @@
     <string name="smap_background_location_permission_denied">If location recording is not allowed all the time FieldTask will not be able to alert you if a location dependent task is nearby.</string>
     <string name="smap_request_background_location_permission">FieldTask collects location data to alert you when you are near a location dependent task even when the app is closed or not in use.</string>
     <string name="smap_request_foreground_location_permission">FieldTask collects location data to alert you when you are near a location dependent task.</string>
-    <string name="smap_set_marker">Set Marker</string>
-    <string name="smap_apply">Apply</string>
     <string name="smap_deny">Deny</string>
     <string name="smap_accept2">Accept</string>
     <string name="smap_media_download">Unable to download initial data from \"%s\" into file %s</string>
@@ -154,6 +152,13 @@
     <string name="smap_invalid_auth_token">Error Invalid Token</string>
     <string name="smap_compromised">Compromised device detected - the application will exit</string>
     <string name="smap_emulator">The app is not allowed to be run on an emulator - the application will exit</string>
+
+    <!-- Geocompound widget button labels -->
+    <string name="get_geocompound">Start Compound Map</string>
+    <string name="geocompound_view_change_location">View or Change Compound Map</string>
+    <string name="geocompound_view_read_only">View Compound Map</string>
+    <string name="geocompound_title">Compound Map</string>
+
     <string-array name="smap_kontrolid_servers">
         <item>Kontrolid Org Server</item>
         <item>Kontrolid Com Server</item>
