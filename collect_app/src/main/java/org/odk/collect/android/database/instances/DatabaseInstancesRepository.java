@@ -42,6 +42,32 @@ import static org.odk.collect.android.database.instances.DatabaseInstanceColumns
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SOURCE;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.STATUS;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SUBMISSION_URI;
+// Smap-specific columns
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.FORM_PATH;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.ACT_LON;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.ACT_LAT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SCHED_LON;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.SCHED_LAT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TITLE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_TYPE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SCHED_START;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SCHED_FINISH;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ACT_START;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ACT_FINISH;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ADDRESS;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_IS_SYNC;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_ASS_ID;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_STATUS;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_COMMENT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_REPEAT;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_UPDATEID;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_LOCATION_TRIGGER;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SURVEY_NOTES;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_UPDATED;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.UUID;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SHOW_DIST;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_HIDE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.PHONE;
 import static org.odk.collect.shared.PathUtils.getRelativeFilePath;
 
 /**
@@ -310,7 +336,33 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
                     CAN_DELETE_BEFORE_SEND,
                     EDIT_OF,
                     EDIT_NUMBER,
-                    SOURCE
+                    SOURCE,
+                    // Smap-specific columns
+                    FORM_PATH,
+                    ACT_LON,
+                    ACT_LAT,
+                    SCHED_LON,
+                    SCHED_LAT,
+                    T_TITLE,
+                    T_TASK_TYPE,
+                    T_SCHED_START,
+                    T_SCHED_FINISH,
+                    T_ACT_START,
+                    T_ACT_FINISH,
+                    T_ADDRESS,
+                    T_IS_SYNC,
+                    T_ASS_ID,
+                    T_TASK_STATUS,
+                    T_TASK_COMMENT,
+                    T_REPEAT,
+                    T_UPDATEID,
+                    T_LOCATION_TRIGGER,
+                    T_SURVEY_NOTES,
+                    T_UPDATED,
+                    UUID,
+                    T_SHOW_DIST,
+                    T_HIDE,
+                    PHONE
             };
         }
 
