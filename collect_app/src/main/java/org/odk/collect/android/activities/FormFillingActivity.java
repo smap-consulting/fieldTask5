@@ -919,6 +919,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             case RequestCodes.GEOTRACE_CAPTURE:
             case RequestCodes.BEARING_CAPTURE:
             case RequestCodes.BARCODE_CAPTURE:
+            case RequestCodes.NFC_CAPTURE:
             case RequestCodes.EX_STRING_CAPTURE:
             case RequestCodes.EX_INT_CAPTURE:
             case RequestCodes.EX_DECIMAL_CAPTURE:

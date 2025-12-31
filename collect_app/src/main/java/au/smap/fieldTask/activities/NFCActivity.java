@@ -26,7 +26,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import org.odk.collect.android.R;
-import org.odk.collect.android.activities.FormFillingActivity;
+import org.odk.collect.externalapp.ExternalAppUtils;
 import au.smap.fieldTask.listeners.NFCListener;
 import au.smap.fieldTask.tasks.NdefReaderTask;
 
@@ -77,9 +77,14 @@ public class NFCActivity extends Activity implements NFCListener {
              */
 
             // Pending intent
-            Intent nfcIntent = new Intent(getApplicationContext(), getClass());
+            Intent nfcIntent = new Intent(this, getClass());
             nfcIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            mNfcPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, nfcIntent, PendingIntent.FLAG_MUTABLE);    // Must be mutable
+            // For Android 12+, use FLAG_MUTABLE with additional options to allow activity launch
+            int flags = PendingIntent.FLAG_MUTABLE;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                flags |= PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT;
+            }
+            mNfcPendingIntent = PendingIntent.getActivity(this, 0, nfcIntent, flags);
 
             // Filter
             IntentFilter filter = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
@@ -165,12 +170,7 @@ public class NFCActivity extends Activity implements NFCListener {
 
 
     private void returnNfc(String id) {
-
-        Intent i = new Intent();
-        i.putExtra(FormFillingActivity.NFC_RESULT, id);
-        setResult(RESULT_OK, i);
-
-        finish();
+        ExternalAppUtils.returnSingleValue(this, id);
     }
 
 
@@ -184,6 +184,12 @@ public class NFCActivity extends Activity implements NFCListener {
     public void readComplete(String result) {
 
         Timber.i("NFC tag read: %s", result);
+
+        // Update dialog to show the NFC value
+        if (mNfcDialog != null && mNfcDialog.isShowing()) {
+            mNfcDialog.setMessage(getString(R.string.smap_read_nfc) + ": " + result);
+        }
+
         returnNfc(result);
 
     }
