@@ -180,9 +180,10 @@ public class AppDependencyModule {
     @Provides
     @Singleton
     public OpenRosaHttpInterface provideHttpInterface(MimeTypeMap mimeTypeMap, UserAgentProvider userAgentProvider, Application application, VersionInformation versionInformation) {
-        String cacheDir = application.getCacheDir().getAbsolutePath();
+        // Disable HTTP response caching - the app has proper offline support via local database/filesystem
+        // Network requests should always hit the server and surface errors immediately
         return new OkHttpConnection(
-                cacheDir,
+                null,  // No HTTP cache
                 new CollectThenSystemContentTypeMapper(mimeTypeMap),
                 userAgentProvider.getUserAgent()
         );

@@ -375,6 +375,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 headers.put("devicetime", String.valueOf(System.currentTimeMillis()));
                 headers.put("deviceid", propertyManager.reload().getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID));
                 headers.put("appversion", Collect.getInstance().getString(org.odk.collect.strings.R.string.app_version));
+                headers.put("Cache-Control", "no-cache");
 
                 URI uri = URI.create(taskURL);
                 String resp = httpInterface.getRequest(uri, "application/json", webCredentialsUtils.getCredentials(uri), headers);
@@ -492,6 +493,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 Timber.i("Failed to getlocations :%s", e.getMessage());
             }
         }
+        headers.put("Cache-Control", "no-cache");
         InstancesDao dao = new InstancesDao();
         if(tr.taskAssignments != null) {
             for (TaskResponseAssignment ta : tr.taskAssignments) {
