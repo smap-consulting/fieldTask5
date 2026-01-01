@@ -2011,6 +2011,27 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                         activityDisplayed();
                         formEntryViewModel.refresh();
 
+                        // start smap - Handle form launcher widget return
+                        au.smap.fieldTask.models.FormRestartDetails frd = Collect.getInstance().getFormRestartDetails();
+                        if (frd != null) {
+                            Collect.getInstance().setFormRestartDetails(null);
+                            formController.jumpToIndex(frd.initiatingQuestion);
+
+                            // Set answer for form launch question
+                            org.javarosa.core.model.data.StringData sd = new org.javarosa.core.model.data.StringData();
+                            sd.setValue(":::::" + frd.launchedFormInstanceId);
+                            try {
+                                formController.answerQuestion(frd.initiatingQuestion, sd);
+                            } catch (Exception e) {
+                                Timber.e(e, "Error setting answer for form launch widget");
+                            }
+                            // Goto the next screen as part of the initialize step
+                            formController.getFormDef().getMainInstance().isInitialize = true;
+                            next();
+                            formController.getFormDef().getMainInstance().isInitialize = false;
+                        }
+                        // end smap
+
                         if (warningMsg != null) {
                             showLongToast(warningMsg);
                             Timber.w(warningMsg);
@@ -2038,6 +2059,28 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                                     formController.jumpToIndex(formIndex);
                                     formControllerAvailable(formController, form, instance);
                                     formEntryViewModel.refresh();
+
+                                    // start smap - Handle form launcher widget return
+                                    au.smap.fieldTask.models.FormRestartDetails frd = Collect.getInstance().getFormRestartDetails();
+                                    if (frd != null) {
+                                        Collect.getInstance().setFormRestartDetails(null);
+                                        formController.jumpToIndex(frd.initiatingQuestion);
+
+                                        // Set answer for form launch question
+                                        org.javarosa.core.model.data.StringData sd = new org.javarosa.core.model.data.StringData();
+                                        sd.setValue(":::::" + frd.launchedFormInstanceId);
+                                        try {
+                                            formController.answerQuestion(frd.initiatingQuestion, sd);
+                                        } catch (Exception e) {
+                                            Timber.e(e, "Error setting answer for form launch widget");
+                                        }
+                                        // Goto the next screen as part of the initialize step
+                                        formController.getFormDef().getMainInstance().isInitialize = true;
+                                        next();
+                                        formController.getFormDef().getMainInstance().isInitialize = false;
+                                    }
+                                    // end smap
+
                                     return;
                                 }
                             }
@@ -2050,10 +2093,32 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                             } else {
                                 formController.getAuditEventLogger().logEvent(AuditEvent.AuditEventType.HIERARCHY, true, System.currentTimeMillis());
                                 formControllerAvailable(formController, form, instance);
-                                Intent intent = new Intent(this, FormHierarchyFragmentHostActivity.class);
-                                intent.putExtra(FormHierarchyFragmentHostActivity.EXTRA_SESSION_ID, sessionId);
-                                intent.putExtra(FormHierarchyFragmentHostActivity.SHOW_NEW_EDIT_MESSAGE, formEntryViewModel.shouldShowNewEditMessage());
-                                startActivityForResult(intent, RequestCodes.HIERARCHY_ACTIVITY);
+
+                                // start smap - Handle form launcher widget return
+                                au.smap.fieldTask.models.FormRestartDetails frd = Collect.getInstance().getFormRestartDetails();
+                                if (frd != null) {
+                                    Collect.getInstance().setFormRestartDetails(null);
+                                    formController.jumpToIndex(frd.initiatingQuestion);
+
+                                    // Set answer for form launch question
+                                    org.javarosa.core.model.data.StringData sd = new org.javarosa.core.model.data.StringData();
+                                    sd.setValue(":::::" + frd.launchedFormInstanceId);
+                                    try {
+                                        formController.answerQuestion(frd.initiatingQuestion, sd);
+                                    } catch (Exception e) {
+                                        Timber.e(e, "Error setting answer for form launch widget");
+                                    }
+                                    // Goto the next screen as part of the initialize step
+                                    formController.getFormDef().getMainInstance().isInitialize = true;
+                                    next();
+                                    formController.getFormDef().getMainInstance().isInitialize = false;
+                                } else {
+                                    // end smap
+                                    Intent intent = new Intent(this, FormHierarchyFragmentHostActivity.class);
+                                    intent.putExtra(FormHierarchyFragmentHostActivity.EXTRA_SESSION_ID, sessionId);
+                                    intent.putExtra(FormHierarchyFragmentHostActivity.SHOW_NEW_EDIT_MESSAGE, formEntryViewModel.shouldShowNewEditMessage());
+                                    startActivityForResult(intent, RequestCodes.HIERARCHY_ACTIVITY);
+                                }  // smap
                             }
                         }
                     });
