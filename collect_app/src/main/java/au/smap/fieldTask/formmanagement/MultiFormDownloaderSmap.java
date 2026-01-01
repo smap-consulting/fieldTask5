@@ -246,8 +246,45 @@ public class MultiFormDownloaderSmap {
 
         FileUtils.checkMediaPath(new File(mediaPath));
 
+        // First check if form exists by formId and version (handles form name changes)
+        String formId = formInfo.get(FileUtils.FORMID);
+        String version = formInfo.get(FileUtils.VERSION);
+        List<Form> existingForms = formsRepository.getAllNotDeletedByFormIdAndVersion(formId, version);
 
-        Form form = formsRepository.getOneByPath(formFile.getAbsolutePath());
+        Form form = null;
+        if (!existingForms.isEmpty()) {
+            // Form with same formId+version exists - update it instead of creating duplicate
+            form = existingForms.get(0);
+
+            // If the file path has changed (e.g., form name changed), delete the old file
+            if (!form.getFormFilePath().equals(formFilePath)) {
+                Timber.i("Form name changed from %s to %s - deleting old file", form.getFormFilePath(), formFilePath);
+                File oldFile = new File(form.getFormFilePath());
+                if (oldFile.exists()) {
+                    FileUtils.deleteAndReport(oldFile);
+                }
+
+                // Update the form with new file path and display name
+                Form updatedForm = new Form.Builder(form)
+                        .formFilePath(formFilePath)
+                        .displayName(formInfo.get(FileUtils.TITLE))
+                        .formMediaPath(mediaPath)
+                        .build();
+                formsRepository.save(updatedForm);
+            }
+
+            uri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, form.getDbId().toString());
+            mediaPath = new StoragePathProvider().getAbsoluteFormFilePath(form.getFormMediaPath());
+
+            if (form.isDeleted()) {
+                formsRepository.restore(form.getDbId());
+            }
+
+            return new UriResult(uri, mediaPath, false);
+        }
+
+        // No existing form found - check by path as fallback
+        form = formsRepository.getOneByPath(formFile.getAbsolutePath());
 
         if (form == null) {
             Form savedForm = saveNewForm(formInfo, formFile, mediaPath, tasks_only, read_only, searchLocalData, source, project);       // smap add tasks_only and source
@@ -258,7 +295,7 @@ public class MultiFormDownloaderSmap {
             mediaPath = new StoragePathProvider().getAbsoluteFormFilePath(form.getFormMediaPath());
 
             if (form.isDeleted()) {
-                formsRepository.restore(form.getDbId());
+                formsRepository.restore(form.getDbId().toString());
             }
 
             return new UriResult(uri, mediaPath, false);

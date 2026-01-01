@@ -817,7 +817,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                             form.hasManifest,   // Are newer media files available
                             form.mediaFiles,
                             form.manifestUrl,
-                            mfd.exists,
+                            mfd.exists && !form.dirty,  // Re-download if form is dirty even if it exists
                             form.tasks_only,
                             form.read_only,
                             form.search_local_data,
