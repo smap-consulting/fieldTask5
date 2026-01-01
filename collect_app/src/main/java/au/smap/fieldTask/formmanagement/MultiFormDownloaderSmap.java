@@ -295,7 +295,7 @@ public class MultiFormDownloaderSmap {
             mediaPath = new StoragePathProvider().getAbsoluteFormFilePath(form.getFormMediaPath());
 
             if (form.isDeleted()) {
-                formsRepository.restore(form.getDbId().toString());
+                formsRepository.restore(form.getDbId());
             }
 
             return new UriResult(uri, mediaPath, false);

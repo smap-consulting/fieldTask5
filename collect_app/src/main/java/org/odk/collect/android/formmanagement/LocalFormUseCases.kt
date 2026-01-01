@@ -104,6 +104,14 @@ object LocalFormUseCases {
                 Collections.shuffle(uriToUpdate) // Big win if multiple DiskSyncTasks running
                 for (entry in uriToUpdate) {
                     val formDefFile = entry!!.file
+
+                    // Check if file still exists before attempting to parse
+                    if (!formDefFile.exists()) {
+                        Timber.w("Form file no longer exists, deleting database entry: ${formDefFile.absolutePath}")
+                        idsToDelete.add(entry.id)
+                        continue
+                    }
+
                     // Probably someone overwrite the file on the sdcard
                     // So re-parse it and update it's information
                     var form: Form
@@ -118,6 +126,11 @@ object LocalFormUseCases {
                         badFile.delete()
                         formDefFile.renameTo(badFile)
                         continue
+                    } catch (e: java.io.FileNotFoundException) {
+                        // File was deleted between the exists() check and parseForm()
+                        Timber.w("Form file disappeared during parsing, deleting database entry: ${formDefFile.absolutePath}")
+                        idsToDelete.add(entry.id)
+                        continue
                     }
                     formsRepository.save(
                         Form.Builder(form)
@@ -125,6 +138,12 @@ object LocalFormUseCases {
                             .build()
                     )
                 }
+
+                // Delete any forms that disappeared during processing
+                for (id in idsToDelete) {
+                    formsRepository.delete(id)
+                }
+                idsToDelete.clear()
                 uriToUpdate.clear()
 
                 // Step 4: go through the newly-discovered files in xFormsToAdd and add them.
