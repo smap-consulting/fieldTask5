@@ -101,6 +101,9 @@ public class JavaRosaFormController implements FormController {
     private final FormEntryController formEntryController;
     private FormIndex indexWaitingForData;
 
+    // smap this seems like a convenient place to store data related to completing a form
+    private String surveyNotes = null;      // smap
+
     public JavaRosaFormController(File mediaFolder, FormEntryController fec, File instanceFile) {
         this.mediaFolder = mediaFolder;
         formEntryController = fec;
@@ -1115,4 +1118,14 @@ public class JavaRosaFormController implements FormController {
     public EntitiesExtra getEntities() {
         return formEntryController.getModel().getExtras().get(EntitiesExtra.class);
     }
+
+    // Start Smap
+    public void setSurveyNotes(String notes) {
+        surveyNotes = notes;
+    }
+
+    public String getSurveyNotes() {
+        return surveyNotes;
+    }
+    // End Smap
 }

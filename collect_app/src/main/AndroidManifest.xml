@@ -130,6 +130,9 @@ the specific language governing permissions and limitations under the License.
 
         <activity android:name="au.smap.fieldTask.activities.SmapLoginActivity" />
 
+        <!-- smap Survey notes activity -->
+        <activity android:name="au.smap.fieldTask.activities.SurveyNotesActivity" />
+
         <activity
             android:name=".activities.ScannerWithFlashlightActivity"
             android:configChanges="orientation|screenSize"/>

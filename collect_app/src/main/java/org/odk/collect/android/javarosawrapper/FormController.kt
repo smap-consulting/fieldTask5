@@ -332,4 +332,9 @@ interface FormController {
     fun getAnswer(treeReference: TreeReference?): IAnswerData?
 
     fun getEntities(): EntitiesExtra?
+
+    // smap - Survey notes functionality
+    fun setSurveyNotes(notes: String?)
+
+    fun getSurveyNotes(): String?
 }

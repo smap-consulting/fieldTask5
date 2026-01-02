@@ -165,6 +165,19 @@ class FormEntryMenuProvider(
                 formEntryMenuClickListener.save()
                 true
             }
+            R.id.menu_comment -> {              // smap
+                val formController = formEntryViewModel.formController
+                if (formController != null && formController.currentCaptionPromptIsQuestion()) {
+                    formEntryViewModel.updateAnswersForScreen(answersProvider.answers, false)
+                }
+                val comment = Intent(activity, au.smap.fieldTask.activities.SurveyNotesActivity::class.java)
+                activity.startActivity(comment)
+                true
+            }
+            R.id.menu_clear_remote_cache -> {              // smap
+                org.odk.collect.android.application.Collect.getInstance().clearRemoteServiceCaches()
+                true
+            }
             else -> {
                 false
             }
