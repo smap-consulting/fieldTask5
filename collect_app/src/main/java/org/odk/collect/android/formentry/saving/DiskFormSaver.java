@@ -15,9 +15,9 @@ public class DiskFormSaver implements FormSaver {
 
     @Override
     public SaveToDiskResult save(Uri instanceContentURI, FormController formController, MediaUtils mediaUtils, boolean shouldFinalize, boolean exitAfter,
-                                 String updatedSaveName, ProgressListener progressListener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository) {
+                                 String updatedSaveName, ProgressListener progressListener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository, String surveyNotes) {  // smap added surveyNotes
         SaveFormToDisk saveFormToDisk = new SaveFormToDisk(formController, mediaUtils, exitAfter, shouldFinalize,
-                updatedSaveName, instanceContentURI, tempFiles, currentProjectId, entitiesRepository, instancesRepository);
+                updatedSaveName, instanceContentURI, tempFiles, currentProjectId, entitiesRepository, instancesRepository, surveyNotes);  // smap added surveyNotes
         return saveFormToDisk.saveForm(progressListener);
     }
 }

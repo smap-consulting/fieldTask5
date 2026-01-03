@@ -188,7 +188,7 @@ public class InstanceServerUploader extends InstanceUploader {
             URI uri = URI.create(submissionUri.toString());
 
             postResult = httpInterface.uploadSubmissionAndFiles(files, submissionFile, uri,
-                    webCredentialsUtils.getCredentials(uri), null, null, null, null, contentLength);
+                    webCredentialsUtils.getCredentials(uri), instance.getStatus(), instance.getLocationTrigger(), instance.getSurveyNotes(), instance.getAssignmentId(), contentLength);  // smap added status, locationTrigger, surveyNotes, assignmentId
 
             int responseCode = postResult.getResponseCode();
             messageParser.setMessageResponse(postResult.getHttpResponse());

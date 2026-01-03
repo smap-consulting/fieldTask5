@@ -246,6 +246,9 @@ public class FormSaveViewModel extends ViewModel implements MaterialProgressDial
     }
 
     private void saveToDisk(SaveRequest saveRequest) {
+        // smap get surveyNotes from formController
+        String surveyNotes = formController != null ? formController.getSurveyNotes() : null;
+
         saveTask = new SaveTask(saveRequest, formSaver, formController, mediaUtils, new SaveTask.Listener() {
             @Override
             public void onProgressPublished(String progress) {
@@ -257,7 +260,7 @@ public class FormSaveViewModel extends ViewModel implements MaterialProgressDial
                 handleTaskResult(saveToDiskResult, saveRequest);
                 clearMediaFiles();
             }
-        }, new ArrayList<>(originalFiles.values()), projectsDataService.requireCurrentProject().getUuid(), entitiesRepository, instancesRepository).execute();
+        }, new ArrayList<>(originalFiles.values()), projectsDataService.requireCurrentProject().getUuid(), entitiesRepository, instancesRepository, surveyNotes).execute();  // smap added surveyNotes
     }
 
     private void handleTaskResult(SaveToDiskResult taskResult, SaveRequest saveRequest) {
@@ -526,9 +529,10 @@ public class FormSaveViewModel extends ViewModel implements MaterialProgressDial
         private final String currentProjectId;
         private final EntitiesRepository entitiesRepository;
         private final InstancesRepository instancesRepository;
+        private final String surveyNotes;  // smap
 
         SaveTask(SaveRequest saveRequest, FormSaver formSaver, FormController formController, MediaUtils mediaUtils,
-                 Listener listener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository) {
+                 Listener listener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository, String surveyNotes) {  // smap added surveyNotes
             this.saveRequest = saveRequest;
             this.formSaver = formSaver;
             this.listener = listener;
@@ -538,6 +542,7 @@ public class FormSaveViewModel extends ViewModel implements MaterialProgressDial
             this.currentProjectId = currentProjectId;
             this.entitiesRepository = entitiesRepository;
             this.instancesRepository = instancesRepository;
+            this.surveyNotes = surveyNotes;  // smap
         }
 
         @Override
@@ -546,7 +551,7 @@ public class FormSaveViewModel extends ViewModel implements MaterialProgressDial
                     mediaUtils, saveRequest.shouldFinalize,
                     saveRequest.viewExiting, saveRequest.updatedSaveName,
                     this::publishProgress, tempFiles,
-                    currentProjectId, entitiesRepository, instancesRepository);
+                    currentProjectId, entitiesRepository, instancesRepository, surveyNotes);  // smap added surveyNotes
         }
 
         @Override

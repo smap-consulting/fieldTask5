@@ -88,6 +88,7 @@ public class SaveFormToDisk {
     private final ArrayList<String> tempFiles;
     private final String currentProjectId;
     private final EntitiesRepository entitiesRepository;
+    private String surveyNotes;  // smap
 
     public static final int SAVED = 500;
     public static final int SAVE_ERROR = 501;
@@ -95,7 +96,7 @@ public class SaveFormToDisk {
     public static final int ENCRYPTION_ERROR = 505;
 
     public SaveFormToDisk(FormController formController, MediaUtils mediaUtils, boolean saveAndExit, boolean shouldFinalize, String updatedName,
-                          Uri uri, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository,  InstancesRepository instancesRepository) {
+                          Uri uri, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository,  InstancesRepository instancesRepository, String surveyNotes) {  // smap added surveyNotes
         this.formController = formController;
         this.mediaUtils = mediaUtils;
         this.uri = uri;
@@ -106,6 +107,7 @@ public class SaveFormToDisk {
         this.currentProjectId = currentProjectId;
         this.entitiesRepository = entitiesRepository;
         this.instancesRepository = instancesRepository;
+        this.surveyNotes = surveyNotes;  // smap
     }
 
     @Nullable
@@ -251,6 +253,11 @@ public class SaveFormToDisk {
                 instanceBuilder.geometryType(geometryContentValues.first);
                 instanceBuilder.geometry(geometryContentValues.second);
             }
+        }
+
+        // smap set survey notes
+        if (surveyNotes != null) {
+            instanceBuilder.survey_notes(surveyNotes);
         }
 
         Instance newInstance = instancesRepository.save(instanceBuilder.build());

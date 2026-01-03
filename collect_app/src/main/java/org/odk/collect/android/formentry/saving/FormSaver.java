@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public interface FormSaver {
     SaveToDiskResult save(Uri instanceContentURI, FormController formController, MediaUtils mediaUtils, boolean shouldFinalize, boolean exitAfter,
-                          String updatedSaveName, ProgressListener progressListener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository);
+                          String updatedSaveName, ProgressListener progressListener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository, String surveyNotes);  // smap added surveyNotes
 
     interface ProgressListener {
         void onProgressUpdate(String message);

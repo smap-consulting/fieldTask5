@@ -170,6 +170,15 @@ object DatabaseObjectMapper {
         val editNumberColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.EDIT_NUMBER)
         val sourceColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.SOURCE)
 
+        // smap fields
+        val repeatColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.T_REPEAT)
+        val updateidColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.T_UPDATEID)
+        val locationTriggerColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.T_LOCATION_TRIGGER)
+        val surveyNotesColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.T_SURVEY_NOTES)
+        val taskTypeColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.T_TASK_TYPE)
+        val assignmentIdColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.T_ASS_ID)
+        val phoneColumnIndex = cursor.getColumnIndex(DatabaseInstanceColumns.PHONE)
+
         return Instance.Builder()
             .dbId(dbId)
             .displayName(cursor.getString(displayNameColumnIndex))
@@ -194,6 +203,14 @@ object DatabaseObjectMapper {
             .editOf(cursor.getLongOrNull(editOfColumnIndex))
             .editNumber(cursor.getLongOrNull(editNumberColumnIndex))
             .source(cursor.getString(sourceColumnIndex))
+            // smap fields
+            .repeat(cursor.getString(repeatColumnIndex) == "1")
+            .updateid(cursor.getString(updateidColumnIndex))
+            .location_trigger(cursor.getString(locationTriggerColumnIndex))
+            .survey_notes(cursor.getString(surveyNotesColumnIndex))
+            .isCase(cursor.getString(taskTypeColumnIndex) == "case")
+            .assignment_id(cursor.getString(assignmentIdColumnIndex))
+            .phone(cursor.getString(phoneColumnIndex))
             .build()
     }
 
@@ -226,6 +243,15 @@ object DatabaseObjectMapper {
         values.put(DatabaseInstanceColumns.EDIT_OF, instance.editOf)
         values.put(DatabaseInstanceColumns.EDIT_NUMBER, instance.editNumber)
         values.put(DatabaseInstanceColumns.SOURCE, instance.source)
+
+        // smap fields
+        values.put(DatabaseInstanceColumns.T_REPEAT, if (instance.repeat) "1" else "0")
+        values.put(DatabaseInstanceColumns.T_UPDATEID, instance.updateid)
+        values.put(DatabaseInstanceColumns.T_LOCATION_TRIGGER, instance.locationTrigger)
+        values.put(DatabaseInstanceColumns.T_SURVEY_NOTES, instance.surveyNotes)
+        values.put(DatabaseInstanceColumns.T_TASK_TYPE, if (instance.isCase) "case" else "task")
+        values.put(DatabaseInstanceColumns.T_ASS_ID, instance.assignmentId)
+        values.put(DatabaseInstanceColumns.PHONE, instance.phone)
 
         return values
     }
