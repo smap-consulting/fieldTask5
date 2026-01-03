@@ -14,9 +14,15 @@
 
 package org.odk.collect.android.upload;
 
+import android.content.ContentValues;
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.database.instances.DatabaseInstanceColumns;
+import org.odk.collect.android.external.InstancesContract;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 
@@ -67,10 +73,31 @@ public abstract class InstanceUploader {
     }
 
     public void markSubmissionComplete(Instance instance) {
-        instancesRepository
-                .save(new Instance.Builder(instance)
-                        .status(Instance.STATUS_SUBMITTED)
-                        .build()
-                );
+        // smap - Handle submission differently for cases vs regular tasks
+        Uri instanceDatabaseUri = Uri.withAppendedPath(
+                org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns.CONTENT_URI,
+                instance.getDbId().toString()
+        );
+        ContentValues contentValues = new ContentValues();
+
+        if (!instance.isCase()) {    // smap - Regular tasks/forms
+            instancesRepository
+                    .save(new Instance.Builder(instance)
+                            .status(Instance.STATUS_SUBMITTED)
+                            .build()
+                    );
+            // smap - Set T_TASK_STATUS for task list filtering
+            contentValues.put(DatabaseInstanceColumns.T_TASK_STATUS, Instance.STATUS_SUBMITTED);
+            Collect.getInstance().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
+        } else {    // smap - Cases reset to incomplete so they can be edited again
+            instancesRepository
+                    .save(new Instance.Builder(instance)
+                            .status(Instance.STATUS_INCOMPLETE)
+                            .build()
+                    );
+            // smap - Reset task status back to accepted for cases
+            contentValues.put(DatabaseInstanceColumns.T_TASK_STATUS, au.smap.fieldTask.utilities.Utilities.STATUS_T_ACCEPTED);
+            Collect.getInstance().getContentResolver().update(instanceDatabaseUri, contentValues, null, null);
+        }
     }
 }
