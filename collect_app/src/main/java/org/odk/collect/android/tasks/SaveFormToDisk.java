@@ -295,6 +295,13 @@ public class SaveFormToDisk {
         smapValues.put(DatabaseInstanceColumns.T_REPEAT, 0);  // When saved it is no longer a repeat task
         smapValues.put(DatabaseInstanceColumns.T_UPDATED, 1);
 
+        // Set T_TITLE for task list display (smap)
+        if (instanceName != null) {
+            smapValues.put(DatabaseInstanceColumns.T_TITLE, instanceName);
+        } else if (form != null) {
+            smapValues.put(DatabaseInstanceColumns.T_TITLE, form.getDisplayName());
+        }
+
         Collect.getInstance().getContentResolver().update(
                 uri,
                 smapValues,
