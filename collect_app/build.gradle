@@ -64,6 +64,9 @@ def entitiesFilterProjectUrl = secrets.getProperty('ENTITIES_FILTER_PROJECT_URL'
 def entitiesFilterSearchProjectUrl = secrets.getProperty('ENTITIES_FILTER_SEARCH_PROJECT_URL', '')
 def thousandMediaFileProjectUrl = secrets.getProperty('THOUSAND_MEDIA_FILE_PROJECT_URL', '')
 def thousandMediaFileEntityListProjectUrl = secrets.getProperty('THOUSAND_MEDIA_FILE_ENTITY_LIST_PROJECT_URL', '')
+def amazonCognitoRegion = secrets.getProperty('AMAZON_COGNITO_REGION', 'us-east-1')
+def amazonCognitoIdentityPoolId = secrets.getProperty('AMAZON_COGNITO_IDENTITY_POOL_ID', '')
+def amazonDynamodbRegion = secrets.getProperty('AMAZON_DYNAMODB_REGION', 'us-east-1')
 
 android {
     compileSdk libs.versions.compileSdk.get().toInteger()
@@ -82,6 +85,11 @@ android {
         versionName getVersionName()
         testInstrumentationRunner('androidx.test.runner.AndroidJUnitRunner')
         vectorDrawables.useSupportLibrary = true
+
+        // smap - AWS configuration
+        buildConfigField("String", "AMAZON_COGNITO_REGION", "\"$amazonCognitoRegion\"")
+        buildConfigField("String", "AMAZON_COGNITO_IDENTITY_POOL_ID", "\"$amazonCognitoIdentityPoolId\"")
+        buildConfigField("String", "AMAZON_DYNAMODB_REGION", "\"$amazonDynamodbRegion\"")
     }
 
     base {
@@ -376,6 +384,13 @@ dependencies {
 
     implementation libs.firebaseAnalytics
     implementation libs.firebaseCrashlytics
+
+    // smap - AWS SDK v3
+    implementation libs.awsSdkCognitoIdentity
+    implementation libs.awsSdkDynamodb
+    implementation libs.awsSdkDynamodbEnhanced
+    implementation libs.awsSdkAuth
+    implementation libs.awsSdkRegions
 
     implementation libs.persianJodaTime
     implementation libs.myanmarCalendar

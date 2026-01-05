@@ -29,3 +29,22 @@
 
 # Keep line numbers for Crashlytics https://stackoverflow.com/questions/38529304/android-crashlytics-sending-incorrect-line-number
 -keepattributes SourceFile,LineNumberTable
+
+# smap - AWS SDK v3 ProGuard rules
+-keep class software.amazon.awssdk.** { *; }
+-keepclassmembers class software.amazon.awssdk.** { *; }
+-dontwarn software.amazon.awssdk.**
+
+# DynamoDB Enhanced Client annotations
+-keep @software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean class * { *; }
+-keepclassmembers class * {
+    @software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey *;
+    @software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute *;
+}
+
+# Cognito Identity
+-keep class software.amazon.awssdk.services.cognitoidentity.** { *; }
+
+# HTTP clients (AWS SDK dependencies)
+-dontwarn org.apache.http.**
+-dontwarn org.apache.commons.logging.**

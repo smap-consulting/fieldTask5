@@ -1223,7 +1223,10 @@ public class Utilities {
                     if (newToken || registeredServer == null || registeredUser == null ||
                             !username.equals(registeredUser) || !server.equals(registeredServer)) {
 
-                        SmapRegisterForMessagingTask task = new SmapRegisterForMessagingTask();
+                        // smap - Use Dagger to get SmapRegisterForMessagingTask with injected dependencies
+                        SmapRegisterForMessagingTask task = new SmapRegisterForMessagingTask(
+                            org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).provideDeviceRegistrationService()
+                        );
                         task.execute(token, server, username);
 
                         editor.putString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, server);

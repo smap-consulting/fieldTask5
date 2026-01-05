@@ -191,6 +191,9 @@ public class Collect extends Application implements
                     fixGoogleBug154855417();
                     CollectStrictMode.enable();
                     MlKitBarcodeScannerViewFactory.init(this);
+
+                    // smap - Initialize notification channels for Android O+
+                    au.smap.fieldTask.notifications.SmapNotificationChannels.INSTANCE.createChannels(this);
                 }
         );
     }

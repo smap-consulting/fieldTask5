@@ -277,6 +277,15 @@ the specific language governing permissions and limitations under the License.
             android:exported="false">
         </service>
 
+        <!-- smap - Firebase Cloud Messaging service for push notifications -->
+        <service
+            android:name="au.smap.fieldTask.services.NotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity-alias
             android:name=".activities.FormEntryActivity"
             android:targetActivity=".external.FormUriActivity"

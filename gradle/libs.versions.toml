@@ -13,6 +13,7 @@ camerax = "1.4.2" # Newer versions require minSdkVersion >= 23
 espresso = "3.7.0"
 kotlin = "2.2.20"
 junit = "1.3.0"
+awsSdk = "2.20.26"
 
 [libraries]
 firebaseCrashlyticsGradle = { group = "com.google.firebase", name = "firebase-crashlytics-gradle", version = "3.0.6" }
@@ -83,6 +84,11 @@ kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version
 gson = { group = "com.google.code.gson", name = "gson", version = "2.13.2" }
 firebaseAnalytics = { group = "com.google.firebase", name = "firebase-analytics-ktx", version = "22.5.0" }
 firebaseCrashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version = "19.4.4" }
+awsSdkCognitoIdentity = { group = "software.amazon.awssdk", name = "cognitoidentity", version.ref = "awsSdk" }
+awsSdkDynamodb = { group = "software.amazon.awssdk", name = "dynamodb", version.ref = "awsSdk" }
+awsSdkDynamodbEnhanced = { group = "software.amazon.awssdk", name = "dynamodb-enhanced", version.ref = "awsSdk" }
+awsSdkAuth = { group = "software.amazon.awssdk", name = "auth", version.ref = "awsSdk" }
+awsSdkRegions = { group = "software.amazon.awssdk", name = "regions", version.ref = "awsSdk" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.14" }
 timber = { group = "com.jakewharton.timber", name = "timber", version = "5.0.1" }
 slf4jApi = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }

@@ -112,7 +112,7 @@ import javax.inject.Singleton
  * To read more about Dagger visit: https://google.github.io/dagger/users-guide
  */
 @Singleton
-@Component(modules = [AppDependencyModule::class])
+@Component(modules = [AppDependencyModule::class, au.smap.fieldTask.aws.AWSModule::class])
 interface AppDependencyComponent {
     @Component.Builder
     interface Builder {
@@ -176,6 +176,10 @@ interface AppDependencyComponent {
     fun inject(downloadTasksTask: au.smap.fieldTask.tasks.DownloadTasksTask)
 
     fun inject(utilities: au.smap.fieldTask.utilities.Utilities)
+
+    fun inject(smapRegisterForMessagingTask: au.smap.fieldTask.tasks.SmapRegisterForMessagingTask)
+
+    fun inject(notificationService: au.smap.fieldTask.services.NotificationService)
 
     fun inject(SmapRemoteWebServiceTask: au.smap.fieldTask.tasks.SmapRemoteWebServiceTask)
 
@@ -332,5 +336,7 @@ interface AppDependencyComponent {
     fun webPageService(): WebPageService
 
     fun uniqueIdGenerator(): UniqueIdGenerator
+
+    fun provideDeviceRegistrationService(): au.smap.fieldTask.aws.services.DeviceRegistrationService
 
 }
