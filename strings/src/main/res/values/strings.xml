@@ -1482,4 +1482,7 @@
     <string name="geocompound_title">Compound Map</string>
     <string name="smap_set_marker">Set Marker</string>
     <string name="smap_apply">Apply</string>
+
+    <!-- smap - Location tracking notification -->
+    <string name="location_tracking_active">Location tracking is active</string>
 </resources>

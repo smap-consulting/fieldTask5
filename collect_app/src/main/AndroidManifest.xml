@@ -44,6 +44,7 @@ the specific language governing permissions and limitations under the License.
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- smap - Restart services after reboot -->
 
     <!--
         Since we use Scoped Storage, we should not need this permission. However, we discovered that
@@ -269,6 +270,15 @@ the specific language governing permissions and limitations under the License.
             android:exported="true">
             <intent-filter>
                 <action android:name="au.com.smap.location_service.action.PROCESS_UPDATES" />
+            </intent-filter>
+        </receiver>
+
+        <!-- smap - Boot receiver to restart LocationService after device reboot -->
+        <receiver
+            android:name="au.smap.fieldTask.receivers.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 

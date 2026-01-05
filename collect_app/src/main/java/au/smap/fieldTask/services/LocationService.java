@@ -28,6 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -40,10 +41,8 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.receivers.LocationReceiver;
+import au.smap.fieldTask.notifications.SmapNotificationChannels;
 import org.odk.collect.android.utilities.ApplicationConstants;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import androidx.core.app.NotificationCompat;
 import timber.log.Timber;
@@ -57,16 +56,33 @@ import timber.log.Timber;
  */
 public class LocationService extends Service implements GoogleApiClient.ConnectionCallbacks {
 
-    Handler mHandler = new Handler();           // Background thread to check for enabling / disabling the location listener
+    private Handler mHandler = new Handler(Looper.getMainLooper());  // smap - Handler for periodic checks
     private LocationRequest locationRequest;
     private FusedLocationProviderClient fusedLocationClient;
     private boolean isRecordingLocation = false;
-    private Timer mTimer;
-    String FG_CHANNEL_ID = "smap_foreground_channel";
+    private static final long CHECK_INTERVAL_MS = 60000;  // smap - Check every 60 seconds
+    private static final int LOCATION_SERVICE_NOTIFICATION_ID = 1;
 
     public LocationService() {
         super();
     }
+
+    // smap - Runnable for periodic settings check (replaces Timer)
+    private final Runnable checkSettingsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Timber.i("=================== Periodic check for user settings");
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
+            isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
+
+            // Restart location monitoring - in case permission was disabled and then re-enabled
+            stopLocationUpdates();
+            requestLocationUpdates();
+
+            // Schedule next check
+            mHandler.postDelayed(this, CHECK_INTERVAL_MS);
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -77,29 +93,26 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
         isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
 
-        if (mTimer == null) {
-            mTimer = new Timer();
-        }
-        mTimer.schedule(new CheckEnabledTimerTask(), 0, 60000);  // Peiodically check to see if location tracking is disabled
+        // smap - Start periodic checks using Handler (replaces Timer)
+        mHandler.post(checkSettingsRunnable);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         createLocationRequest();
         requestLocationUpdates();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-
-            NotificationChannel chan = new NotificationChannel(FG_CHANNEL_ID, "Notifications", NotificationManager.IMPORTANCE_NONE);
-            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            manager.createNotificationChannel(chan);
-
-            Notification.Builder builder = new Notification.Builder(this, FG_CHANNEL_ID)
+        // smap - CRITICAL FIX: Start foreground notification on API 26+ (was API 29+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Notification channel already created in Collect.onCreate() by SmapNotificationChannels
+            Notification notification = new NotificationCompat.Builder(this, SmapNotificationChannels.LOCATION_TRACKING_CHANNEL_ID)
                     .setContentTitle(getString(org.odk.collect.strings.R.string.app_name))
-                    .setContentText("some text")
-                    .setAutoCancel(true);
+                    .setContentText(getString(org.odk.collect.strings.R.string.location_tracking_active))
+                    .setSmallIcon(org.odk.collect.icons.R.drawable.ic_room_24dp)
+                    .setOngoing(true)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .build();
 
-            Notification notification = builder.build();
-            startForeground(1, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
-
+            startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
+            Timber.i("Foreground service started for location tracking");
         }
 
         return START_STICKY;
@@ -120,6 +133,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
 
     @Override
     public void onDestroy() {
+        Timber.i("======================= Destroy Location Service");
+        // smap - Stop periodic checks
+        mHandler.removeCallbacks(checkSettingsRunnable);
         stopLocationUpdates();
         super.onDestroy();
     }
@@ -128,33 +144,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
     public IBinder onBind(Intent intent) {
         return null;
     }
-    /*
-     * Run a a periodic query to see if the user settings have changes
-     */
-    class CheckEnabledTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            // run on another thread
-            mHandler.post(new Runnable() {
-
-                @Override
-                public void run() {
-                    Timber.i("=================== Periodic check for user settings ");
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-                    isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
-
-                    // Restart location monitoring - Incase permission was disabled and then re-enabled
-                    stopLocationUpdates();
-                    requestLocationUpdates();
-                }
-            });
-
-        }
-    }
 
     /*
-     * Methods ot support location broadcast receiver
+     * Methods to support location broadcast receiver
      */
     private void createLocationRequest() {
         locationRequest = new LocationRequest.Builder(ApplicationConstants.GPS_INTERVAL)
