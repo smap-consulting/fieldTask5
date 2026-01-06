@@ -180,9 +180,9 @@ public class LocalDataManagerSmap {
                         // Need to process this survey
                         li.instanceFilePath = cursor.getString(cursor.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
                         instances.add(li);
-                        Timber.i("xxxxxxxxxxxxxxxxxxx: %s", li.instanceFilePath);
+                        Timber.d("Processing linked instance: %s", li.instanceFilePath);
                     } else {
-                        Timber.i("xxxxxxxxxxxxxxxxxx: Survey " + surveyName + " is not referenced");
+                        Timber.d("Survey %s is not referenced", surveyName);
                     }
                 }
             }
