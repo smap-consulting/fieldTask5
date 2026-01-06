@@ -12,8 +12,8 @@ import android.preference.PreferenceManager;
 import org.odk.collect.android.R;
 import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.database.TraceUtilities;
-import import org.odk.collect.permissions.PermissionListener;
+import au.smap.fieldTask.database.TraceUtilities;
+import org.odk.collect.permissions.PermissionListener;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.smap.tasks.SubmitLocationTask;
@@ -112,8 +112,7 @@ public class LocationRegister {
 
                 @Override
                 public void denied() {
-                    permissionsProvider.showAdditionalExplanation(activity, R.string.location_runtime_permissions_denied_title,
-                            R.string.smap_background_location_permission_denied, R.drawable.ic_room_black_24dp, action);
+                    action.denied();
                 }
             }, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
         } else {

@@ -229,4 +229,12 @@ public final class InMemInstancesRepository implements InstancesRepository {
         }
         instances.add(instance);
     }
+
+    @Override
+    public Instance getInstanceByTaskId(long taskId) {
+        return instances.stream()
+                .filter(instance -> instance.getTaskId() != null && instance.getTaskId() == taskId)
+                .findFirst()
+                .orElse(null);
+    }
 }
