@@ -1,7 +1,7 @@
 package au.smap.fieldTask.aws.config
 
+import com.amazonaws.regions.Regions
 import org.odk.collect.android.BuildConfig
-import software.amazon.awssdk.regions.Region
 
 /**
  * AWS configuration for Cognito and DynamoDB.
@@ -14,8 +14,8 @@ object AWSConfiguration {
     /**
      * AWS Cognito Identity Pool region
      */
-    val COGNITO_REGION: Region
-        get() = Region.of(BuildConfig.AMAZON_COGNITO_REGION)
+    val COGNITO_REGION: Regions
+        get() = Regions.fromName(BuildConfig.AMAZON_COGNITO_REGION)
 
     /**
      * AWS Cognito Identity Pool ID for unauthenticated (guest) access
@@ -26,8 +26,8 @@ object AWSConfiguration {
     /**
      * AWS DynamoDB region
      */
-    val DYNAMODB_REGION: Region
-        get() = Region.of(BuildConfig.AMAZON_DYNAMODB_REGION)
+    val DYNAMODB_REGION: Regions
+        get() = Regions.fromName(BuildConfig.AMAZON_DYNAMODB_REGION)
 
     /**
      * DynamoDB table name for device registration

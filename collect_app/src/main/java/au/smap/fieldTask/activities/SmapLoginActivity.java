@@ -33,15 +33,17 @@ import com.google.gson.reflect.TypeToken;
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.configure.qr.QRCodeTabsActivity;
+import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.listeners.SmapLoginListener;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.tasks.SmapLoginTask;
-import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import au.smap.fieldTask.utilities.KeyValueString;
 import org.odk.collect.androidshared.ui.SnackbarUtils;
 import org.odk.collect.androidshared.utils.Validator;
 
 import java.util.ArrayList;
+
+import javax.inject.Inject;
 
 import org.odk.collect.android.databinding.SmapActivityLoginBinding;
 import timber.log.Timber;
@@ -49,6 +51,9 @@ import timber.log.Timber;
 public class SmapLoginActivity extends CollectAbstractActivity implements SmapLoginListener {
 
     private SmapActivityLoginBinding binding;
+
+    @Inject
+    org.odk.collect.settings.SettingsProvider settingsProvider;
 
     private String url;
     private final ActivityResultLauncher<Intent> formLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -81,11 +86,15 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DaggerUtils.getComponent(this).inject(this);
+
         //setTheme(R.style.DarkAppTheme);     // override theme for login
         binding = SmapActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        boolean forceToken = (Boolean) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_FORCE_TOKEN);
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+
+        boolean forceToken = settings.getBoolean(ProjectKeys.KEY_SMAP_FORCE_TOKEN);
         if(forceToken) {
             binding.smapUseToken.setChecked(true);
             binding.smapUseToken.setEnabled(false);
@@ -101,10 +110,10 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
 
         });
 
-        url = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SERVER_URL);
+        url = settings.getString(ProjectKeys.KEY_SERVER_URL);
         binding.inputUrl.setText(url);
 
-        binding.inputUsername.setText((String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_USERNAME));
+        binding.inputUsername.setText(settings.getString(ProjectKeys.KEY_USERNAME));
 
         binding.inputPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -175,21 +184,22 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
 
     public void loginSuccess() {
 
-        // Update preferences with login values
-        GeneralSharedPreferencesSmap prefs = GeneralSharedPreferencesSmap.getInstance();
-        prefs.save(ProjectKeys.KEY_SERVER_URL, url);
-        prefs.save(ProjectKeys.KEY_USERNAME, binding.inputUsername.getText().toString());
-        prefs.save(ProjectKeys.KEY_SMAP_USE_TOKEN, binding.smapUseToken.isChecked());
+        // Update preferences with login values using fieldTask5 Settings architecture
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+
+        settings.save(ProjectKeys.KEY_SERVER_URL, url);
+        settings.save(ProjectKeys.KEY_USERNAME, binding.inputUsername.getText().toString());
+        settings.save(ProjectKeys.KEY_SMAP_USE_TOKEN, binding.smapUseToken.isChecked());
 
         if(binding.smapUseToken.isChecked()) {
-            prefs.save(ProjectKeys.KEY_SMAP_AUTH_TOKEN, binding.authToken.getText().toString());
+            settings.save(ProjectKeys.KEY_SMAP_AUTH_TOKEN, binding.authToken.getText().toString());
         } else {
-            prefs.save(ProjectKeys.KEY_PASSWORD, binding.inputPassword.getText().toString());
-            saveUserHistory(prefs, binding.inputUsername.getText().toString(), binding.inputPassword.getText().toString());      // Save logon details for multiple users to allow logon offline
+            settings.save(ProjectKeys.KEY_PASSWORD, binding.inputPassword.getText().toString());
+            saveUserHistory(settings, binding.inputUsername.getText().toString(), binding.inputPassword.getText().toString());      // Save logon details for multiple users to allow logon offline
         }
 
         // Save the login time in case the password policy is set to periodic
-        prefs.save(ProjectKeys.KEY_SMAP_LAST_LOGIN, String.valueOf(System.currentTimeMillis()));
+        settings.save(ProjectKeys.KEY_SMAP_LAST_LOGIN, String.valueOf(System.currentTimeMillis()));
 
         // Start Main Activity and initiate a refresh
         Intent i = new Intent(SmapLoginActivity.this, SmapMain.class);
@@ -201,26 +211,28 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
 
     public void loginFailed(String status) {
 
-        // Attempt to login by comparing values against stored preferences
-        GeneralSharedPreferencesSmap prefs = GeneralSharedPreferencesSmap.getInstance();
+        // Attempt to login by comparing values against stored preferences using fieldTask5 Settings architecture
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+
         boolean useToken = binding.smapUseToken.isChecked();
         String username = binding.inputUsername.getText().toString();
         String password = binding.inputPassword.getText().toString();
         String token = binding.authToken.getText().toString();
 
-        String prefUrl = (String) prefs.get(ProjectKeys.KEY_SERVER_URL);
-        String prefUsername = (String) prefs.get(ProjectKeys.KEY_USERNAME);
-        String prefPassword = (String) prefs.get(ProjectKeys.KEY_PASSWORD);
-        String prefToken = (String) prefs.get(ProjectKeys.KEY_SMAP_AUTH_TOKEN);
+        String prefUrl = settings.getString(ProjectKeys.KEY_SERVER_URL);
+        String prefUsername = settings.getString(ProjectKeys.KEY_USERNAME);
+        String prefPassword = settings.getString(ProjectKeys.KEY_PASSWORD);
+        String prefToken = settings.getString(ProjectKeys.KEY_SMAP_AUTH_TOKEN);
+
         if(url.equals(prefUrl)) {
             if((useToken && username.equals(prefUsername) && token.equals(prefToken))
                     || (!useToken && username.equals(prefUsername) && password.equals(prefPassword))
-                    || (!useToken && offlineLogonCheck(prefs, username, password))) {
+                    || (!useToken && offlineLogonCheck(settings, username, password))) {
 
                 // Save the preferences
-                prefs.save(ProjectKeys.KEY_SERVER_URL, url);
-                prefs.save(ProjectKeys.KEY_USERNAME, binding.inputUsername.getText().toString());
-                prefs.save(ProjectKeys.KEY_SMAP_USE_TOKEN, binding.smapUseToken.isChecked());
+                settings.save(ProjectKeys.KEY_SERVER_URL, url);
+                settings.save(ProjectKeys.KEY_USERNAME, binding.inputUsername.getText().toString());
+                settings.save(ProjectKeys.KEY_SMAP_USE_TOKEN, binding.smapUseToken.isChecked());
 
                 // Start Main Activity no refresh as presumably there is no network
                 Intent i = new Intent(SmapLoginActivity.this, SmapMain.class);
@@ -309,9 +321,9 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
     /*
      * Save logon details of last 5 users to allow for offline logout and logon
      */
-    private void saveUserHistory(GeneralSharedPreferencesSmap prefs, String user, String password) {
+    private void saveUserHistory(org.odk.collect.shared.settings.Settings settings, String user, String password) {
         // Get existing logon array
-        String savedUsersString = (String) prefs.get(ProjectKeys.KEY_SAVED_USERS);
+        String savedUsersString = settings.getString(ProjectKeys.KEY_SAVED_USERS);
         ArrayList<KeyValueString> savedUsers = new ArrayList<> ();
         if(savedUsersString != null && !savedUsersString.trim().isEmpty()) {
             savedUsers = gson.fromJson(savedUsersString, new TypeToken<ArrayList<KeyValueString>>() {}.getType());
@@ -335,13 +347,13 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
             }
         }
 
-        prefs.save(ProjectKeys.KEY_SAVED_USERS, gson.toJson(savedUsers));
+        settings.save(ProjectKeys.KEY_SAVED_USERS, gson.toJson(savedUsers));
     }
 
-    private boolean offlineLogonCheck(GeneralSharedPreferencesSmap prefs, String user, String password) {
+    private boolean offlineLogonCheck(org.odk.collect.shared.settings.Settings settings, String user, String password) {
         boolean credsFound = false;
 
-        String savedUsersString = (String) prefs.get(ProjectKeys.KEY_SAVED_USERS);
+        String savedUsersString = settings.getString(ProjectKeys.KEY_SAVED_USERS);
         ArrayList<KeyValueString> savedUsers = new ArrayList<> ();
         if(savedUsersString != null && !savedUsersString.trim().isEmpty()) {
             savedUsers = gson.fromJson(savedUsersString, new TypeToken<ArrayList<KeyValueString>>() {}.getType());

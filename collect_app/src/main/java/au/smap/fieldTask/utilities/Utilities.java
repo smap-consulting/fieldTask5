@@ -24,13 +24,11 @@ import org.odk.collect.android.utilities.ApplicationConstants;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,7 +44,6 @@ import au.smap.fieldTask.loaders.GeofenceEntry;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.settings.keys.ProjectKeys;
-import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.android.external.InstanceProvider;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -106,16 +103,23 @@ public class Utilities {
 
     // Get the task source
     public static String getSource() {
-        String serverUrl = (String) GeneralSharedPreferencesSmap.getInstance()
-                .get(ProjectKeys.KEY_SERVER_URL);
+        org.odk.collect.settings.SettingsProvider settingsProvider =
+            org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).settingsProvider();
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+
+        String serverUrl = settings.getString(ProjectKeys.KEY_SERVER_URL);
         String source = STFileUtils.getSource(serverUrl);
 
         return source;
     }
 
     public static String getOrgMediaPath() {
+        org.odk.collect.settings.SettingsProvider settingsProvider =
+            org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).settingsProvider();
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+
         String source = getSource();
-        String currentOrg = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        String currentOrg = settings.getString(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
         return new StoragePathProvider().getDirPath(StorageSubdirectory.FORMS) + File.separator
                 + "smap_media" + File.separator + source + File.separator + currentOrg;
     }
@@ -1202,26 +1206,33 @@ public class Utilities {
 
         Timber.i("================================================== Update Server registration");
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Use fieldTask5 Settings architecture - get Settings from SettingsProvider via DaggerUtils
+        org.odk.collect.settings.SettingsProvider settingsProvider =
+            org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).settingsProvider();
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
 
         try {
 
             // Get the token
-            String token = sharedPreferences.getString(ProjectKeys.KEY_SMAP_REGISTRATION_ID, null);
+            String token = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_ID);
             if (token != null && token.trim().length() > 0) {
 
-                String username = sharedPreferences.getString(ProjectKeys.KEY_USERNAME, null);
+                String username = settings.getString(ProjectKeys.KEY_USERNAME);
                 String server = getSource();
+
+                Timber.i("Registration check - username: %s, server: %s, token: %s",
+                        username, server, token != null ? "present" : "null");
 
                 if (username != null && server != null && token != null && username.trim().length() != 0 && server.trim().length() != 0) {
 
-                    String registeredServer = sharedPreferences.getString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, null);
-                    String registeredUser = sharedPreferences.getString(ProjectKeys.KEY_SMAP_REGISTRATION_USER, null);
+                    String registeredServer = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER);
+                    String registeredUser = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_USER);
 
                     // Update the server if the token is new or the server or usernames have changed
                     if (newToken || registeredServer == null || registeredUser == null ||
                             !username.equals(registeredUser) || !server.equals(registeredServer)) {
+
+                        Timber.i("Registering with server - user: %s, server: %s", username, server);
 
                         // smap - Use Dagger to get SmapRegisterForMessagingTask with injected dependencies
                         SmapRegisterForMessagingTask task = new SmapRegisterForMessagingTask(
@@ -1229,13 +1240,19 @@ public class Utilities {
                         );
                         task.execute(token, server, username);
 
-                        editor.putString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, server);
-                        editor.putString(ProjectKeys.KEY_SMAP_REGISTRATION_USER, username);
-                        editor.apply();
+                        settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, server);
+                        settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_USER, username);
                     } else {
                         Timber.i("================================================== Notification not required");
                     }
+                } else {
+                    Timber.w("Registration skipped - missing required values: username=%s, server=%s, token=%s",
+                            username != null ? "set" : "null",
+                            server != null ? "set" : "null",
+                            token != null ? "set" : "null");
                 }
+            } else {
+                Timber.i("No FCM token available for registration");
             }
 
 

@@ -384,13 +384,13 @@ dependencies {
 
     implementation libs.firebaseAnalytics
     implementation libs.firebaseCrashlytics
+    implementation libs.firebaseMessaging // smap - FCM for push notifications
 
-    // smap - AWS SDK v3
-    implementation libs.awsSdkCognitoIdentity
-    implementation libs.awsSdkDynamodb
-    implementation libs.awsSdkDynamodbEnhanced
-    implementation libs.awsSdkAuth
-    implementation libs.awsSdkRegions
+    // smap - AWS Android SDK v2 (latest version)
+    implementation libs.awsAndroidSdkCore
+    implementation libs.awsAndroidSdkCognito
+    implementation libs.awsAndroidSdkDdb
+    implementation libs.awsAndroidSdkDdbMapper
 
     implementation libs.persianJodaTime
     implementation libs.myanmarCalendar

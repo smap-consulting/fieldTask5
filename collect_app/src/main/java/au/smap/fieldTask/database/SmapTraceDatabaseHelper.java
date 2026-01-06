@@ -120,6 +120,10 @@ public class SmapTraceDatabaseHelper extends SQLiteOpenHelper {
     public static boolean databaseNeedsUpgrade() {
         boolean isDatabaseHelperOutOfDate = false;
         try {
+            File dbFile = new File(SmapTraceDatabaseHelper.getDatabasePath());
+            if (!dbFile.exists()) {
+                return false; // Database doesn't exist yet, no upgrade needed
+            }
             SQLiteDatabase db = SQLiteDatabase.openDatabase(SmapTraceDatabaseHelper.getDatabasePath(), null, SQLiteDatabase.OPEN_READONLY);
             isDatabaseHelperOutOfDate = SmapTraceDatabaseHelper.DATABASE_VERSION != db.getVersion();
             db.close();

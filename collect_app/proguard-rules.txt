@@ -30,21 +30,27 @@
 # Keep line numbers for Crashlytics https://stackoverflow.com/questions/38529304/android-crashlytics-sending-incorrect-line-number
 -keepattributes SourceFile,LineNumberTable
 
-# smap - AWS SDK v3 ProGuard rules
--keep class software.amazon.awssdk.** { *; }
--keepclassmembers class software.amazon.awssdk.** { *; }
--dontwarn software.amazon.awssdk.**
+# smap - AWS Android SDK v2 ProGuard rules
+-keep class com.amazonaws.** { *; }
+-keepclassmembers class com.amazonaws.** { *; }
+-dontwarn com.amazonaws.**
 
-# DynamoDB Enhanced Client annotations
--keep @software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean class * { *; }
--keepclassmembers class * {
-    @software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey *;
-    @software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute *;
-}
-
-# Cognito Identity
--keep class software.amazon.awssdk.services.cognitoidentity.** { *; }
-
-# HTTP clients (AWS SDK dependencies)
+# AWS Android SDK dependencies
 -dontwarn org.apache.http.**
 -dontwarn org.apache.commons.logging.**
+-dontwarn com.fasterxml.jackson.**
+
+# DynamoDB Mapper annotations
+-keep @com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable class * { *; }
+-keepclassmembers class * {
+    @com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey *;
+    @com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribute *;
+    @com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey *;
+}
+
+# Cognito Identity and credentials
+-keep class com.amazonaws.auth.** { *; }
+-keep class com.amazonaws.services.cognitoidentity.** { *; }
+
+# Keep our DynamoDB data objects
+-keep class au.smap.fieldTask.aws.dynamodb.DevicesDO { *; }

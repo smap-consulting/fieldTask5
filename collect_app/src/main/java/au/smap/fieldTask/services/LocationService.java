@@ -106,7 +106,7 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
             Notification notification = new NotificationCompat.Builder(this, SmapNotificationChannels.LOCATION_TRACKING_CHANNEL_ID)
                     .setContentTitle(getString(org.odk.collect.strings.R.string.app_name))
                     .setContentText(getString(org.odk.collect.strings.R.string.location_tracking_active))
-                    .setSmallIcon(org.odk.collect.icons.R.drawable.ic_room_24dp)
+                    .setSmallIcon(org.odk.collect.icons.R.drawable.ic_baseline_location_on_24)
                     .setOngoing(true)
                     .setPriority(NotificationCompat.PRIORITY_LOW)
                     .build();

@@ -38,6 +38,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -45,8 +46,11 @@ import org.odk.collect.android.utilities.ApplicationConstants;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.messaging.FirebaseMessaging;
 import org.odk.collect.material.MaterialProgressDialogFragment;
 
 import org.odk.collect.android.R;
@@ -139,6 +143,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     SurveyDataViewModel model;
     private MainTaskListener listener = null;
     private RefreshListener refreshListener = null;
+    private org.odk.collect.shared.settings.Settings.OnSettingChangeListener settingsChangeListener = null;
 
     boolean listenerRegistered = false;
     private static List<TaskEntry> mTasks = null;
@@ -159,6 +164,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
     @Inject
     org.odk.collect.projects.ProjectsRepository projectsRepository;
+
+    @Inject
+    org.odk.collect.settings.SettingsProvider settingsProvider;
 
     /*
      * Start scoped storage
@@ -234,11 +242,36 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             } else if(login_status.equals("failed")) {
                 SnackbarUtils.showSnackbar(binding.pager, Collect.getInstance().getString(R.string.smap_login_failed), SnackbarUtils.DURATION_SHORT);
             }
+        } else {
+            // No login status - check if we should register (e.g., on app startup with existing credentials)
+            org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+            String username = settings.getString(ProjectKeys.KEY_USERNAME);
+            if (username != null && !username.trim().isEmpty()) {
+                Timber.i("SmapMain onCreate: Username exists, updating server registration");
+                Utilities.updateServerRegistration(false);
+            }
         }
 
+        // Register preference change listener for username and server URL changes
+        settingsChangeListener = key -> {
+            if (ProjectKeys.KEY_USERNAME.equals(key) || ProjectKeys.KEY_SERVER_URL.equals(key)) {
+                Timber.i("SmapMain: Preference changed - %s, updating server registration", key);
+                org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+                String currentUsername = settings.getString(ProjectKeys.KEY_USERNAME);
+                if (currentUsername != null && !currentUsername.trim().isEmpty()) {
+                    Utilities.updateServerRegistration(false);
+                }
+            }
+        };
+        settingsProvider.getUnprotectedSettings().registerOnSettingChangeListener(settingsChangeListener);
+
         // Restore the preference to record a user trail in case the user had previously selected "exit"
-        GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION,
-                GeneralSharedPreferencesSmap.getInstance().getBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION, false));
+        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+        settings.save(ProjectKeys.KEY_SMAP_USER_LOCATION,
+                settings.getBoolean(ProjectKeys.KEY_SMAP_USER_SAVE_LOCATION));
+
+        // Request FCM token on startup to enable push notifications
+        requestFcmToken();
 
         // Initiate a refresh if requested in start parameters
         String refresh = getIntent().getStringExtra(EXTRA_REFRESH);
@@ -368,6 +401,13 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         if(mLocationService != null) {
             stopService(mLocationServiceIntent);
         }
+
+        // Unregister settings change listener
+        if (settingsChangeListener != null) {
+            settingsProvider.getUnprotectedSettings().unregisterOnSettingChangeListener(settingsChangeListener);
+            settingsChangeListener = null;
+        }
+
         super.onDestroy();
 
     }
@@ -1064,5 +1104,45 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             // If there's an error, require login to be safe
             return true;
         }
+    }
+
+    /**
+     * Request Firebase Cloud Messaging token for push notifications.
+     * The token is automatically saved to Settings when received via onNewToken callback in NotificationService.
+     */
+    private void requestFcmToken() {
+        Timber.i("Requesting FCM token...");
+        FirebaseMessaging.getInstance().getToken()
+            .addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(Task<String> task) {
+                    if (!task.isSuccessful()) {
+                        Timber.w(task.getException(), "Failed to get FCM token");
+                        return;
+                    }
+
+                    // Get the token
+                    String token = task.getResult();
+                    if (token != null && !token.isEmpty()) {
+                        Timber.i("FCM token retrieved: %s...", token.substring(0, Math.min(30, token.length())));
+
+                        // Save token to settings using fieldTask5 architecture
+                        org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
+                        String existingToken = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_ID);
+
+                        if (!token.equals(existingToken)) {
+                            Timber.i("FCM token changed or new, saving to settings");
+                            settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_ID, token);
+
+                            // Trigger server registration with new token
+                            Utilities.updateServerRegistration(true);
+                        } else {
+                            Timber.i("FCM token unchanged, no update needed");
+                        }
+                    } else {
+                        Timber.w("FCM token is null or empty");
+                    }
+                }
+            });
     }
 }

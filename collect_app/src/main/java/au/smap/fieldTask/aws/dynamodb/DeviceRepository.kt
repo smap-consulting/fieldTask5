@@ -2,14 +2,11 @@ package au.smap.fieldTask.aws.dynamodb
 
 import au.smap.fieldTask.aws.config.AWSConfiguration
 import au.smap.fieldTask.aws.credentials.CognitoCredentialsProvider
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable
-import software.amazon.awssdk.enhanced.dynamodb.Key
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,24 +22,16 @@ class DeviceRepository @Inject constructor(
     private val credentialsProvider: CognitoCredentialsProvider
 ) {
 
-    private val dynamoDbClient: DynamoDbClient by lazy {
-        DynamoDbClient.builder()
-            .region(AWSConfiguration.DYNAMODB_REGION)
-            .credentialsProvider(credentialsProvider)
-            .build()
+    private val dynamoDBClient: AmazonDynamoDBClient by lazy {
+        AmazonDynamoDBClient(credentialsProvider.credentialsProvider).apply {
+            setRegion(com.amazonaws.regions.Region.getRegion(AWSConfiguration.DYNAMODB_REGION))
+        }
     }
 
-    private val enhancedClient: DynamoDbEnhancedClient by lazy {
-        DynamoDbEnhancedClient.builder()
-            .dynamoDbClient(dynamoDbClient)
+    private val mapper: DynamoDBMapper by lazy {
+        DynamoDBMapper.builder()
+            .dynamoDBClient(dynamoDBClient)
             .build()
-    }
-
-    private val devicesTable: DynamoDbTable<DevicesDO> by lazy {
-        enhancedClient.table(
-            DevicesDO.TABLE_NAME,
-            TableSchema.fromBean(DevicesDO::class.java)
-        )
     }
 
     /**
@@ -65,7 +54,7 @@ class DeviceRepository @Inject constructor(
 
         while (attempt < maxAttempts) {
             try {
-                devicesTable.putItem(device)
+                mapper.save(device)
                 Timber.i("Successfully saved device registration to DynamoDB")
                 return@withContext Result.success(Unit)
             } catch (e: Exception) {
@@ -96,11 +85,7 @@ class DeviceRepository @Inject constructor(
         Timber.d("Getting device from DynamoDB: token=%s...", registrationId.take(10))
 
         try {
-            val key = Key.builder()
-                .partitionValue(registrationId)
-                .build()
-
-            val device = devicesTable.getItem(key)
+            val device = mapper.load(DevicesDO::class.java, registrationId)
             Timber.d("Device found: %s", device != null)
             Result.success(device)
         } catch (e: Exception) {
@@ -119,12 +104,14 @@ class DeviceRepository @Inject constructor(
         Timber.i("Deleting device from DynamoDB: token=%s...", registrationId.take(10))
 
         try {
-            val key = Key.builder()
-                .partitionValue(registrationId)
-                .build()
-
-            devicesTable.deleteItem(key)
-            Timber.i("Successfully deleted device registration")
+            // Load the device first (required by DynamoDBMapper.delete)
+            val device = mapper.load(DevicesDO::class.java, registrationId)
+            if (device != null) {
+                mapper.delete(device)
+                Timber.i("Successfully deleted device registration")
+            } else {
+                Timber.w("Device not found, nothing to delete")
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Timber.e(e, "Failed to delete device from DynamoDB")

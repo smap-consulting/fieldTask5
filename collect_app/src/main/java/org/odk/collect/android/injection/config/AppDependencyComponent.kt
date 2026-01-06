@@ -157,6 +157,8 @@ interface AppDependencyComponent {
 
     fun inject(smapMain: au.smap.fieldTask.activities.SmapMain)
 
+    fun inject(smapLoginActivity: au.smap.fieldTask.activities.SmapLoginActivity)
+
     fun inject(splashScreenActivity: au.smap.fieldTask.activities.SplashScreenActivity)
 
     fun inject(SmapLoginTask: au.smap.fieldTask.tasks.SmapLoginTask)
