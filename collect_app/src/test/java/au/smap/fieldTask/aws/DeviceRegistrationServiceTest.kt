@@ -2,6 +2,7 @@ package au.smap.fieldTask.aws
 
 import androidx.test.core.app.ApplicationProvider
 import au.smap.fieldTask.aws.dynamodb.DeviceRepository
+import au.smap.fieldTask.aws.services.DeviceRegistrationService
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -26,10 +27,7 @@ class DeviceRegistrationServiceTest {
 
     @Test
     fun testServiceCreation() {
-        val service = DeviceRegistrationService(
-            ApplicationProvider.getApplicationContext(),
-            deviceRepository
-        )
+        val service = DeviceRegistrationService(deviceRepository)
         assertNotNull(service)
     }
 }

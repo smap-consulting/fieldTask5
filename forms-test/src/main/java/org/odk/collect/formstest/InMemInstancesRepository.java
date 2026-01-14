@@ -233,7 +233,7 @@ public final class InMemInstancesRepository implements InstancesRepository {
     @Override
     public Instance getInstanceByTaskId(long taskId) {
         return instances.stream()
-                .filter(instance -> instance.getTaskId() != null && instance.getTaskId() == taskId)
+                .filter(instance -> instance.getAssignmentId() != null && instance.getAssignmentId().equals(String.valueOf(taskId)))
                 .findFirst()
                 .orElse(null);
     }

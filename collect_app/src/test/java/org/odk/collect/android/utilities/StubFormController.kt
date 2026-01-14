@@ -157,4 +157,8 @@ open class StubFormController : FormController {
     override fun getAnswer(treeReference: TreeReference?): IAnswerData? = null
 
     override fun getEntities(): EntitiesExtra? = null
+
+    override fun getSurveyNotes(): String? = null
+
+    override fun setSurveyNotes(notes: String?) {}
 }
