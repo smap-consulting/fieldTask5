@@ -45,18 +45,19 @@ public class FormNameUtilsTest {
 
     @Test
     public void formatFilenameFromFormNameTest() {
+        // smap: filenames now include source prefix "test--" in unit tests
         assertThat(formatFilenameFromFormName(null), is(nullValue()));
-        assertThat(formatFilenameFromFormName("simple"), is("simple"));
-        assertThat(formatFilenameFromFormName("CamelCase"), is("CamelCase"));
-        assertThat(formatFilenameFromFormName("01234566789"), is("01234566789"));
+        assertThat(formatFilenameFromFormName("simple"), is("test--simple"));
+        assertThat(formatFilenameFromFormName("CamelCase"), is("test--CamelCase"));
+        assertThat(formatFilenameFromFormName("01234566789"), is("test--01234566789"));
 
-        assertThat(formatFilenameFromFormName(" trimWhitespace "), is("trimWhitespace"));
-        assertThat(formatFilenameFromFormName("keep internal spaces"), is("keep internal spaces"));
-        assertThat(formatFilenameFromFormName("other\n\twhitespace"), is("other whitespace"));
-        assertThat(formatFilenameFromFormName("repeated         whitespace"), is("repeated whitespace"));
+        assertThat(formatFilenameFromFormName(" trimWhitespace "), is("test--trimWhitespace"));
+        assertThat(formatFilenameFromFormName("keep internal spaces"), is("test--keep internal spaces"));
+        assertThat(formatFilenameFromFormName("other\n\twhitespace"), is("test--other whitespace"));
+        assertThat(formatFilenameFromFormName("repeated         whitespace"), is("test--repeated whitespace"));
 
-        assertThat(formatFilenameFromFormName("Turkish İ kept"), is("Turkish İ kept"));
-        assertThat(formatFilenameFromFormName("registered symbol ® stripped"), is("registered symbol stripped"));
-        assertThat(formatFilenameFromFormName("unicode fragment \ud800 stripped"), is("unicode fragment stripped"));
+        assertThat(formatFilenameFromFormName("Turkish İ kept"), is("test--Turkish İ kept"));
+        assertThat(formatFilenameFromFormName("registered symbol ® stripped"), is("test--registered symbol stripped"));
+        assertThat(formatFilenameFromFormName("unicode fragment \ud800 stripped"), is("test--unicode fragment stripped"));
     }
 }

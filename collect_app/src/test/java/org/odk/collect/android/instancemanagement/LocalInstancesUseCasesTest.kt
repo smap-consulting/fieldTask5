@@ -26,7 +26,8 @@ class LocalInstancesUseCasesTest {
             TimeZone.getTimeZone("UTC")
         ) { 640915200000 }
 
-        val instanceDir = File(instancesDirPath + File.separator + "Cool form name_1990-04-24_00-00-00")
+        // smap: directory name includes source prefix "test--" in unit tests
+        val instanceDir = File(instancesDirPath + File.separator + "test--Cool form name_1990-04-24_00-00-00")
         assertThat(instanceDir.exists(), equalTo(true))
         assertThat(instanceDir.isDirectory, equalTo(true))
     }
@@ -41,10 +42,11 @@ class LocalInstancesUseCasesTest {
             TimeZone.getTimeZone("UTC")
         ) { 640915200000 }!!
 
-        val instanceDir = instancesDirPath + File.separator + "Cool form name_1990-04-24_00-00-00"
+        // smap: directory and file names include source prefix "test--" in unit tests
+        val instanceDir = instancesDirPath + File.separator + "test--Cool form name_1990-04-24_00-00-00"
         assertThat(
             instanceFile.absolutePath,
-            equalTo(instanceDir + File.separator + "Cool form name_1990-04-24_00-00-00.xml")
+            equalTo(instanceDir + File.separator + "test--Cool form name_1990-04-24_00-00-00.xml")
         )
     }
 

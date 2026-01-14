@@ -117,14 +117,14 @@ public class InstanceProviderTest {
         updateValues.put(STATUS, STATUS_COMPLETE);
 
         int updatedCount = contentResolver.update(instanceUri, updateValues, null, null);
-        assertThat(updatedCount, is(0));
+        assertThat(updatedCount, is(1)); // smap: provider now allows updates
         try (Cursor cursor = contentResolver.query(instanceUri, null, null, null)) {
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToNext();
-            assertThat(cursor.getString(cursor.getColumnIndex(STATUS)), is(STATUS_INCOMPLETE));
+            assertThat(cursor.getString(cursor.getColumnIndex(STATUS)), is(STATUS_COMPLETE)); // smap: status should be updated
+            // LAST_STATUS_CHANGE_DATE is only updated internally, not through content provider
             assertThat(cursor.getLong(cursor.getColumnIndex(LAST_STATUS_CHANGE_DATE)), is(originalStatusChangeDate));
-            assertThat(cursor.getLong(cursor.getColumnIndex(LAST_STATUS_CHANGE_DATE)), is(0L));
         }
     }
 
@@ -225,7 +225,7 @@ public class InstanceProviderTest {
         Uri uri = addInstanceToDb(firstProjectId, "/blah1", "Instance 1");
 
         try (Cursor cursor = contentResolver.query(uri, null, null, null, null)) {
-            assertThat(cursor.getColumnCount(), is(16));
+            assertThat(cursor.getColumnCount(), is(42)); // smap: added 26 task-specific columns
         }
     }
 

@@ -35,7 +35,7 @@ class InstanceDatabaseMigratorTest {
 
     @Before
     fun setup() {
-        assertThat("Test expects different Instances DB version", DatabaseConstants.INSTANCES_DATABASE_VERSION, equalTo(10))
+        assertThat("Test expects different Instances DB version", DatabaseConstants.INSTANCES_DATABASE_VERSION, equalTo(27))
     }
 
     @After
@@ -146,7 +146,7 @@ class InstanceDatabaseMigratorTest {
         database.insert(DatabaseConstants.INSTANCES_TABLE_NAME, null, contentValues)
         instancesDatabaseMigrator.onUpgrade(database, oldVersion)
         database.rawQuery("SELECT * FROM " + DatabaseConstants.INSTANCES_TABLE_NAME + ";", arrayOf<String>()).use { cursor ->
-            assertThat(cursor.columnCount, equalTo(16))
+            assertThat(cursor.columnCount, equalTo(42)) // smap: added 26 task-specific columns
             assertThat(cursor.count, equalTo(1))
 
             cursor.moveToFirst()
@@ -183,7 +183,7 @@ class InstanceDatabaseMigratorTest {
         database.insert(DatabaseConstants.INSTANCES_TABLE_NAME, null, contentValues)
         instancesDatabaseMigrator.onUpgrade(database, oldVersion)
         database.rawQuery("SELECT * FROM " + DatabaseConstants.INSTANCES_TABLE_NAME + ";", arrayOf<String>()).use { cursor ->
-            assertThat(cursor.columnCount, equalTo(16))
+            assertThat(cursor.columnCount, equalTo(42)) // smap: added 26 task-specific columns
             assertThat(cursor.count, equalTo(1))
 
             cursor.moveToFirst()
@@ -219,7 +219,7 @@ class InstanceDatabaseMigratorTest {
         database.insert(DatabaseConstants.INSTANCES_TABLE_NAME, null, contentValues)
         instancesDatabaseMigrator.onUpgrade(database, oldVersion)
         database.rawQuery("SELECT * FROM " + DatabaseConstants.INSTANCES_TABLE_NAME + ";", arrayOf<String>()).use { cursor ->
-            assertThat(cursor.columnCount, equalTo(16))
+            assertThat(cursor.columnCount, equalTo(42)) // smap: added 26 task-specific columns
             assertThat(cursor.count, equalTo(1))
 
             cursor.moveToFirst()
@@ -251,7 +251,7 @@ class InstanceDatabaseMigratorTest {
         database.insert(DatabaseConstants.INSTANCES_TABLE_NAME, null, contentValues)
         instancesDatabaseMigrator.onUpgrade(database, oldVersion)
         database.rawQuery("SELECT * FROM " + DatabaseConstants.INSTANCES_TABLE_NAME + ";", arrayOf<String>()).use { cursor ->
-            assertThat(cursor.columnCount, equalTo(16))
+            assertThat(cursor.columnCount, equalTo(42)) // smap: added 26 task-specific columns
             assertThat(cursor.count, equalTo(1))
 
             cursor.moveToFirst()

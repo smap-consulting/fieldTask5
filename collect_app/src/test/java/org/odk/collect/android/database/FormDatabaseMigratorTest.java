@@ -45,7 +45,7 @@ public class FormDatabaseMigratorTest {
 
     @Before
     public void setup() {
-        assertThat("Test expects different Forms DB version", DatabaseConstants.FORMS_DATABASE_VERSION, is(14));
+        assertThat("Test expects different Forms DB version", DatabaseConstants.FORMS_DATABASE_VERSION, is(27));
         database = SQLiteDatabase.create(null);
     }
 
@@ -89,7 +89,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();
@@ -129,7 +129,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();
@@ -171,7 +171,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();
@@ -211,7 +211,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();
@@ -251,7 +251,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();
@@ -292,7 +292,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();
@@ -332,7 +332,7 @@ public class FormDatabaseMigratorTest {
         formDatabaseMigrator.onUpgrade(database, oldVersion);
 
         try (Cursor cursor = database.rawQuery("SELECT * FROM " + FORMS_TABLE_NAME + ";", new String[]{})) {
-            assertThat(cursor.getColumnCount(), is(19));
+            assertThat(cursor.getColumnCount(), is(24)); // smap: added 5 columns (PROJECT, TASKS_ONLY, READ_ONLY, SEARCH_LOCAL_DATA, SOURCE)
             assertThat(cursor.getCount(), is(1));
 
             cursor.moveToFirst();

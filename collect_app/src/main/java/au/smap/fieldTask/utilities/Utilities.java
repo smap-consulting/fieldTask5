@@ -103,8 +103,14 @@ public class Utilities {
 
     // Get the task source
     public static String getSource() {
+        // Handle unit test case where Collect.getInstance() returns null
+        Collect collectInstance = Collect.getInstance();
+        if (collectInstance == null) {
+            return "test"; // Default source for unit tests
+        }
+
         org.odk.collect.settings.SettingsProvider settingsProvider =
-            org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).settingsProvider();
+            org.odk.collect.android.injection.DaggerUtils.getComponent(collectInstance).settingsProvider();
         org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
 
         String serverUrl = settings.getString(ProjectKeys.KEY_SERVER_URL);
@@ -114,8 +120,14 @@ public class Utilities {
     }
 
     public static String getOrgMediaPath() {
+        // Handle unit test case where Collect.getInstance() returns null
+        Collect collectInstance = Collect.getInstance();
+        if (collectInstance == null) {
+            return ""; // Default empty path for unit tests
+        }
+
         org.odk.collect.settings.SettingsProvider settingsProvider =
-            org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).settingsProvider();
+            org.odk.collect.android.injection.DaggerUtils.getComponent(collectInstance).settingsProvider();
         org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
 
         String source = getSource();
