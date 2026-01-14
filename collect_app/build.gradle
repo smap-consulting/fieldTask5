@@ -400,7 +400,8 @@ dependencies {
     implementation (libs.opencsv) {
         exclude group: 'commons-logging'
     }
-    // smap - Use custom javarosa library from Maven local (v5.1.4-smap)
+    // smap - Use custom javarosa library (v5.1.4-smap)
+    // Loaded from .local-m2/ (checked in) or ~/.m2/ (for active development)
     implementation('org.getodk:javarosa:5.1.4-smap') {
         exclude group: 'commons-io'
         exclude group: 'joda-time'

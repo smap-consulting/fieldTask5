@@ -52,7 +52,11 @@ collect_app/src/odkCollectRelease/
 robolectric-deps/
 **/robolectric-deps.properties
 
-.local-m2
+# Project-local Maven repo for custom javarosa (checked in for out-of-box builds)
+# Developers modifying javarosa can override by publishing to ~/.m2/ (checked second)
+!.local-m2/
+!.local-m2/**
+
 apks
 
 # Smap

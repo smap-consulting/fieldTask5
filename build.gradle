@@ -24,6 +24,8 @@ buildscript {
 
 allprojects {
     repositories {
+        // Project-local Maven repo (checked in) - contains custom javarosa 5.1.4-smap
+        // This allows out-of-box builds without setting up JavaRosa repository
         maven {
             url "${rootDir}/.local-m2/"
             metadataSources {
@@ -35,7 +37,8 @@ allprojects {
         // Needs to go first to get specialty libraries https://stackoverflow.com/a/48438866/137744
         google()
 
-        mavenLocal() // Only used for javarosa_local dependency
+        // User's local Maven (~/.m2/) - checked second, allows overriding javarosa during active development
+        mavenLocal()
         mavenCentral()
 
         maven { url 'https://oss.sonatype.org/content/groups/public' }
