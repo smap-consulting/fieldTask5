@@ -63,7 +63,7 @@ FieldTask5 is designed to work as part of the Smap ecosystem, which provides a c
 |------------- |---------------------------------------------------------- |----------------|
 |**FieldTask5**    |Mobile data collection app (this repository)           |Android/Kotlin  |
 |**JavaRosa**      |Form processing engine with smap extensions            |Java            |
-|**Smap Server**   |Backend API, data storage, user management             |Java/PHP        |
+|**Smap Server**   |Backend API, data storage, user management             |Java            |
 |**WebForm**       |Browser-based form completion                          |JavaScript      |
 |**Smap Client**   |Web-based administration and data analysis             |JavaScript      |
 |**PostgreSQL**    |Relational database for data storage                   |SQL             |
