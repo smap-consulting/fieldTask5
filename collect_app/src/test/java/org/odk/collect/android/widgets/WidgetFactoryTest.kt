@@ -1,6 +1,6 @@
 package org.odk.collect.android.widgets
 
-import android.app.Activity
+import androidx.fragment.app.FragmentActivity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
@@ -24,13 +24,10 @@ import org.odk.collect.android.widgets.items.SelectOneFromMapWidget
 import org.odk.collect.android.widgets.items.SelectOneImageMapWidget
 import org.odk.collect.android.widgets.items.SelectOneMinimalWidget
 import org.odk.collect.android.widgets.items.SelectOneWidget
-import org.odk.collect.android.widgets.utilities.QuestionFontSizeUtils
-import org.odk.collect.settings.InMemSettingsProvider
-import org.odk.collect.settings.keys.ProjectKeys
 
 @RunWith(AndroidJUnit4::class)
 class WidgetFactoryTest {
-    private val activity: Activity = CollectHelpers.buildThemedActivity(WidgetTestActivity::class.java).get()
+    private val activity: FragmentActivity = CollectHelpers.buildThemedActivity(WidgetTestActivity::class.java).get()
 
     private var widgetFactory = WidgetFactory(
         activity,
@@ -45,10 +42,7 @@ class WidgetFactoryTest {
         null,
         null,
         null,
-        null,
-        InMemSettingsProvider().apply {
-            getUnprotectedSettings().save(ProjectKeys.KEY_FONT_SIZE, QuestionFontSizeUtils.DEFAULT_FONT_SIZE.toString())
-        }
+        null
     )
 
     @Test

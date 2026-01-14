@@ -158,6 +158,8 @@ import org.odk.collect.android.utilities.InstancesRepositoryProvider;
 import org.odk.collect.android.utilities.MediaUtils;
 import org.odk.collect.android.utilities.SavepointsRepositoryProvider;
 import org.odk.collect.android.utilities.SoftKeyboardController;
+import org.odk.collect.android.widgets.GeoShapeWidget;
+import org.odk.collect.android.widgets.GeoTraceWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.datetime.DateTimeWidget;
 import org.odk.collect.android.widgets.datetime.pickers.CustomDatePickerDialog;
@@ -168,6 +170,7 @@ import org.odk.collect.android.widgets.range.RangePickerDecimalWidget;
 import org.odk.collect.android.widgets.range.RangePickerIntegerWidget;
 import org.odk.collect.android.widgets.utilities.ExternalAppRecordingRequester;
 import org.odk.collect.android.widgets.utilities.FormControllerWaitingForDataRegistry;
+import org.odk.collect.android.widgets.utilities.GeoPolyDialogFragment;
 import org.odk.collect.android.widgets.utilities.InternalRecordingRequester;
 import org.odk.collect.android.widgets.utilities.WaitingForDataRegistry;
 import org.odk.collect.androidshared.system.IntentLauncher;
@@ -449,6 +452,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 .forClass(DeleteRepeatDialogFragment.class, () -> new DeleteRepeatDialogFragment(viewModelFactory))
                 .forClass(BackgroundAudioPermissionDialogFragment.class, () -> new BackgroundAudioPermissionDialogFragment(viewModelFactory))
                 .forClass(SelectOneFromMapDialogFragment.class, () -> new SelectOneFromMapDialogFragment(viewModelFactory))
+                .forClass(GeoPolyDialogFragment.class, () -> new GeoPolyDialogFragment(viewModelFactory))
                 .build());
 
         getSupportFragmentManager().setFragmentResultListener(REQUEST_DELETE_REPEAT, this, (requestKey, result) -> deleteGroup());
@@ -571,11 +575,16 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
 
         formEntryViewModel.getCurrentIndex().observe(this, indexAndValidationResult -> {
             if (indexAndValidationResult != null) {
-                FormIndex formIndex = indexAndValidationResult.component1();
-                FailedValidationResult validationResult = indexAndValidationResult.component2();
-                formIndexAnimationHandler.handle(formIndex);
+                FormIndex screenIndex = indexAndValidationResult.getFirst();
+                FormIndex questionIndex = indexAndValidationResult.getSecond();
+                FailedValidationResult validationResult = indexAndValidationResult.getThird();
+                formIndexAnimationHandler.handle(screenIndex);
                 if (validationResult != null) {
                     handleValidationResult(validationResult);
+                } else {
+                    if (odkView != null) {
+                        odkView.scrollToTopOf(questionIndex);
+                    }
                 }
             }
         });
@@ -915,8 +924,6 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 loadMedia(intent.getData());
                 break;
             case RequestCodes.LOCATION_CAPTURE:
-            case RequestCodes.GEOSHAPE_CAPTURE:
-            case RequestCodes.GEOTRACE_CAPTURE:
             case RequestCodes.BEARING_CAPTURE:
             case RequestCodes.BARCODE_CAPTURE:
             case RequestCodes.NFC_CAPTURE:
@@ -988,7 +995,9 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
      * Clears the answer on the screen.
      */
     private void clearAnswer(QuestionWidget qw) {
-        if (qw.getAnswer() != null || qw instanceof DateTimeWidget) {
+        if (qw instanceof GeoTraceWidget || qw instanceof GeoShapeWidget) {
+            formEntryViewModel.answerQuestion(qw.getFormEntryPrompt().getIndex(), null);
+        } else if (qw.getAnswer() != null || qw instanceof DateTimeWidget) {
             qw.clearAnswer();
         }
     }

@@ -41,6 +41,7 @@ import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.LifecycleOwner;
 
 import org.javarosa.core.model.Constants;
@@ -145,7 +146,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
      * @param advancingPage   whether this view is being created after a forward swipe through the
      */
     public ODKView(
-            ComponentActivity context,
+            FragmentActivity context,
             final FormEntryPrompt[] questionPrompts,
             FormEntryCaption[] groups,
             boolean advancingPage,
@@ -186,8 +187,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
                 this.viewLifecycle,
                 new FileRequesterImpl(intentLauncher, externalAppIntentProvider, formController),
                 new StringRequesterImpl(intentLauncher, externalAppIntentProvider, formController),
-                formController,
-                settingsProvider
+                formController
         );
 
         widgets = new ArrayList<>();
@@ -562,9 +562,18 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
         return qw.getLocalVisibleRect(scrollBounds);
     }
 
+    public void scrollToTopOf(FormIndex index) {
+        for (QuestionWidget widget : widgets) {
+            if (widget.getFormEntryPrompt().getIndex().equals(index)) {
+                scrollToTopOf(widget);
+                break;
+            }
+        }
+    }
+
     public void scrollToTopOf(@Nullable QuestionWidget qw) {
         if (qw != null && widgets.contains(qw)) {
-            findViewById(R.id.odk_view_container).scrollTo(0, qw.getTop());
+            postDelayed(() -> findViewById(R.id.odk_view_container).scrollTo(0, qw.getTop()), 400);
         }
     }
 
@@ -691,12 +700,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
         for (QuestionWidget questionWidget : getWidgets()) {
             if (formIndex.equals(questionWidget.getFormEntryPrompt().getIndex())) {
                 questionWidget.displayError(errorMessage);
-                // postDelayed is needed because otherwise scrolling may not work as expected in case when
-                // answers are validated during form finalization.
-                postDelayed(() -> {
-                    questionWidget.setFocus(getContext());
-                    scrollToTopOf(questionWidget);
-                }, 400);
+                scrollToTopOf(questionWidget);
             } else {
                 questionWidget.hideError();
             }

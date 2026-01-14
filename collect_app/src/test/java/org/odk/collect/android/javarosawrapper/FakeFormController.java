@@ -92,7 +92,7 @@ public class FakeFormController extends StubFormController {
 
     @Override
     public @NotNull ValidationResult saveOneScreenAnswer(@Nullable FormIndex index, @Nullable IAnswerData data, boolean evaluateConstraints) {
-        if (failedConstraint != null) {
+        if (failedConstraint != null && evaluateConstraints) {
             return failedConstraint;
         } else {
             answers.put(index.getReference(), data);
@@ -127,6 +127,15 @@ public class FakeFormController extends StubFormController {
     @Override
     public FormEntryPrompt getQuestionPrompt() {
         return currentPrompts.get(0);
+    }
+
+    @Override
+    public @NotNull ValidationResult validateAnswerConstraint(@NotNull FormIndex index, @Nullable IAnswerData answer) {
+        if (failedConstraint != null) {
+            return failedConstraint;
+        } else {
+            return SuccessValidationResult.INSTANCE;
+        }
     }
 
     @NonNull
