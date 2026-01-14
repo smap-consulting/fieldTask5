@@ -46,7 +46,7 @@ FieldTask5 is designed to work as part of the Smap ecosystem, which provides a c
          ▼
 ┌─────────────────┐
 │  Smap Server    │ ◄─── Backend server, API, data storage
-│   (Java/PHP)    │
+│   (Java)        │
 └────────┬────────┘
          │
     ┌────┴────┬──────────┬─────────────┐
@@ -145,6 +145,8 @@ In Android Studio:
 1. Go to **Build > Select Build Variant**
 2. For `collect_app`, select `standardDebug`
 
+Note.  Custom code for many of the variants is not included in GitHub.  Hence you are probably best to stick to "standard" or create your own variant using one of the other included variants as the starting point.
+
 #### 6. Build and Run
 
 Click the green **Run** button or press `Shift+F10` to build and launch in an emulator or connected device.
@@ -225,21 +227,7 @@ After running tests, view HTML reports at:
 - Unit tests: `{module}/build/reports/tests/testDebugUnitTest/index.html`
 - Instrumented tests: `{module}/build/reports/androidTests/connected/index.html`
 
-## Product Flavors
-
-FieldTask5 supports **16 product flavors** for different organizations and use cases:
-
-|Flavor               |Application ID                              |Purpose                    |
-|-------------------- |------------------------------------------- |---------------------------|
-|`standard`           |`org.smap.smapTask.android`                 |Default Smap flavor        |
-|`fieldTaskMax`       |`org.smap.smapTask.android.fieldTaskMax`    |Extended feature set       |
-|`bps`                |`org.smap.smapTask.android.bps`             |Minimal location features  |
-|`ljstracker`         |`org.smap.smapTask.android.ljstracker`      |Location tracking focused  |
-|`kontrolid`          |`org.smap.smapTask.android.kontrolid`       |Kontrolid variant          |
-|`kontrolid_corporate`|`org.smap.smapTask.android.kontrolid_corporate`|Kontrolid corporate    |
-|`plan`, `xxx1-4`, `meqa`, `pop`, `tdh`, `informEd`, `pangolin`, `stl2`|Various|Organization-specific    |
-
-### Flavor Customization
+## Flavor Customization
 
 Each flavor can customize:
 - **Icons and branding** (`src/{flavor}/res/`)
@@ -253,11 +241,8 @@ Each flavor can customize:
 # Build fieldTaskMax debug
 ./gradlew assembleFieldTaskMaxDebug
 
-# Build bps release
-./gradlew assembleBpsRelease
-
-# Run tests for kontrolid flavor
-./gradlew testKontrolidDebugUnitTest
+# Run tests for fieldTaskMax flavor
+./gradlew testFieldTaskMaxDebugUnitTest
 ```
 
 ## Custom JavaRosa Dependency
@@ -273,7 +258,6 @@ The custom JavaRosa is already included in the repository:
 ├── javarosa-5.1.4-smap.module
 └── javarosa-5.1.4-smap.pom
 ```
-
 Just clone and build - it works out of the box! 🎉
 
 ### For Developers Modifying JavaRosa
