@@ -59,8 +59,7 @@ dependencies {
     implementation(libs.dagger)
     kapt(libs.daggerCompiler)
 
-    debugImplementation(project(":fragments-test"))
-
+    testImplementation(project(":fragments-test"))
     testImplementation(project(":androidtest"))
     testImplementation(project(":test-shared"))
 

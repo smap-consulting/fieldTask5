@@ -60,4 +60,6 @@ dependencies {
 
     implementation(libs.dagger)
     kapt(libs.daggerCompiler)
+
+    testImplementation(libs.junit)
 }

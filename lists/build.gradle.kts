@@ -60,5 +60,5 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidxArchCoreTesting)
 
-    debugImplementation(project(":fragments-test"))
+    testImplementation(project(":fragments-test"))
 }

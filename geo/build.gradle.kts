@@ -69,8 +69,7 @@ dependencies {
         exclude(group = "org.hamcrest", module = "hamcrest-all")
     }
 
-    debugImplementation(project(":fragments-test"))
-
+    testImplementation(project(":fragments-test"))
     testImplementation(project(":androidtest"))
     testImplementation(project(":settings"))
     testImplementation(project(":test-shared"))

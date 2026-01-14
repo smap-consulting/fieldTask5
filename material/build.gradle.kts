@@ -51,8 +51,7 @@ dependencies {
     implementation(libs.androidxFragmentKtx)
     implementation(libs.kotlinStdlib)
 
-    debugImplementation(project(":fragments-test"))
-
+    testImplementation(project(":fragments-test"))
     testImplementation(project(":test-shared"))
     testImplementation(libs.junit)
     testImplementation(libs.androidxTestExtJunit)
