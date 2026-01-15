@@ -116,8 +116,6 @@ public class SmapTaskMapFragment extends Fragment
     private ImageButton layers_button;
     private ImageButton location_button;
 
-    private SharedPreferences adminPreferences;
-
     ArrayList<Marker> markers = null;
     HashMap<Marker, Integer> markerMap = null;
     ArrayList<LatLng> mPoints = new ArrayList<LatLng>();
@@ -192,9 +190,6 @@ public class SmapTaskMapFragment extends Fragment
 
     @Override
     public void onActivityCreated(Bundle b) {
-        adminPreferences = getActivity().getSharedPreferences(
-                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
-
         super.onActivityCreated(b);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);

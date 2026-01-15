@@ -16,10 +16,8 @@ package au.smap.fieldTask.fragments;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +51,7 @@ import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
 import au.smap.fieldTask.adapters.TaskListArrayAdapter;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
+import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.forms.instances.Instance;
 import au.smap.fieldTask.listeners.OnTaskOptionsClickListener;
 import au.smap.fieldTask.loaders.SurveyData;
@@ -60,6 +59,7 @@ import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
+import org.odk.collect.shared.settings.Settings;
 import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
@@ -91,8 +91,6 @@ public class SmapTaskListFragment extends ListFragment {
     private String filterText;
 
     private BottomSheetDialog bottomSheetDialog;
-
-    private SharedPreferences adminPreferences;
 
     private TaskListArrayAdapter mAdapter;
 
@@ -225,9 +223,6 @@ public class SmapTaskListFragment extends ListFragment {
         mAdapter = new TaskListArrayAdapter(getActivity(), false, taskClickListener);
         setListAdapter(mAdapter);
 
-        adminPreferences = getActivity().getSharedPreferences(
-                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
-
     }
 
     @Override
@@ -248,8 +243,8 @@ public class SmapTaskListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Notify the user if tracking is turned on
-        if (new LocationRegister().locationEnabled()
-                && PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)) {
+        Settings settings = DaggerUtils.getComponent(getContext()).settingsProvider().getUnprotectedSettings();
+        if (new LocationRegister().locationEnabled() && settings.getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION)) {
             SnackbarUtils.showSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking), SnackbarUtils.DURATION_LONG);
         }
     }
@@ -359,10 +354,8 @@ public class SmapTaskListFragment extends ListFragment {
 
         getActivity().getMenuInflater().inflate(R.menu.smap_menu, menu);
 
-
-        boolean odkMenus = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getBoolean(ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS, true);
+        Settings settings = DaggerUtils.getComponent(getContext()).settingsProvider().getUnprotectedSettings();
+        boolean odkMenus = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS);
 
         if (odkMenus) {
             menu
@@ -394,9 +387,7 @@ public class SmapTaskListFragment extends ListFragment {
                 .add(0, MENU_EXIT, 0, org.odk.collect.strings.R.string.exit)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-        boolean adminMenu = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU, false);
+        boolean adminMenu = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU);
 
         if (adminMenu) {
             /* SMAP BUILD - preferences

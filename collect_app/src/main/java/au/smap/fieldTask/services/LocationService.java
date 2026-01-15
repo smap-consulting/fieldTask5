@@ -23,13 +23,11 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,7 +37,9 @@ import com.google.android.gms.location.Priority;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.settings.keys.ProjectKeys;
+import org.odk.collect.shared.settings.Settings;
 import au.smap.fieldTask.receivers.LocationReceiver;
 import au.smap.fieldTask.notifications.SmapNotificationChannels;
 import org.odk.collect.android.utilities.ApplicationConstants;
@@ -72,8 +72,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         @Override
         public void run() {
             Timber.i("=================== Periodic check for user settings");
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-            isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
+            Settings settings = DaggerUtils.getComponent(Collect.getInstance()).settingsProvider().getUnprotectedSettings();
+            isRecordingLocation = settings.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE);
 
             // Restart location monitoring - in case permission was disabled and then re-enabled
             stopLocationUpdates();
@@ -90,8 +90,8 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         super.onStartCommand(intent, flags, startId);
         Timber.i("======================= Start Location Service");
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-        isRecordingLocation = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true);
+        Settings settings = DaggerUtils.getComponent(Collect.getInstance()).settingsProvider().getUnprotectedSettings();
+        isRecordingLocation = settings.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE);
 
         // smap - Start periodic checks using Handler (replaces Timer)
         mHandler.post(checkSettingsRunnable);

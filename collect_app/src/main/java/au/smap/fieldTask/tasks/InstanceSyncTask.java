@@ -17,15 +17,14 @@ package au.smap.fieldTask.tasks;
 import static org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 
 import android.content.ContentValues;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.provider.BaseColumns;
 
 import org.apache.commons.io.FileUtils;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.dao.FormsDao;
 import au.smap.fieldTask.dao.InstancesDao;
 import org.odk.collect.android.exception.EncryptionException;
@@ -33,6 +32,7 @@ import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.android.javarosawrapper.FormController;
 import au.smap.fieldTask.listeners.DiskSyncListener;
 import org.odk.collect.settings.keys.ProjectKeys;
+import org.odk.collect.shared.settings.Settings;
 import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
@@ -139,12 +139,8 @@ public class InstanceSyncTask extends AsyncTask<Void, String, String> {
                     }
                 }
 
-                SharedPreferences  sharedPreferences = PreferenceManager
-                        .getDefaultSharedPreferences(Collect.getInstance().getBaseContext());
-
-                final boolean instanceSyncFlag = PreferenceManager.getDefaultSharedPreferences(
-                        Collect.getInstance().getApplicationContext()).getBoolean(
-                        ProjectKeys.KEY_INSTANCE_SYNC, false);    // smap change default to false
+                Settings settings = DaggerUtils.getComponent(Collect.getInstance()).settingsProvider().getUnprotectedSettings();
+                final boolean instanceSyncFlag = settings.getBoolean(ProjectKeys.KEY_INSTANCE_SYNC);
 
                 int counter = 0;
                 // Begin parsing and add them to the content provider

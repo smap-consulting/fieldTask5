@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -35,7 +34,6 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
 import android.view.View;
@@ -75,6 +73,7 @@ import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
+import org.odk.collect.shared.settings.Settings;
 import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
@@ -332,8 +331,8 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         initToolbar();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SurveyDataViewModelFactory viewModelFactory = new SurveyDataViewModelFactory(sharedPreferences);
+        Settings settings = DaggerUtils.getComponent(this).settingsProvider().getUnprotectedSettings();
+        SurveyDataViewModelFactory viewModelFactory = new SurveyDataViewModelFactory(settings);
 
         model = new ViewModelProvider(this, viewModelFactory).get(SurveyDataViewModel.class);
         model.getSurveyData().observe(this, surveyData -> {
@@ -363,10 +362,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         // NFC
         boolean nfcAuthorised = false;
-        SharedPreferences sharedPreferences = this.getSharedPreferences(
-                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
+        Settings adminSettings = DaggerUtils.getComponent(this).settingsProvider().getProtectedSettings();
 
-        if (sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_LOCATION_TRIGGER, true)) {
+        if (adminSettings.getBoolean(ProjectKeys.KEY_SMAP_LOCATION_TRIGGER)) {
             if(mNfcAdapter == null) {
                 mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
             }
@@ -466,8 +464,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      * Show admin password dialog using modern Material design
      */
     private void showPasswordDialog() {
-        final SharedPreferences adminPreferences = getSharedPreferences(
-                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
+        final Settings adminSettings = DaggerUtils.getComponent(this).settingsProvider().getProtectedSettings();
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -478,7 +475,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                 .setView(input, 20, 10, 20, 10)
                 .setPositiveButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> {
                     String value = input.getText().toString();
-                    String pw = adminPreferences.getString(ProtectedProjectKeys.KEY_ADMIN_PW, "");
+                    String pw = adminSettings.getString(ProtectedProjectKeys.KEY_ADMIN_PW);
                     if (pw.equals(value)) {
                         Intent i = new Intent(getApplicationContext(), AdminPreferencesActivitySmap.class);
                         startActivity(i);
@@ -735,8 +732,8 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             boolean isSubmitted = Utilities.isSubmitted(status);
             boolean isSelfAssigned = Utilities.isSelfAssigned(status);
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean reviewFinal = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_REVIEW_FINAL, true);
+            Settings settings = DaggerUtils.getComponent(this).settingsProvider().getUnprotectedSettings();
+            boolean reviewFinal = settings.getBoolean(ProjectKeys.KEY_SMAP_REVIEW_FINAL);
 
             if (isSubmitted) {
                 Toast.makeText(
@@ -991,9 +988,8 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      * The user has chosen to exit the application
      */
     public void exit() {
-        boolean continueTracking = PreferenceManager
-                .getDefaultSharedPreferences(this)
-                .getBoolean(ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU, false);
+        Settings settings = DaggerUtils.getComponent(this).settingsProvider().getUnprotectedSettings();
+        boolean continueTracking = settings.getBoolean(ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU);
         if(!continueTracking) {
             GeneralSharedPreferencesSmap.getInstance().save(ProjectKeys.KEY_SMAP_USER_LOCATION, false);
             this.finish();

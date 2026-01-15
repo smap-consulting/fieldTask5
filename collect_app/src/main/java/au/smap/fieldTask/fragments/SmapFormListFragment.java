@@ -16,9 +16,7 @@ package au.smap.fieldTask.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +51,7 @@ import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.settings.keys.ProjectKeys;
+import org.odk.collect.shared.settings.Settings;
 import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
@@ -87,9 +86,6 @@ public class SmapFormListFragment extends ListFragment {
     private String filterText;
 
     private BottomSheetDialog bottomSheetDialog;
-
-
-    private SharedPreferences adminPreferences;
 
     private TaskListArrayAdapter mAdapter;
 
@@ -140,9 +136,6 @@ public class SmapFormListFragment extends ListFragment {
         // Handle long item clicks
         ListView lv = getListView();
 
-        adminPreferences = getActivity().getSharedPreferences(
-                AdminPreferencesActivitySmap.ADMIN_PREFERENCES, 0);
-
     }
 
 
@@ -189,9 +182,10 @@ public class SmapFormListFragment extends ListFragment {
         }
 
         // Notify the user if tracking is turned on
+        Settings settings = DaggerUtils.getComponent(getContext()).settingsProvider().getUnprotectedSettings();
         if (new LocationRegister().locationEnabled()
-                && (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)
-                || PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, false))) {
+                && (settings.getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION)
+                || settings.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE))) {
             SnackbarUtils.showSnackbar(getActivity().findViewById(R.id.llParent), getString(R.string.smap_location_tracking), SnackbarUtils.DURATION_LONG);
         }
 
@@ -264,10 +258,8 @@ public class SmapFormListFragment extends ListFragment {
 
         getActivity().getMenuInflater().inflate(R.menu.smap_menu, menu);
 
-
-        boolean odkMenus = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getBoolean(ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS, true);
+        Settings settings = DaggerUtils.getComponent(getContext()).settingsProvider().getUnprotectedSettings();
+        boolean odkMenus = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS);
 
         if (odkMenus) {
             menu
@@ -299,9 +291,7 @@ public class SmapFormListFragment extends ListFragment {
                 .add(0, MENU_EXIT, 0, org.odk.collect.strings.R.string.exit)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
-        boolean adminMenu = PreferenceManager
-                .getDefaultSharedPreferences(getContext())
-                .getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU, false);
+        boolean adminMenu = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU);
 
         if (adminMenu) {
             /* SMAP BUILD

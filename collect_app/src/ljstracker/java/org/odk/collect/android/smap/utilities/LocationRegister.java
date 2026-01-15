@@ -4,19 +4,19 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Build;
-import android.preference.PreferenceManager;
 
 import org.odk.collect.android.R;
 import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.database.TraceUtilities;
 import org.odk.collect.permissions.PermissionListener;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.smap.tasks.SubmitLocationTask;
+import org.odk.collect.shared.settings.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -38,7 +38,8 @@ public class LocationRegister {
     }
 
     public void register(Context context, Location location) {
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)) {
+        Settings settings = DaggerUtils.getComponent(context).settingsProvider().getUnprotectedSettings();
+        if (settings.getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION)) {
 
             // Save trace
             TraceUtilities.insertPoint(location);
@@ -46,8 +47,7 @@ public class LocationRegister {
             LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("locationChanged"));  // update map
 
             // Attempt to send current location and trace immediately
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(Collect.getInstance());
-            String server = sharedPreferences.getString(ProjectKeys.KEY_SERVER_URL, "");
+            String server = settings.getString(ProjectKeys.KEY_SERVER_URL);
             String latString = String.valueOf(location.getLatitude());
             String lonString = String.valueOf(location.getLongitude());
             SubmitLocationTask task = new SubmitLocationTask();

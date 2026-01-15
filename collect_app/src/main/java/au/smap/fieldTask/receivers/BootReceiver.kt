@@ -4,8 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import androidx.preference.PreferenceManager
 import au.smap.fieldTask.services.LocationService
+import org.odk.collect.android.injection.DaggerUtils
 import org.odk.collect.settings.keys.ProjectKeys
 import timber.log.Timber
 
@@ -21,8 +21,8 @@ class BootReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
             Timber.i("Boot completed, checking if location service should start")
 
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val locationEnabled = sharedPreferences.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, false)
+            val settings = DaggerUtils.getComponent(context).settingsProvider().getUnprotectedSettings()
+            val locationEnabled = settings.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE)
 
             if (locationEnabled) {
                 Timber.i("Location tracking enabled, starting LocationService")

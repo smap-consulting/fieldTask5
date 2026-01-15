@@ -118,3 +118,4 @@ collect_app/bps/
 collect_app/ljstracker/
 
 test-output.log
+test_location_tracking.sh

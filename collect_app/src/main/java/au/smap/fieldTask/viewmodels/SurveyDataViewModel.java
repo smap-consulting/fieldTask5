@@ -1,7 +1,6 @@
 package au.smap.fieldTask.viewmodels;
 
 import android.content.ContentResolver;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 
 import androidx.lifecycle.LiveData;
@@ -9,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import org.odk.collect.android.application.Collect;
+import org.odk.collect.shared.settings.Settings;
 import au.smap.fieldTask.database.TraceUtilities;
 import au.smap.fieldTask.loaders.PointEntry;
 import au.smap.fieldTask.loaders.SurveyData;
@@ -28,13 +28,13 @@ public class SurveyDataViewModel extends ViewModel {
     private static final String TASK_MANAGER_LIST_SORTING_ORDER = "taskManagerListSortingOrder";
     private static final String FORM_MANAGER_LIST_SORTING_ORDER = "formManagerListSortingOrder";
 
-    private final SharedPreferences sharedPreferences;
+    private final Settings settings;
     private MutableLiveData<SurveyData> surveyData;
 
     private CharSequence filter = "";
 
-    public SurveyDataViewModel(SharedPreferences sharedPreferences) {
-        this.sharedPreferences = sharedPreferences;
+    public SurveyDataViewModel(Settings settings) {
+        this.settings = settings;
     }
 
     public LiveData<SurveyData> getSurveyData() {
@@ -168,24 +168,23 @@ public class SurveyDataViewModel extends ViewModel {
     }
 
     private void saveSortOrder(String key, int sortOrder) {
-        sharedPreferences
-                .edit()
-                .putInt(key, sortOrder)
-                .apply();
+        settings.save(key, sortOrder);
     }
 
     public int getFormSortingOrder() {
-        return sharedPreferences.getInt(
-                FORM_MANAGER_LIST_SORTING_ORDER,
-                ApplicationConstants.SortingOrder.BY_NAME_ASC
-        );
+        try {
+            return settings.getInt(FORM_MANAGER_LIST_SORTING_ORDER);
+        } catch (Exception e) {
+            return ApplicationConstants.SortingOrder.BY_NAME_ASC;
+        }
     }
 
     public int getTaskSortingOrder() {
-        return sharedPreferences.getInt(
-                TASK_MANAGER_LIST_SORTING_ORDER,
-                ApplicationConstants.SortingOrder.BY_NAME_ASC
-        );
+        try {
+            return settings.getInt(TASK_MANAGER_LIST_SORTING_ORDER);
+        } catch (Exception e) {
+            return ApplicationConstants.SortingOrder.BY_NAME_ASC;
+        }
     }
 
 }
