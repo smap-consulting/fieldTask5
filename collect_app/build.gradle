@@ -317,6 +317,9 @@ configurations.all {
 
         // Newer Jackson versions cannot be ued until Collect minSDK >= 26 (https://github.com/FasterXML/jackson-databind#android)
         force 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+
+        // smap - Force custom javarosa version to prevent upgrade to upstream version
+        force 'org.getodk:javarosa:5.1.4-smap'
     }
     
     transitive = true

@@ -82,7 +82,7 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
     }
 
     @Override
-    public @NotNull List<@NotNull Class<?>@NotNull []> getPrototypes() {
+    public List<Class[]> getPrototypes() {
         return new ArrayList<>();
     }
 

@@ -127,8 +127,6 @@
   <string name="smap_background_location_permission_denied">Si el registro de la ubicación no está permitida todo el tiempo, la app no podrá alertarle si hay una tarea que dependa de la ubicación cerca.</string>
   <string name="smap_request_background_location_permission">La aplicación recopila datos de ubicación para alertarlo cuando está cerca de una tarea que depende de la ubicación, incluso cuando la aplicación está cerrada o no está en uso.</string>
   <string name="smap_request_foreground_location_permission">La aplicación recopila datos de ubicación para avisarle cuando esté cerca de una tarea que dependa de la ubicación.</string>
-  <string name="smap_set_marker">Establecer marcador</string>
-  <string name="smap_apply">Aplicar</string>
   <string name="smap_deny">Denegar</string>
   <string name="smap_accept2">Aceptar</string>
   <string name="smap_media_download">No se pueden descargar los datos iniciales de \"%s\" al archivo %s</string>
