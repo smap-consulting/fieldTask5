@@ -512,9 +512,16 @@ dependencies {
 
 // Fix OSS licenses plugin task dependencies for Gradle 9.0
 // See: https://github.com/google/play-services-plugins/issues/299
+// Disable OSS licenses tasks for debug builds (only needed for release)
 tasks.configureEach { task ->
     if (task.name.contains('OssLicensesCleanUp')) {
         task.mustRunAfter(tasks.matching { it.name.contains('OssDependencyTask') })
+    }
+
+    // Disable OSS licenses tasks for debug builds to avoid Gradle 9.0 compatibility issues
+    // OSS licenses are only needed for release builds
+    if (task.name.contains('OssLicenses') && task.name.contains('Debug')) {
+        task.enabled = false
     }
 }
 
