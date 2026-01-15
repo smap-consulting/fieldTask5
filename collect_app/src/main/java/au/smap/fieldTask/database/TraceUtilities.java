@@ -16,18 +16,13 @@ package au.smap.fieldTask.database;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 
 import au.smap.fieldTask.database.TraceProviderAPI.TraceColumns;
 import org.odk.collect.android.application.Collect;
 import au.smap.fieldTask.loaders.PointEntry;
-import org.odk.collect.android.utilities.STFileUtils;
-import org.odk.collect.settings.keys.ProjectKeys;
-
 import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.List;
@@ -47,19 +42,10 @@ public class TraceUtilities {
         values.put(TraceColumns.LON, location.getLongitude());
         values.put(TraceColumns.TIME, System.currentTimeMillis());
 
-        values.put(TraceColumns.SOURCE, getSource());
+        values.put(TraceColumns.SOURCE, Utilities.getSource());
 
         Collect.getInstance().getContentResolver().insert(dbUri, values);
 
-    }
-
-    private static String getSource() {
-        SharedPreferences settings = PreferenceManager
-                .getDefaultSharedPreferences(Collect.getInstance()
-                        .getBaseContext());
-        String serverUrl = settings.getString(
-                ProjectKeys.KEY_SERVER_URL, null);
-        return STFileUtils.getSource(serverUrl);
     }
 
     /*
