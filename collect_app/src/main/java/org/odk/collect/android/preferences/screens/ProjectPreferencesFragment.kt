@@ -59,16 +59,16 @@ class ProjectPreferencesFragment(private val inFormEntry: Boolean) :
         setPreferencesFromResource(R.xml.project_preferences, rootKey)
 
         findPreference<Preference>(PROTOCOL_PREFERENCE_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(PROJECT_DISPLAY_PREFERENCE_KEY)!!.onPreferenceClickListener = this
+        findPreference<Preference>(PROJECT_DISPLAY_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
         findPreference<Preference>(USER_INTERFACE_PREFERENCE_KEY)!!.onPreferenceClickListener = this
         findPreference<Preference>(MAPS_PREFERENCE_KEY)!!.onPreferenceClickListener = this
         findPreference<Preference>(FORM_MANAGEMENT_PREFERENCE_KEY)!!.onPreferenceClickListener = this
         findPreference<Preference>(USER_AND_DEVICE_IDENTITY_PREFERENCE_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(EXPERIMENTAL_PREFERENCE_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(UNLOCK_PROTECTED_SETTINGS_PREFERENCE_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(CHANGE_ADMIN_PASSWORD_PREFERENCE_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(ACCESS_CONTROL_PREFERENCE_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(PROJECT_MANAGEMENT_PREFERENCE_KEY)!!.also {
+        findPreference<Preference>(EXPERIMENTAL_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
+        findPreference<Preference>(UNLOCK_PROTECTED_SETTINGS_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
+        findPreference<Preference>(CHANGE_ADMIN_PASSWORD_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
+        findPreference<Preference>(ACCESS_CONTROL_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
+        findPreference<Preference>(PROJECT_MANAGEMENT_PREFERENCE_KEY)?.also {  // smap - optional
             it.onPreferenceClickListener = this
             if (inFormEntry) {
                 it.isEnabled = false

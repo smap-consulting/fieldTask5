@@ -19,11 +19,7 @@ limitations under the License.
         android:title="@string/server_settings_title"
         android:summary="@string/server_settings_subtext" />
 
-    <Preference
-        android:icon="@drawable/ic_outline_color_lens_accent_24"
-        android:key="project_display"
-        android:title="@string/project_display_title"
-        android:summary="@string/project_display_subtext" />
+    <!-- smap - removed project_display preference -->
 
     <Preference
         android:icon="@drawable/ic_outline_phonelink_setup_accent_24"
@@ -49,37 +45,8 @@ limitations under the License.
         android:title="@string/user_and_device_identity_title"
         android:summary="@string/user_and_device_identity_settings_subtext" />
 
-    <Preference
-        android:icon="@drawable/ic_outline_warning_accent_24"
-        android:key="experimental"
-        android:title="@string/experimental" />
+    <!-- smap - removed experimental preference -->
 
-    <PreferenceCategory
-        android:title="@string/protected_settings"
-        app:iconSpaceReserved="false">
+    <!-- smap - removed protected_settings category with admin_password, project_management, access_control -->
 
-        <Preference
-            android:icon="@drawable/ic_outline_lock_accent_24"
-            android:key="unlock_protected_settings"
-            android:title="@string/unlock_protected_settings_section_title"
-            android:summary="@string/unlock_protected_settings_section_subtext"/>
-
-        <Preference
-            android:icon="@drawable/ic_outline_vpn_key_accent_24"
-            android:key="admin_password"
-            android:title="@string/set_admin_password" />
-
-        <Preference
-            android:icon="@drawable/ic_outline_settings_accent_24"
-            android:key="project_management"
-            android:title="@string/project_management_section_title"
-            android:summary="@string/project_management_section_subtext"/>
-
-        <Preference
-            android:icon="@drawable/ic_outline_lock_accent_24"
-            android:key="access_control"
-            android:title="@string/access_control_section_title"
-            android:summary="@string/access_control_section_subtext"/>
-
-    </PreferenceCategory>
 </PreferenceScreen>
