@@ -65,7 +65,6 @@ object Defaults {
             hashMap[ProjectKeys.KEY_SMAP_ODK_MARK_FINALIZED] = false
             hashMap[ProjectKeys.KEY_SMAP_PREVENT_DISABLE_TRACK] = false
             hashMap[ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE] = true
-            hashMap[ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU] = false
             hashMap[ProjectKeys.KEY_SMAP_ADMIN_SERVER_MENU] = true
             hashMap[ProjectKeys.KEY_SMAP_ADMIN_META_MENU] = true
             hashMap[ProjectKeys.KEY_SMAP_EXIT_TRACK_MENU] = false
