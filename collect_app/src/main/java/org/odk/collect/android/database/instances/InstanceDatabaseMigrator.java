@@ -110,11 +110,44 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
             case 24:
             case 25:
             case 26:
-                // Versions 12-26 used by fieldTask4 - all columns already exist
-                // upgradeToVersion27 would go here for future changes
-                Timber.i("Upgrading from fieldTask4 database version %s - no changes needed", oldVersion);
+                // smap - Versions 11-26 used by fieldTask4 which may not have ODK Collect columns
+                // Ensure all ODK Collect columns exist that may be missing in fieldTask4
+                ensureOdkColumnsExist(db);
+                Timber.i("Upgrading from fieldTask4 database version %s", oldVersion);
             case 27:
                 // Current version - no upgrade needed
+        }
+    }
+
+    // smap - Ensure all ODK Collect columns exist for fieldTask4 upgrades
+    private void ensureOdkColumnsExist(SQLiteDatabase db) {
+        // Columns from ODK Collect v6
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, GEOMETRY)) {
+            Timber.i("Adding missing geometry column");
+            addColumn(db, INSTANCES_TABLE_NAME, GEOMETRY, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, GEOMETRY_TYPE)) {
+            Timber.i("Adding missing geometryType column");
+            addColumn(db, INSTANCES_TABLE_NAME, GEOMETRY_TYPE, "text");
+        }
+        // Columns from ODK Collect v8
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, CAN_DELETE_BEFORE_SEND)) {
+            Timber.i("Adding missing canDeleteBeforeSend column");
+            addColumn(db, INSTANCES_TABLE_NAME, CAN_DELETE_BEFORE_SEND, "text");
+        }
+        // Columns from ODK Collect v9
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, EDIT_OF)) {
+            Timber.i("Adding missing editOf column");
+            db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME + " ADD COLUMN " + EDIT_OF + " integer REFERENCES " + INSTANCES_TABLE_NAME + "(" + _ID + ") CHECK (" + EDIT_OF + " != " + _ID + ")");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, EDIT_NUMBER)) {
+            Timber.i("Adding missing editNumber column");
+            db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME + " ADD COLUMN " + EDIT_NUMBER + " integer CHECK ((" + EDIT_OF + " IS NULL AND " + EDIT_NUMBER + " IS NULL) OR + (" + EDIT_OF + " IS NOT NULL AND + " + EDIT_NUMBER + " IS NOT NULL))");
+        }
+        // Columns from ODK Collect v10
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, FINALIZATION_DATE)) {
+            Timber.i("Adding missing finalizationDate column");
+            addColumn(db, INSTANCES_TABLE_NAME, FINALIZATION_DATE, "date");
         }
     }
 
