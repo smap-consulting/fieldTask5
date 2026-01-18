@@ -139,6 +139,9 @@ the specific language governing permissions and limitations under the License.
         <!-- smap History activity -->
         <activity android:name="au.smap.fieldTask.activities.HistoryActivity" />
 
+        <!-- smap Login QR scanner activity -->
+        <activity android:name="au.smap.fieldTask.activities.SmapLoginQRActivity" />
+
         <activity
             android:name=".activities.ScannerWithFlashlightActivity"
             android:configChanges="orientation|screenSize"/>

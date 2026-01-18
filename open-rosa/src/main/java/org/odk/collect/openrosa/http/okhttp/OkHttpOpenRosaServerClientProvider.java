@@ -49,6 +49,7 @@ public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientP
     private static final String OPEN_ROSA_VERSION_HEADER = OpenRosaConstants.VERSION_HEADER;
     private static final String OPEN_ROSA_VERSION = "1.0";
     private static final String DATE_HEADER = "Date";
+    private static final String TOKEN_HEADER = "x-api-key";  // smap - token authentication header
 
     private final OkHttpClient baseClient;
     private final String cacheDir;
@@ -117,7 +118,8 @@ public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientP
                     .addInterceptor(new AuthenticationCacheInterceptor(authCache)).build();
         }
 
-        return new OkHttpOpenRosaServerClient(builder.build(), userAgent);
+        // smap - pass credentials for token authentication
+        return new OkHttpOpenRosaServerClient(builder.build(), userAgent, credentials);
     }
 
     // https://stackoverflow.com/a/64844360/137744
@@ -170,19 +172,27 @@ public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientP
 
         private final OkHttpClient client;
         private final String userAgent;
+        private final HttpCredentialsInterface credentials;  // smap - for token auth
 
-        OkHttpOpenRosaServerClient(OkHttpClient client, String userAgent) {
+        OkHttpOpenRosaServerClient(OkHttpClient client, String userAgent, HttpCredentialsInterface credentials) {
             this.client = client;
             this.userAgent = userAgent;
+            this.credentials = credentials;  // smap
         }
 
         @Override
         public Response makeRequest(Request request, Date currentTime) throws IOException {
-            return client.newCall(request.newBuilder()
+            Request.Builder requestBuilder = request.newBuilder()
                     .addHeader(USER_AGENT_HEADER, userAgent)
                     .addHeader(OPEN_ROSA_VERSION_HEADER, OPEN_ROSA_VERSION)
-                    .addHeader(DATE_HEADER, getHeaderDate(currentTime))
-                    .build()).execute();
+                    .addHeader(DATE_HEADER, getHeaderDate(currentTime));
+
+            // smap - add token header for token authentication
+            if (credentials != null && credentials.getUseToken() && credentials.getAuthToken() != null) {
+                requestBuilder.addHeader(TOKEN_HEADER, credentials.getAuthToken());
+            }
+
+            return client.newCall(requestBuilder.build()).execute();
         }
 
         private static String getHeaderDate(Date currentTime) {

@@ -32,7 +32,6 @@ import com.google.gson.reflect.TypeToken;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.configure.qr.QRCodeTabsActivity;
 import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.listeners.SmapLoginListener;
 import org.odk.collect.settings.keys.ProjectKeys;
@@ -128,7 +127,8 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
         binding.btnScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                formLauncher.launch(new Intent(SmapLoginActivity.this, QRCodeTabsActivity.class));
+                // smap - use Smap login QR scanner instead of ODK settings scanner
+                formLauncher.launch(new Intent(SmapLoginActivity.this, SmapLoginQRActivity.class));
             }
         });
 
