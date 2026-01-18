@@ -85,6 +85,8 @@ the specific language governing permissions and limitations under the License.
     <application
         android:name=".application.Collect"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:installLocation="auto"
         android:label="@string/app_name"
@@ -133,6 +135,9 @@ the specific language governing permissions and limitations under the License.
 
         <!-- smap Survey notes activity -->
         <activity android:name="au.smap.fieldTask.activities.SurveyNotesActivity" />
+
+        <!-- smap History activity -->
+        <activity android:name="au.smap.fieldTask.activities.HistoryActivity" />
 
         <activity
             android:name=".activities.ScannerWithFlashlightActivity"

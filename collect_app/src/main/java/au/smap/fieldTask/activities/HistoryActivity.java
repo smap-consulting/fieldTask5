@@ -22,9 +22,9 @@ import androidx.loader.content.Loader;
 
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.TextView;
 
 import org.odk.collect.android.R;
+import org.odk.collect.lists.EmptyListView;
 import org.odk.collect.android.adapters.InstanceListCursorAdapter;
 import au.smap.fieldTask.dao.InstancesDao;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
@@ -52,7 +52,8 @@ public class HistoryActivity extends SmapHistoryListActivity implements
 
         setTitle(getString(R.string.smap_history));       // smap change to history
 
-        ((TextView) findViewById(android.R.id.empty)).setText(org.odk.collect.strings.R.string.empty_list_of_questions);
+        // smap - EmptyListView replaces TextView in upstream ODK Collect
+        ((EmptyListView) findViewById(android.R.id.empty)).setTitle(getString(org.odk.collect.strings.R.string.empty_list_of_questions));
 
         init();
     }

@@ -34,6 +34,7 @@ import static org.odk.collect.android.database.forms.DatabaseFormColumns.READ_ON
 import static org.odk.collect.android.database.forms.DatabaseFormColumns.SEARCH_LOCAL_DATA;
 import static org.odk.collect.android.database.forms.DatabaseFormColumns.SOURCE;
 import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.addColumn;
+import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.doesColumnExist;
 
 import timber.log.Timber;
 
@@ -95,11 +96,35 @@ public class FormDatabaseMigrator implements DatabaseMigrator {
             case 24:
             case 25:
             case 26:
-                // Versions 16-26 used by fieldTask4 - all columns already exist
-                // upgradeToVersion27 would go here for future changes
-                Timber.i("Upgrading from fieldTask4 database version %s - no changes needed", oldVersion);
+                // smap - Versions 15-26 used by fieldTask4 which may not have ODK Collect columns
+                ensureOdkColumnsExist(db);
+                Timber.i("Upgrading from fieldTask4 database version %s", oldVersion);
             case 27:
                 // Current version - no upgrade needed
+        }
+    }
+
+    // smap - Ensure all ODK Collect columns exist for fieldTask4 upgrades
+    private void ensureOdkColumnsExist(SQLiteDatabase db) {
+        // Column from ODK Collect v8
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, GEOMETRY_XPATH)) {
+            Timber.i("Adding missing geometryXpath column");
+            addColumn(db, FORMS_TABLE_NAME, GEOMETRY_XPATH, "text");
+        }
+        // Column from ODK Collect v10/v11
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, DELETED_DATE)) {
+            Timber.i("Adding missing deleted_date column");
+            addColumn(db, FORMS_TABLE_NAME, DELETED_DATE, "integer");
+        }
+        // Column from ODK Collect v12
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, LAST_DETECTED_ATTACHMENTS_UPDATE_DATE)) {
+            Timber.i("Adding missing lastDetectedAttachmentsUpdateDate column");
+            addColumn(db, FORMS_TABLE_NAME, LAST_DETECTED_ATTACHMENTS_UPDATE_DATE, "integer");
+        }
+        // Column from ODK Collect v14
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, USES_ENTITIES)) {
+            Timber.i("Adding missing usesEntities column");
+            addColumn(db, FORMS_TABLE_NAME, USES_ENTITIES, "text");
         }
     }
 
