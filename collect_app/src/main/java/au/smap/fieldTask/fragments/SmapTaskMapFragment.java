@@ -79,6 +79,8 @@ import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
+import org.odk.collect.settings.keys.ProjectKeys;  // smap admin menu
+import org.odk.collect.shared.settings.Settings;  // smap admin menu
 import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;
 import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import au.smap.fieldTask.utilities.KeyValueJsonFns;
@@ -207,6 +209,15 @@ public class SmapTaskMapFragment extends Fragment
         getActivity().getMenuInflater().inflate(R.menu.smap_menu_map, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
+        // smap - conditionally add admin menu
+        Settings settings = DaggerUtils.getComponent(getContext()).settingsProvider().getUnprotectedSettings();
+        boolean adminMenu = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU);
+        if (adminMenu) {
+            menu
+                    .add(0, R.id.menu_admin_preferences, 0,
+                            org.odk.collect.strings.R.string.admin_preferences)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
     }
 
     @Override
@@ -224,6 +235,16 @@ public class SmapTaskMapFragment extends Fragment
             return true;
         } else if (itemId == R.id.menu_gettasks) {
             ((SmapMain) getActivity()).processGetTask(true);
+            return true;
+        } else if (itemId == R.id.menu_admin_preferences) {  // smap admin menu
+            Settings adminSettings = DaggerUtils.getComponent(getContext()).settingsProvider().getProtectedSettings();
+            String pw = adminSettings.getString(ProtectedProjectKeys.KEY_ADMIN_PW);
+            if (pw == null || pw.isEmpty()) {
+                Intent i = new Intent(getActivity(), AdminPreferencesActivitySmap.class);
+                startActivity(i);
+            } else {
+                ((SmapMain) getActivity()).processAdminMenu();
+            }
             return true;
         } else if (itemId == R.id.menu_history) {
             ((SmapMain) getActivity()).processHistory();

@@ -24,6 +24,9 @@ import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.odk.collect.android.activities.ActivityUtils;  // smap
+import au.smap.fieldTask.activities.SmapMain;  // smap
+
 public class ResetSettingsResultDialog extends DialogFragment {
     public static final String RESET_SETTINGS_RESULT_DIALOG_TAG = "resetSettingsResultDialogTag";
 
@@ -64,7 +67,12 @@ public class ResetSettingsResultDialog extends DialogFragment {
                 .setPositiveButton(org.odk.collect.strings.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        listener.onDialogClosed();
+                        // smap - handle null listener (can happen after activity recreation)
+                        if (listener != null) {
+                            listener.onDialogClosed();
+                        } else if (getActivity() != null) {
+                            ActivityUtils.startActivityAndCloseAllOthers(getActivity(), SmapMain.class);
+                        }
                     }
                 })
                 .create();

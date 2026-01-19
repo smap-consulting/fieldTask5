@@ -3,6 +3,8 @@ package org.odk.collect.android.preferences.screens
 import android.os.Bundle
 import androidx.preference.Preference
 import org.odk.collect.android.R
+import org.odk.collect.android.preferences.dialogs.ResetDialogPreference // smap
+import org.odk.collect.android.preferences.dialogs.ResetDialogPreferenceFragmentCompat // smap
 import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard
 
 class AccessControlPreferencesFragment :
@@ -28,6 +30,20 @@ class AccessControlPreferencesFragment :
             return true
         }
         return false
+    }
+
+    // smap - handle reset dialog
+    override fun onDisplayPreferenceDialog(preference: Preference) {
+        if (MultiClickGuard.allowClick(javaClass.name)) {
+            if (preference is ResetDialogPreference) {
+                val dialogFragment = ResetDialogPreferenceFragmentCompat.newInstance(preference.key)
+                @Suppress("DEPRECATION")
+                dialogFragment.setTargetFragment(this, 0)
+                dialogFragment.show(parentFragmentManager, null)
+            } else {
+                super.onDisplayPreferenceDialog(preference)
+            }
+        }
     }
 
     companion object {

@@ -22,6 +22,8 @@ import org.odk.collect.android.fragments.dialogs.ResetSettingsResultDialog;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.preferences.screens.ProjectPreferencesActivity;
 import org.odk.collect.android.projects.ProjectResetter;
+import au.smap.fieldTask.preferences.AdminPreferencesActivitySmap;  // smap
+import androidx.fragment.app.FragmentActivity;  // smap
 import org.odk.collect.androidshared.ui.DialogFragmentUtils;
 
 import java.util.ArrayList;
@@ -127,7 +129,8 @@ public class ResetDialogPreferenceFragmentCompat extends PreferenceDialogFragmen
             new AsyncTask<Void, Void, List<Integer>>() {
                 @Override
                 protected void onPreExecute() {
-                    DialogFragmentUtils.showIfNotShowing(ResetProgressDialog.class, ((ProjectPreferencesActivity) context).getSupportFragmentManager());
+                    // smap - use FragmentActivity instead of ProjectPreferencesActivity
+                    DialogFragmentUtils.showIfNotShowing(ResetProgressDialog.class, ((FragmentActivity) context).getSupportFragmentManager());
                 }
 
                 @Override
@@ -137,7 +140,8 @@ public class ResetDialogPreferenceFragmentCompat extends PreferenceDialogFragmen
 
                 @Override
                 protected void onPostExecute(List<Integer> failedResetActions) {
-                    DialogFragmentUtils.dismissDialog(ResetProgressDialog.class, ((ProjectPreferencesActivity) context).getSupportFragmentManager());
+                    // smap - use FragmentActivity instead of ProjectPreferencesActivity
+                    DialogFragmentUtils.dismissDialog(ResetProgressDialog.class, ((FragmentActivity) context).getSupportFragmentManager());
                     handleResult(resetActions, failedResetActions);
                 }
             }.execute();
@@ -198,14 +202,22 @@ public class ResetDialogPreferenceFragmentCompat extends PreferenceDialogFragmen
                 resultMessage.append("\n\n");
             }
         }
-        if (!((ProjectPreferencesActivity) context).isInstanceStateSaved()) {
-            ((ProjectPreferencesActivity) context).runOnUiThread(() -> {
+        // smap - support both ProjectPreferencesActivity and AdminPreferencesActivitySmap
+        boolean isInstanceStateSaved;
+        if (context instanceof AdminPreferencesActivitySmap) {
+            isInstanceStateSaved = ((AdminPreferencesActivitySmap) context).isInstanceStateSaved();
+        } else {
+            isInstanceStateSaved = ((ProjectPreferencesActivity) context).isInstanceStateSaved();
+        }
+
+        if (!isInstanceStateSaved) {
+            ((FragmentActivity) context).runOnUiThread(() -> {
                 if (resetActions.contains(RESET_PREFERENCES)) {
-                    ((ProjectPreferencesActivity) context).recreate();
+                    ((FragmentActivity) context).recreate();
                 }
                 ResetSettingsResultDialog resetSettingsResultDialog = ResetSettingsResultDialog.newInstance(String.valueOf(resultMessage));
                 try {
-                    resetSettingsResultDialog.show(((ProjectPreferencesActivity) context).getSupportFragmentManager(), RESET_SETTINGS_RESULT_DIALOG_TAG);
+                    resetSettingsResultDialog.show(((FragmentActivity) context).getSupportFragmentManager(), RESET_SETTINGS_RESULT_DIALOG_TAG);
                 } catch (ClassCastException e) {
                     Timber.i(e);
                 }

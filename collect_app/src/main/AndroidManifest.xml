@@ -169,6 +169,10 @@ the specific language governing permissions and limitations under the License.
         <activity
             android:name=".preferences.screens.ProjectPreferencesActivity"
             android:theme="@style/Theme.Collect.Settings" />
+        <!-- smap admin preferences activity -->
+        <activity
+            android:name="au.smap.fieldTask.preferences.AdminPreferencesActivitySmap"
+            android:theme="@style/Theme.Collect.Settings" />
         <activity
             android:name="org.odk.collect.geo.geopoint.GeoPointActivity"
             android:theme="@style/Theme.Collect"

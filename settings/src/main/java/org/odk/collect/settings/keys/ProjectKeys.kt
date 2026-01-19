@@ -91,6 +91,7 @@ object ProjectKeys {
     const val KEY_SMAP_ODK_MARK_FINALIZED = "odk_mark_finalized" // Allow user to mark an instance as incomplete
     const val KEY_SMAP_PREVENT_DISABLE_TRACK = "disable_prevent_track" // Prevent the user from disabling tracking
     const val KEY_SMAP_ENABLE_GEOFENCE = "enable_geofence" // Monitor location for geofence
+    const val KEY_SMAP_ODK_ADMIN_MENU = "odk_admin_menu" // Show ODK admin menu
     const val KEY_SMAP_ADMIN_SERVER_MENU = "admin_server_menu" // Show server menu in general settings
     const val KEY_SMAP_ADMIN_META_MENU = "admin_meta_menu" // Show meta menu in general settings
     const val KEY_SMAP_EXIT_TRACK_MENU = "smap_exit_track_menu" // Disable the exit track menu

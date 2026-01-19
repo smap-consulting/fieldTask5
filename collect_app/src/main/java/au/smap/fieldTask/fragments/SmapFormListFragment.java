@@ -291,6 +291,15 @@ public class SmapFormListFragment extends ListFragment {
                 .add(0, MENU_EXIT, 0, org.odk.collect.strings.R.string.exit)
                 .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 
+        // smap - conditionally add admin menu
+        boolean adminMenu = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU);
+        if (adminMenu) {
+            menu
+                    .add(0, R.id.menu_admin_preferences, 0,
+                            org.odk.collect.strings.R.string.admin_preferences)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
+
         final MenuItem sortItem = menu.findItem(R.id.menu_sort);
         final MenuItem searchItem = menu.findItem(R.id.menu_filter);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -350,6 +359,16 @@ public class SmapFormListFragment extends ListFragment {
             return true;
         } else if (itemId == R.id.menu_gettasks) {
             ((SmapMain) getActivity()).processGetTask(true);
+            return true;
+        } else if (itemId == R.id.menu_admin_preferences) {  // smap admin menu
+            Settings adminSettings = DaggerUtils.getComponent(getContext()).settingsProvider().getProtectedSettings();
+            String pw = adminSettings.getString(ProtectedProjectKeys.KEY_ADMIN_PW);
+            if (pw == null || pw.isEmpty()) {
+                Intent i = new Intent(getActivity(), AdminPreferencesActivitySmap.class);
+                startActivity(i);
+            } else {
+                ((SmapMain) getActivity()).processAdminMenu();
+            }
             return true;
         } else if (itemId == R.id.menu_sort) {
             bottomSheetDialog.show();
