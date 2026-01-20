@@ -281,6 +281,23 @@ public final class DatabaseInstancesRepository implements InstancesRepository {
         );
     }
 
+    // smap - raw insert to preserve all ContentValues columns (including smap task fields)
+    public long rawInsert(ContentValues values) {
+        // Set default status if not provided
+        if (!values.containsKey(STATUS) || values.getAsString(STATUS) == null) {
+            values.put(STATUS, Instance.STATUS_INCOMPLETE);
+        }
+        // Set last status change date if not provided
+        if (!values.containsKey(LAST_STATUS_CHANGE_DATE) || values.getAsLong(LAST_STATUS_CHANGE_DATE) == null) {
+            values.put(LAST_STATUS_CHANGE_DATE, clock.get());
+        }
+        return databaseConnection.getWritableDatabase().insertOrThrow(
+                INSTANCES_TABLE_NAME,
+                null,
+                values
+        );
+    }
+
     /*
      * Start Smap
      */

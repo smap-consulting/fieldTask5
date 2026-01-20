@@ -140,12 +140,16 @@ public class InstanceProvider extends ContentProvider {
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
 
-        if (initialValues.containsKey(DatabaseInstanceColumns.SUBMISSION_URI)) {
-            throw new SecurityException();
-        }
+        // smap - allow SUBMISSION_URI for internal task management
+        // Original ODK code blocked this to prevent external apps from setting arbitrary submission URIs
+        // if (initialValues.containsKey(DatabaseInstanceColumns.SUBMISSION_URI)) {
+        //     throw new SecurityException();
+        // }
 
-        Instance newInstance = instancesRepositoryProvider.create(projectId).save(getInstanceFromValues(initialValues));
-        return getUri(projectId, newInstance.getDbId());
+        // smap - use rawInsert to preserve all ContentValues columns (task fields, source, etc.)
+        // Original: Instance newInstance = instancesRepositoryProvider.create(projectId).save(getInstanceFromValues(initialValues));
+        long newId = ((DatabaseInstancesRepository) instancesRepositoryProvider.create(projectId)).rawInsert(initialValues);
+        return getUri(projectId, newId);
     }
 
     /**

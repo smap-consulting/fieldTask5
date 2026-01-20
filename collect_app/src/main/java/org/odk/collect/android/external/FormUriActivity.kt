@@ -268,7 +268,8 @@ private class FormUriViewModel(
             val instance = instancesRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))
             if (instance == null) {
                 resources.getString(string.bad_uri)
-            } else if (!File(instance.instanceFilePath).exists()) {
+            } else if (!File(instance.instanceFilePath).exists() && instance.assignmentId.isNullOrEmpty()) {
+                // smap - only delete if not a smap task (tasks may not have instance file until started)
                 Analytics.log(AnalyticsEvents.OPEN_DELETED_INSTANCE)
                 InstanceDeleter(
                     instancesRepositoryProvider.create(),
