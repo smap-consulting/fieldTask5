@@ -908,6 +908,7 @@ public class Utilities {
         values.put(InstanceColumns.T_TITLE, ta.task.title);
         values.put(InstanceColumns.T_ADDRESS, ta.task.address);
         values.put(InstanceColumns.T_LOCATION_TRIGGER, ta.task.location_trigger);
+        values.put(InstanceColumns.T_TASK_TYPE, ta.task.type);   // smap ensure task type is updated for existing tasks
 
         // Add task geofence values
         values.put(InstanceColumns.T_SHOW_DIST, ta.task.show_dist);

@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="?selectableItemBackground"
+        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_locate" />
 
     <Button
@@ -31,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="?selectableItemBackground"
+        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_phone" />
 
     <Button
@@ -39,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="?selectableItemBackground"
+        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_sms" />
 
     <Button
@@ -47,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="?selectableItemBackground"
+        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_directions" />
 
     <Button
@@ -55,6 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="?selectableItemBackground"
+        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_accept" />
 
     <Button
@@ -63,6 +68,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="?selectableItemBackground"
+        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_reject_task" />
 
 </LinearLayout>
