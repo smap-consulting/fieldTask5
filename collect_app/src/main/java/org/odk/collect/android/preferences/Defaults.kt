@@ -2,6 +2,8 @@ package org.odk.collect.android.preferences
 
 import com.google.android.gms.maps.GoogleMap
 import org.odk.collect.android.BuildConfig
+import org.odk.collect.android.R
+import org.odk.collect.android.application.Collect
 import org.odk.collect.android.widgets.utilities.QuestionFontSizeUtils
 import org.odk.collect.settings.keys.ProjectKeys
 import org.odk.collect.settings.keys.ProtectedProjectKeys
@@ -12,10 +14,11 @@ object Defaults {
     val unprotected: HashMap<String, Any>
         get() {
             val hashMap = HashMap<String, Any>()
-            // odk_server_preferences.xml
-            hashMap[ProjectKeys.KEY_SERVER_URL] = "https://sg.smap.com.au"  // smap
-            hashMap[ProjectKeys.KEY_USERNAME] = "gplay"     // smap: Default username for demo/trial
-            hashMap[ProjectKeys.KEY_PASSWORD] = "gplay!34"  // smap: Default password for demo/trial
+            // odk_server_preferences.xml - read from variant-specific string resources
+            val context = Collect.getInstance()
+            hashMap[ProjectKeys.KEY_SERVER_URL] = context.getString(R.string.default_server_url)
+            hashMap[ProjectKeys.KEY_USERNAME] = context.getString(R.string.default_username)
+            hashMap[ProjectKeys.KEY_PASSWORD] = context.getString(R.string.default_password)
             // form_management_preferences.xml
             hashMap[ProjectKeys.KEY_AUTOSEND] = "off"
             hashMap[ProjectKeys.KEY_GUIDANCE_HINT] = "yes_collapsed"
