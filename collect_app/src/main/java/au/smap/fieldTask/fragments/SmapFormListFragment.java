@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -88,6 +89,7 @@ public class SmapFormListFragment extends ListFragment {
     private BottomSheetDialog bottomSheetDialog;
 
     private TaskListArrayAdapter mAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     SurveyDataViewModel model;
 
@@ -147,10 +149,21 @@ public class SmapFormListFragment extends ListFragment {
                 org.odk.collect.strings.R.string.sort_by_date_asc, org.odk.collect.strings.R.string.sort_by_date_desc,
                 R.string.smap_sort_by_project_asc, R.string.smap_sort_by_project_desc
         };
+
+        // Set up pull-to-refresh
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            ((SmapMain) getActivity()).processGetTask(true);
+        });
+
         model = getViewMode();
         model.getSurveyData().observe(getViewLifecycleOwner(), surveyData -> {
             Timber.i("-------------------------------------- Form List Fragment got Data ");
             setData(surveyData);
+            // Stop the refresh animation when data is loaded
+            if (swipeRefreshLayout != null) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
 
         super.onViewCreated(view, savedInstanceState);
@@ -225,6 +238,12 @@ public class SmapFormListFragment extends ListFragment {
             } else {
                 mAdapter.setData(null);
             }
+        }
+    }
+
+    public void setRefreshing(boolean refreshing) {
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(refreshing);
         }
     }
 

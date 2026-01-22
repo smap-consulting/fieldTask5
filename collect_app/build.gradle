@@ -378,6 +378,7 @@ dependencies {
 
     implementation libs.androidxPreferenceKtx
     implementation libs.androidxFragmentKtx
+    implementation libs.androidxSwiperefreshlayout
 
     implementation libs.androidFlexbox
 
