@@ -275,6 +275,12 @@ public class InstanceServerUploader extends InstanceUploader {
             urlString = getServerSubmissionURL();
         }
 
+        // start smap
+        if (!currentInstance.getRepeat() && currentInstance.getUpdateid() != null) {
+            urlString = urlString + "/" + currentInstance.getUpdateid();
+        }
+        // end smap
+
         // add deviceID to request
         try {
             urlString += "?deviceID=" + URLEncoder.encode(deviceId != null ? deviceId : "", "UTF-8");
