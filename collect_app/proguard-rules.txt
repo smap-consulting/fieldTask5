@@ -69,7 +69,10 @@
 -keep class au.smap.fieldTask.database.TaskResponseAssignment { *; }
 -keep class au.smap.fieldTask.database.TrAssignment { *; }
 -keep class au.smap.fieldTask.database.TrTask { *; }
+-keep class au.smap.fieldTask.database.Location { *; }
+-keep class au.smap.fieldTask.database.Geometry { *; }
 -keep class au.smap.fieldTask.loaders.PointEntry { *; }
+-keep class au.smap.fieldTask.loaders.TaskEntry { *; }
 
 # Prevent R8 from leaving Data object members always null
 -keepclassmembers,allowobfuscation class * {
