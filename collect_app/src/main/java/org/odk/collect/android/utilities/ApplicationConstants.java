@@ -17,11 +17,26 @@
 package org.odk.collect.android.utilities;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import org.odk.collect.android.R;
+import java.util.HashMap;
 
 public class ApplicationConstants {
 
     private ApplicationConstants() {
 
+    }
+
+    public static HashMap<Integer, Integer> getSortLabelToIconMap() {
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+        hashMap.put(org.odk.collect.strings.R.string.sort_by_name_asc, R.drawable.ic_sort_by_alpha);
+        hashMap.put(org.odk.collect.strings.R.string.sort_by_name_desc, R.drawable.ic_sort_by_alpha);
+        hashMap.put(org.odk.collect.strings.R.string.sort_by_date_asc, R.drawable.ic_access_time);
+        hashMap.put(org.odk.collect.strings.R.string.sort_by_date_desc, R.drawable.ic_access_time);
+        hashMap.put(org.odk.collect.strings.R.string.sort_by_status_asc, R.drawable.ic_assignment_turned_in);
+        hashMap.put(org.odk.collect.strings.R.string.sort_by_status_desc, R.drawable.ic_assignment_late);
+        hashMap.put(R.string.smap_sort_by_project_asc, R.drawable.ic_sort_by_alpha);
+        hashMap.put(R.string.smap_sort_by_project_desc, R.drawable.ic_sort_by_alpha);
+        return hashMap;
     }
     public static final int SQLITE_MAX_VARIABLE_NUMBER = 999;   // smap
     public static final float GPS_ACCURACY = (float) 30.0;      // smap

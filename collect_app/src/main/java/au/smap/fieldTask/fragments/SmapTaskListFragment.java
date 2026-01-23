@@ -46,6 +46,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 
 import org.odk.collect.android.R;
+import au.smap.fieldTask.adapters.SortDialogAdapter;
 import org.odk.collect.android.activities.AboutActivity;
 import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
@@ -286,7 +287,6 @@ public class SmapTaskListFragment extends ListFragment {
     }
 
     private void setupBottomSheet() {
-        /* SMAP BUILD - sort
         bottomSheetDialog = new BottomSheetDialog(getActivity(), new ThemeUtils(getContext()).getBottomDialogTheme());
         View sheetView = getActivity().getLayoutInflater().inflate(R.layout.bottom_sheet, null);
         final RecyclerView recyclerView = sheetView.findViewById(R.id.recyclerView);
@@ -304,7 +304,6 @@ public class SmapTaskListFragment extends ListFragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         bottomSheetDialog.setContentView(sheetView);
-         */
     }
 
     @Override
@@ -483,7 +482,9 @@ public class SmapTaskListFragment extends ListFragment {
             }
             return true;
         } else if (itemId == R.id.menu_sort) {
-            bottomSheetDialog.show();
+            if (bottomSheetDialog != null) {
+                bottomSheetDialog.show();
+            }
             return true;
         }
 

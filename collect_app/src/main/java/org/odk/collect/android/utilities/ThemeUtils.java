@@ -102,4 +102,14 @@ public final class ThemeUtils {
     public int getColorPrimary() {
         return getThemeAttributeValue(context, androidx.appcompat.R.attr.colorPrimary);
     }
+
+    @ColorInt
+    public int getAccentColor() {
+        return getThemeAttributeValue(context, com.google.android.material.R.attr.colorSecondary);
+    }
+
+    @StyleRes
+    public int getBottomDialogTheme() {
+        return R.style.Theme_Collect_BottomSheet;
+    }
 }
