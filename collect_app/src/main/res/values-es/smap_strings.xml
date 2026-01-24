@@ -67,7 +67,7 @@
   <string name="smap_closed">Tareas Cerradas</string>
   <string name="smap_created">Creada</string>
   <string name="smap_error">Error</string>
-  <string name="smap_unauth">No Autorizado. Revise los datos de usuario/contraseña</string>
+  <string name="smap_unauth">No autorizado: es posible que no tenga el privilegio de  \\"enumerador\\"</string>
   <string name="smap_no_server">No se ha especificado el servidor en Configuración</string>
   <string name="smap_refresh_started">Iniciando actualización</string>
   <string name="smap_refresh_finished">Actualizado</string>
@@ -76,7 +76,7 @@
   <string name="smap_been_submitted">Este formulario ya fué enviado al servidor y no puede ser editado</string>
   <string name="smap_location_tracking">La ubicación del dispositivo se está registrando. (Haga clic en Salir para detener) </string>
   <string name="smap_reset_locations">Recorrido de GPS registrado</string>
-  <string name="smap_reset_locations_result">Recorrido de GPS registrado ::</string>
+  <string name="smap_reset_locations_result">Recorrido GPS grabado :: %s</string>
   <string name="smap_visit_website">Visite el sitio web</string>
   <string name="smap_get_media">Archivo actualizado: %s</string>
   <string name="smap_lookup">Consultando datos remotos</string>
@@ -136,6 +136,13 @@
   <string name="smap_invalid_auth_token">Error Token no válido</string>
   <string name="smap_compromised">Dispositivo comprometido detectado: la aplicación se cerrará</string>
   <string name="smap_emulator">No se permite ejecutar la aplicación en un emulador: la aplicación se cerrará</string>
+  <!--Override upstream strings for Smap-->
+  <string name="project_settings">Ajustes</string>
+  <!--Geocompound widget button labels-->
+  <string name="get_geocompound">Iniciar mapa compuesto</string>
+  <string name="geocompound_view_change_location">Ver o cambiar el mapa compuesto</string>
+  <string name="geocompound_view_read_only">Ver mapa del compuesto</string>
+  <string name="geocompound_title">Mapa compuesto</string>
   <string-array name="smap_kontrolid_servers">
     <item>Servidor Kontrolid ORG</item>
     <item>Servidor Kontrolid COM</item>
