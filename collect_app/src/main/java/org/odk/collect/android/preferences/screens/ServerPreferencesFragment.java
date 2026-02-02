@@ -17,26 +17,63 @@
 package org.odk.collect.android.preferences.screens;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import org.jetbrains.annotations.NotNull;
 import org.odk.collect.android.R;
 import org.odk.collect.android.backgroundwork.FormUpdateScheduler;
 import org.odk.collect.android.injection.DaggerUtils;
+import org.odk.collect.android.preferences.ScanButtonPreference;
 import org.odk.collect.android.preferences.ServerPreferencesAdder;
 import org.odk.collect.android.preferences.filters.ControlCharacterFilter;
 import org.odk.collect.androidshared.ui.ToastUtils;
 import org.odk.collect.androidshared.utils.Validator;
 import org.odk.collect.settings.keys.ProjectKeys;
+import org.odk.collect.shared.settings.Settings;
+
+import au.smap.fieldTask.activities.SmapLoginQRActivity;
 
 import javax.inject.Inject;
 
 public class ServerPreferencesFragment extends BaseProjectPreferencesFragment {
     private EditTextPreference passwordPreference;
+    private EditTextPreference serverUrlPreference;
+    private EditTextPreference usernamePreference;
+    private SwitchPreferenceCompat useTokenPreference;
+    private ScanButtonPreference scanButton;
+    private EditTextPreference authTokenPreference;
+
+    private final ActivityResultLauncher<Intent> qrScanLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Intent data = result.getData();
+                if (data != null) {
+                    String url = data.getStringExtra("server_url");
+                    if (url != null && serverUrlPreference != null) {
+                        serverUrlPreference.setText(url);
+                        serverUrlPreference.setSummary(url);
+                    }
+                    String user = data.getStringExtra("username");
+                    if (user != null && usernamePreference != null) {
+                        usernamePreference.setText(user);
+                        usernamePreference.setSummary(user);
+                    }
+                    String token = data.getStringExtra("auth_token");
+                    if (token != null && authTokenPreference != null) {
+                        authTokenPreference.setText(token);
+                        authTokenPreference.setSummary(token);
+                    }
+                }
+            }
+    );
 
     @Inject
     FormUpdateScheduler formUpdateScheduler;
@@ -58,8 +95,8 @@ public class ServerPreferencesFragment extends BaseProjectPreferencesFragment {
         if (!new ServerPreferencesAdder(this).add()) {
             return;
         }
-        EditTextPreference serverUrlPreference = findPreference(ProjectKeys.KEY_SERVER_URL);
-        EditTextPreference usernamePreference = findPreference(ProjectKeys.KEY_USERNAME);
+        serverUrlPreference = findPreference(ProjectKeys.KEY_SERVER_URL);
+        usernamePreference = findPreference(ProjectKeys.KEY_USERNAME);
         passwordPreference = findPreference(ProjectKeys.KEY_PASSWORD);
 
         serverUrlPreference.setOnPreferenceChangeListener(createChangeListener());
@@ -78,6 +115,56 @@ public class ServerPreferencesFragment extends BaseProjectPreferencesFragment {
         passwordPreference.setOnBindEditTextListener(editText -> {
             editText.setFilters(new InputFilter[]{new ControlCharacterFilter()});
         });
+
+        // smap - token authentication
+        useTokenPreference = findPreference(ProjectKeys.KEY_SMAP_USE_TOKEN);
+        scanButton = findPreference(ProjectKeys.KEY_SMAP_SCAN_TOKEN);
+        authTokenPreference = findPreference(ProjectKeys.KEY_SMAP_AUTH_TOKEN);
+
+        if (useTokenPreference != null) {
+            Settings settings = settingsProvider.getUnprotectedSettings();
+            boolean forceToken = settings.getBoolean(ProjectKeys.KEY_SMAP_FORCE_TOKEN);
+            if (forceToken) {
+                useTokenPreference.setChecked(true);
+                useTokenPreference.setEnabled(false);
+            }
+
+            useTokenPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+                useTokenChanged((Boolean) newValue);
+                return true;
+            });
+
+            useTokenChanged(useTokenPreference.isChecked());
+        }
+
+        if (scanButton != null) {
+            scanButton.setButtonClickListener(v ->
+                    qrScanLauncher.launch(new Intent(requireContext(), SmapLoginQRActivity.class))
+            );
+        }
+
+        if (authTokenPreference != null) {
+            String currentToken = authTokenPreference.getText();
+            authTokenPreference.setSummary(currentToken != null ? currentToken : "");
+        }
+    }
+
+    private void useTokenChanged(boolean useToken) {
+        if (serverUrlPreference != null) {
+            serverUrlPreference.setEnabled(!useToken);
+        }
+        if (usernamePreference != null) {
+            usernamePreference.setEnabled(!useToken);
+        }
+        if (passwordPreference != null) {
+            passwordPreference.setVisible(!useToken);
+        }
+        if (scanButton != null) {
+            scanButton.setVisible(useToken);
+        }
+        if (authTokenPreference != null) {
+            authTokenPreference.setVisible(useToken);
+        }
     }
 
     private Preference.OnPreferenceChangeListener createChangeListener() {
