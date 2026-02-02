@@ -104,6 +104,41 @@ public class FormDatabaseMigrator implements DatabaseMigrator {
         }
     }
 
+    // smap - Ensure all smap columns exist (defensive, for downgrade/cross-version scenarios)
+    private void ensureSmapColumnsExist(SQLiteDatabase db) {
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, PROJECT)) {
+            addColumn(db, FORMS_TABLE_NAME, PROJECT, "text");
+        }
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, TASKS_ONLY)) {
+            addColumn(db, FORMS_TABLE_NAME, TASKS_ONLY, "text");
+        }
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, READ_ONLY)) {
+            addColumn(db, FORMS_TABLE_NAME, READ_ONLY, "text");
+        }
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, SEARCH_LOCAL_DATA)) {
+            addColumn(db, FORMS_TABLE_NAME, SEARCH_LOCAL_DATA, "text");
+        }
+        if (!doesColumnExist(db, FORMS_TABLE_NAME, SOURCE)) {
+            addColumn(db, FORMS_TABLE_NAME, SOURCE, "text");
+        }
+    }
+
+    private void ensureAllColumnsExist(SQLiteDatabase db) {
+        ensureOdkColumnsExist(db);
+        ensureSmapColumnsExist(db);
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion) {
+        Timber.w("Forms db downgrade from version: %s", oldVersion);
+        ensureAllColumnsExist(db);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        ensureAllColumnsExist(db);
+    }
+
     // smap - Ensure all ODK Collect columns exist for fieldTask4 upgrades
     private void ensureOdkColumnsExist(SQLiteDatabase db) {
         // Column from ODK Collect v8

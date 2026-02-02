@@ -119,6 +119,104 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
         }
     }
 
+    // smap - Ensure all smap columns exist (defensive, for downgrade/cross-version scenarios)
+    private void ensureSmapColumnsExist(SQLiteDatabase db) {
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, SOURCE)) {
+            addColumn(db, INSTANCES_TABLE_NAME, SOURCE, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, FORM_PATH)) {
+            addColumn(db, INSTANCES_TABLE_NAME, FORM_PATH, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, ACT_LON)) {
+            addColumn(db, INSTANCES_TABLE_NAME, ACT_LON, "double");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, ACT_LAT)) {
+            addColumn(db, INSTANCES_TABLE_NAME, ACT_LAT, "double");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, SCHED_LON)) {
+            addColumn(db, INSTANCES_TABLE_NAME, SCHED_LON, "double");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, SCHED_LAT)) {
+            addColumn(db, INSTANCES_TABLE_NAME, SCHED_LAT, "double");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_TITLE)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_TITLE, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_TASK_TYPE)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_TASK_TYPE, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_SCHED_START)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_SCHED_START, "long");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_SCHED_FINISH)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_SCHED_FINISH, "long");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_ACT_START)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_ACT_START, "long");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_ACT_FINISH)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_ACT_FINISH, "long");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_ADDRESS)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_ADDRESS, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_IS_SYNC)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_IS_SYNC, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_ASS_ID)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_ASS_ID, "long");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_TASK_STATUS)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_TASK_STATUS, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_TASK_COMMENT)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_TASK_COMMENT, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_REPEAT)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_REPEAT, "integer");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_UPDATEID)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_UPDATEID, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_LOCATION_TRIGGER)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_LOCATION_TRIGGER, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_SURVEY_NOTES)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_SURVEY_NOTES, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_UPDATED)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_UPDATED, "integer");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, UUID)) {
+            addColumn(db, INSTANCES_TABLE_NAME, UUID, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_SHOW_DIST)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_SHOW_DIST, "integer");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_HIDE)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_HIDE, "integer");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, PHONE)) {
+            addColumn(db, INSTANCES_TABLE_NAME, PHONE, "text");
+        }
+    }
+
+    private void ensureAllColumnsExist(SQLiteDatabase db) {
+        ensureOdkColumnsExist(db);
+        ensureSmapColumnsExist(db);
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion) {
+        Timber.w("Instances db downgrade from version: %s", oldVersion);
+        ensureAllColumnsExist(db);
+    }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        ensureAllColumnsExist(db);
+    }
+
     // smap - Ensure all ODK Collect columns exist for fieldTask4 upgrades
     private void ensureOdkColumnsExist(SQLiteDatabase db) {
         // Columns from ODK Collect v6

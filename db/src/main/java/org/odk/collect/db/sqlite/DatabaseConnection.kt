@@ -159,6 +159,16 @@ private class DatabaseMigratorSQLiteOpenHelper(
         )
     }
 
+    override fun onDowngrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        Timber.i("Downgrading database from version %d to %d", oldVersion, newVersion)
+        databaseMigrator.onDowngrade(db, oldVersion)
+    }
+
+    override fun onOpen(db: SQLiteDatabase?) {
+        super.onOpen(db)
+        db?.let { databaseMigrator.onOpen(it) }
+    }
+
     override fun onConfigure(db: SQLiteDatabase?) {
         super.onConfigure(db)
         db?.setForeignKeyConstraintsEnabled(true)
