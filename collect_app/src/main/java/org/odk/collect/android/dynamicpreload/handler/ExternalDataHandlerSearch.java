@@ -144,11 +144,14 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
                     dataSetName, true);
 
             SQLiteDatabase db = sqLiteOpenHelper.getReadableDatabase();
-            LinkedHashMap<String, String> selectColumnMap =
-                    ExternalDataUtil.createMapWithDisplayingColumns(getValueColumn(),
-                            getDisplayColumns());
 
-            List<String> columnsToFetch = new ArrayList<>(selectColumnMap.keySet());
+            // smap - use separate list for columns to fetch (preserves duplicates)
+            // while map is used for column name lookups only
+            LinkedHashMap<String, String> selectColumnMap = new LinkedHashMap<>();
+            List<String> columnsToFetch = new ArrayList<>();
+            ExternalDataUtil.createMapWithDisplayingColumns(selectColumnMap, columnsToFetch,
+                    getValueColumn(), getDisplayColumns());
+
             String safeImageColumn = null;
             if (getImageColumn() != null && getImageColumn().trim().length() > 0) {
                 safeImageColumn = ExternalDataUtil.toSafeColumnName(getImageColumn());
