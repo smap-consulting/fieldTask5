@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(xargs sed:*)",
+      "Bash(./gradlew :collect_app:compileFieldTaskMaxDebugJavaWithJavac:*)",
+      "Bash(./gradlew :collect_app:compileFieldTaskMaxDebugKotlin:*)",
+      "Bash(./gradlew:*)",
+      "Bash(cat:*)",
+      "Bash(comm -23:*)",
+      "Bash(sqlite3:*)",
+      "Bash(git -C /Users/neilpenman/git/fieldTask5 log --oneline -20)",
+      "Bash(git -C /Users/neilpenman/git/fieldTask5 branch -a)",
+      "Bash(git -C /Users/neilpenman/git/fieldTask5 diff master..migrate --stat)",
+      "Bash(git -C:*)",
+      "Bash(xargs:*)",
+      "Bash(javap:*)"
+    ]
+  }
+}
