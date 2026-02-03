@@ -35,6 +35,9 @@ import org.odk.collect.android.dynamicpreload.ExternalSelectChoice;
 import org.odk.collect.android.exception.ExternalDataException;
 import org.odk.collect.shared.strings.StringUtils;
 
+import au.smap.fieldTask.database.SqlFrag;
+import au.smap.fieldTask.database.SqlFragParam;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -163,8 +166,40 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
             String selection;
             String[] selectionArgs;
 
-            // smap - handle IN and NOT IN search types
-            if (externalDataSearchType.isInType() && searchRows) {
+            // smap - handle EVAL search type with SqlFrag
+            String filter = null;
+            SqlFrag filterFrag = null;
+            if (externalDataSearchType.isEvalType()) {
+                filter = ExternalDataUtil.evaluateExpressionNodes(XPathFuncExpr.toString(args[2]), ec);
+                if (filter != null && filter.length() > 0) {
+                    filterFrag = new SqlFrag();
+                    try {
+                        filterFrag.addSqlFragment(filter, false, null, 0);
+                    } catch (Exception e) {
+                        Timber.e(e);
+                    }
+                }
+            }
+
+            if (filterFrag != null) {
+                // smap - eval filter with SqlFrag
+                selection = filterFrag.sql.toString();
+                int paramSize = filterFrag.params.size();
+                if (useFilter) {
+                    selection += " AND " + ExternalDataUtil.toSafeColumnName(filterColumn) + "=? ";
+                    paramSize++;
+                }
+
+                selectionArgs = new String[paramSize];
+                int idx = 0;
+                for (SqlFragParam param : filterFrag.params) {
+                    selectionArgs[idx++] = SqlFrag.getParamValue(param);
+                }
+                if (useFilter) {
+                    selectionArgs[selectionArgs.length - 1] = filterValue;
+                }
+            } else if (externalDataSearchType.isInType() && searchRows) {
+                // smap - handle IN and NOT IN search types
                 List<String> values = ExternalDataUtil.createListOfValues(queriedValue, searchType);
                 String inExpr = createInExpression(queriedColumns, values.size(), externalDataSearchType.isNegated());
 

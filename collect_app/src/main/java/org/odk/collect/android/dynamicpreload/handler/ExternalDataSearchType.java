@@ -82,6 +82,19 @@ enum ExternalDataSearchType {
         public boolean isNegated() {
             return true;
         }
+    },
+
+    // smap - EVAL filter for SQL-like expression evaluation
+    EVAL("eval") {
+        @Override
+        protected String getSingleLikeArgument(String queriedValue) {
+            return queriedValue; // Not used for EVAL - handled specially with SqlFrag
+        }
+
+        @Override
+        public boolean isEvalType() {
+            return true;
+        }
     };
 
     private final String keyword;
@@ -126,5 +139,19 @@ enum ExternalDataSearchType {
     // smap - returns true for NOT IN type
     public boolean isNegated() {
         return false;
+    }
+
+    // smap - returns true for EVAL type
+    public boolean isEvalType() {
+        return false;
+    }
+
+    // smap - construct like arguments from a list of values
+    public String[] constructLikeArguments(java.util.List<String> queriedValues) {
+        String[] args = new String[queriedValues.size()];
+        for (int i = 0; i < queriedValues.size(); i++) {
+            args[i] = getSingleLikeArgument(queriedValues.get(i));
+        }
+        return args;
     }
 }
