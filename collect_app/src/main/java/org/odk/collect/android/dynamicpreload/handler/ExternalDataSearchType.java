@@ -51,6 +51,37 @@ enum ExternalDataSearchType {
         protected String getSingleLikeArgument(String queriedValue) {
             return '%' + queriedValue;
         }
+    },
+
+    // smap - IN filter for matching against comma-separated list of values
+    IN("in") {
+        @Override
+        protected String getSingleLikeArgument(String queriedValue) {
+            return queriedValue; // Not used for IN - handled specially
+        }
+
+        @Override
+        public boolean isInType() {
+            return true;
+        }
+    },
+
+    // smap - NOT IN filter for excluding comma-separated list of values
+    NOT_IN("not in") {
+        @Override
+        protected String getSingleLikeArgument(String queriedValue) {
+            return queriedValue; // Not used for NOT IN - handled specially
+        }
+
+        @Override
+        public boolean isInType() {
+            return true;
+        }
+
+        @Override
+        public boolean isNegated() {
+            return true;
+        }
     };
 
     private final String keyword;
@@ -86,4 +117,14 @@ enum ExternalDataSearchType {
     }
 
     protected abstract String getSingleLikeArgument(String queriedValue);
+
+    // smap - returns true for IN and NOT IN types
+    public boolean isInType() {
+        return false;
+    }
+
+    // smap - returns true for NOT IN type
+    public boolean isNegated() {
+        return false;
+    }
 }

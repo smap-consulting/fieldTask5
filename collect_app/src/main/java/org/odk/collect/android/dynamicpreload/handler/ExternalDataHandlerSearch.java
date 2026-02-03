@@ -160,7 +160,23 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
             String selection;
             String[] selectionArgs;
 
-            if (searchRows && useFilter) {
+            // smap - handle IN and NOT IN search types
+            if (externalDataSearchType.isInType() && searchRows) {
+                List<String> values = ExternalDataUtil.createListOfValues(queriedValue, searchType);
+                String inExpr = createInExpression(queriedColumns, values.size(), externalDataSearchType.isNegated());
+
+                if (useFilter) {
+                    selection = "( " + inExpr + " ) AND "
+                            + ExternalDataUtil.toSafeColumnName(filterColumn) + "=? ";
+                    selectionArgs = new String[values.size() * queriedColumns.size() + 1];
+                    fillInArguments(selectionArgs, values, queriedColumns.size(), 0);
+                    selectionArgs[selectionArgs.length - 1] = filterValue;
+                } else {
+                    selection = inExpr;
+                    selectionArgs = new String[values.size() * queriedColumns.size()];
+                    fillInArguments(selectionArgs, values, queriedColumns.size(), 0);
+                }
+            } else if (searchRows && useFilter) {
                 selection = "( " + createLikeExpression(queriedColumns) + " ) AND "
                         + ExternalDataUtil.toSafeColumnName(filterColumn) + "=? ";
                 String[] likeArgs = externalDataSearchType.constructLikeArguments(queriedValue,
@@ -251,6 +267,41 @@ public class ExternalDataHandlerSearch extends ExternalDataHandlerBase {
             sb.append(queriedColumn).append(" LIKE ? ");
         }
         return sb.toString();
+    }
+
+    // smap - create IN or NOT IN expression for multiple columns and values
+    protected String createInExpression(List<String> queriedColumns, int valueCount, boolean negated) {
+        if (valueCount == 0) {
+            return negated ? "1=1" : "1=0"; // NOT IN empty = all rows, IN empty = no rows
+        }
+
+        StringBuilder placeholders = new StringBuilder();
+        for (int i = 0; i < valueCount; i++) {
+            if (i > 0) {
+                placeholders.append(", ");
+            }
+            placeholders.append("?");
+        }
+        String inClause = (negated ? " NOT IN (" : " IN (") + placeholders + ")";
+
+        StringBuilder sb = new StringBuilder();
+        for (String queriedColumn : queriedColumns) {
+            if (sb.length() > 0) {
+                sb.append(negated ? " AND " : " OR "); // NOT IN uses AND, IN uses OR
+            }
+            sb.append(queriedColumn).append(inClause);
+        }
+        return sb.toString();
+    }
+
+    // smap - fill selection args array with values for IN expression
+    protected void fillInArguments(String[] selectionArgs, List<String> values, int columnCount, int startIndex) {
+        int idx = startIndex;
+        for (int col = 0; col < columnCount; col++) {
+            for (String value : values) {
+                selectionArgs[idx++] = value;
+            }
+        }
     }
 
     /**
