@@ -19,20 +19,4 @@
         android:key="password"
         android:title="@string/password"
         app:iconSpaceReserved="false" />
-
-    <SwitchPreferenceCompat
-        android:key="smap_use_token"
-        android:title="@string/smap_use_token"
-        android:defaultValue="false"
-        app:iconSpaceReserved="false" />
-
-    <org.odk.collect.android.preferences.ScanButtonPreference
-        android:key="smap_scan_token"
-        app:iconSpaceReserved="false" />
-
-    <EditTextPreference
-        android:key="auth_token"
-        android:title="@string/smap_auth_token"
-        android:enabled="false"
-        app:iconSpaceReserved="false" />
 </PreferenceScreen>
