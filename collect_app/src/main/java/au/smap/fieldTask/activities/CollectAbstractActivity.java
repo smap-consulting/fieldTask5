@@ -22,9 +22,9 @@ import android.os.Build;
 import android.os.Bundle;
 
 import org.odk.collect.android.injection.DaggerUtils;
-import org.odk.collect.android.utilities.LocaleHelper;
 import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.android.utilities.ThemeUtils;
+import org.odk.collect.strings.localization.LocalizedApplication; // smap
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -68,6 +68,7 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
         super.applyOverrideConfiguration(updateConfigurationIfSupported(newConfig));
     }
 
+    // smap - use LocalizedApplication to get app's selected locale
     private Configuration updateConfigurationIfSupported(Configuration config) {
         if (Build.VERSION.SDK_INT >= 24) {
             if (!config.getLocales().isEmpty()) {
@@ -79,13 +80,19 @@ public abstract class CollectAbstractActivity extends AppCompatActivity {
             }
         }
 
-        /*  SMAP BUILD
-        Locale locale = LocaleHelper.getLocale(this);
+        Locale locale;
+        if (getApplicationContext() instanceof LocalizedApplication) {
+            locale = ((LocalizedApplication) getApplicationContext()).getLocale();
+        } else if (Build.VERSION.SDK_INT >= 24) {
+            locale = config.getLocales().get(0);
+        } else {
+            locale = config.locale;
+        }
+
         if (locale != null) {
             config.setLocale(locale);
             config.setLayoutDirection(locale);
         }
-         */
         return config;
     }
 
