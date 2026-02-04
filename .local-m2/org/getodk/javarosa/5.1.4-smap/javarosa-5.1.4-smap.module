@@ -85,11 +85,11 @@
         {
           "name": "javarosa-5.1.4-smap.jar",
           "url": "javarosa-5.1.4-smap.jar",
-          "size": 697625,
-          "sha512": "826733cdbbbc22fbfef5736f6367ad9c2513eaa2d2f74d5706d935a4065f96d8740fa7fb82a749fe8a39590c5088295936428cc8c22ef9016d5394ebb1869b55",
-          "sha256": "57a75500004e45bf56caf7a659cf152e475ca670b09e1e76cae87fb879130c10",
-          "sha1": "58e663a7e9dec2c9b28558b97074c94cb234748b",
-          "md5": "d031d60745f5e109327cf2b38cf366b9"
+          "size": 698321,
+          "sha512": "d39a941ea53d9483903def7edf9b05f7a02a4b267e68e6eb6405f404adabac475a053661d90e4b7117cb41b601ebc37c2b3a9f7f30277492eb2fda77db4e93e7",
+          "sha256": "d0d4e87dd923b19c7fbc205d9554bedfb1b8ee0cb34708075f972063986065c7",
+          "sha1": "09bd5b2ffc32bd792910c1e9cc00bcca9006bb2f",
+          "md5": "87737b14c7f087cd320429cedc9d70ff"
         }
       ]
     },
@@ -164,11 +164,11 @@
         {
           "name": "javarosa-5.1.4-smap.jar",
           "url": "javarosa-5.1.4-smap.jar",
-          "size": 697625,
-          "sha512": "826733cdbbbc22fbfef5736f6367ad9c2513eaa2d2f74d5706d935a4065f96d8740fa7fb82a749fe8a39590c5088295936428cc8c22ef9016d5394ebb1869b55",
-          "sha256": "57a75500004e45bf56caf7a659cf152e475ca670b09e1e76cae87fb879130c10",
-          "sha1": "58e663a7e9dec2c9b28558b97074c94cb234748b",
-          "md5": "d031d60745f5e109327cf2b38cf366b9"
+          "size": 698321,
+          "sha512": "d39a941ea53d9483903def7edf9b05f7a02a4b267e68e6eb6405f404adabac475a053661d90e4b7117cb41b601ebc37c2b3a9f7f30277492eb2fda77db4e93e7",
+          "sha256": "d0d4e87dd923b19c7fbc205d9554bedfb1b8ee0cb34708075f972063986065c7",
+          "sha1": "09bd5b2ffc32bd792910c1e9cc00bcca9006bb2f",
+          "md5": "87737b14c7f087cd320429cedc9d70ff"
         }
       ]
     }
