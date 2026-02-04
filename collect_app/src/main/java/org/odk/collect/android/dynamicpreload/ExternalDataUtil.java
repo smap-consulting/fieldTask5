@@ -467,13 +467,12 @@ public final class ExternalDataUtil {
      */
     public static String evaluateExpressionNodes(String in, EvaluationContext ec) {
         StringBuilder expression = new StringBuilder("");
-        if(in != null) {
-            FormController formController = Collect.getInstance().getFormController();
-            if (formController == null) {
-                return in; // Return original if no form controller available
+        if(in != null && ec != null) {
+            // smap - use EvaluationContext directly instead of FormController
+            org.javarosa.core.model.instance.DataInstance dataInstance = ec.getMainInstance();
+            if (dataInstance == null) {
+                return in; // Return original if no instance available
             }
-            org.javarosa.core.model.FormDef formDef = formController.getFormDef();
-            FormInstance formInstance = formDef.getInstance();
 
             String [] eList = in.split("\\s+");
             for(String s : eList) {
@@ -481,7 +480,7 @@ public final class ExternalDataUtil {
                     try {
                         // smap - XPathReference moved to org.javarosa.model.xform in javarosa 5.x
                         org.javarosa.xpath.expr.XPathPathExpr pathExpr = org.javarosa.model.xform.XPathReference.getPathExpr(s);
-                        org.javarosa.xpath.XPathNodeset xpathNodeset = pathExpr.eval(formInstance, ec);
+                        org.javarosa.xpath.XPathNodeset xpathNodeset = pathExpr.eval(dataInstance, ec);
                         Object o = XPathFuncExpr.unpack(xpathNodeset);
 
                         if (o.getClass() == String.class) {
