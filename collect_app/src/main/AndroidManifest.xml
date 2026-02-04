@@ -129,6 +129,12 @@ the specific language governing permissions and limitations under the License.
             android:windowSoftInputMode="adjustResize">
         </activity>
 
+        <!-- smap - alias MainMenuActivity to SmapMain for ODK code compatibility -->
+        <activity-alias
+            android:name="org.odk.collect.android.mainmenu.MainMenuActivity"
+            android:targetActivity="au.smap.fieldTask.activities.SmapMain"
+            android:exported="false" />
+
         <activity android:name="org.odk.collect.android.activities.CrashHandlerActivity" />
 
         <activity android:name="au.smap.fieldTask.activities.SmapLoginActivity" />
