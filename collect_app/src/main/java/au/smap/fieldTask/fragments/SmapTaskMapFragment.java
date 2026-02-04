@@ -206,17 +206,16 @@ public class SmapTaskMapFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
+        menu.clear(); // smap - prevent duplicates from multiple fragments
         getActivity().getMenuInflater().inflate(R.menu.smap_menu_map, menu);
         super.onCreateOptionsMenu(menu, inflater);
 
-        // smap - conditionally add admin menu
+        // smap - conditionally show admin menu
         Settings settings = DaggerUtils.getComponent(getContext()).settingsProvider().getUnprotectedSettings();
         boolean adminMenu = settings.getBoolean(ProjectKeys.KEY_SMAP_ODK_ADMIN_MENU);
-        if (adminMenu) {
-            menu
-                    .add(0, R.id.menu_admin_preferences, 0,
-                            org.odk.collect.strings.R.string.admin_preferences)
-                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        MenuItem adminItem = menu.findItem(R.id.menu_admin_preferences);
+        if (adminItem != null) {
+            adminItem.setVisible(adminMenu);
         }
     }
 

@@ -45,10 +45,11 @@ limitations under the License.
         android:title="@string/general_preferences"
         app:showAsAction="never"/>
 
-    <!-- smap admin menu -->
+    <!-- smap admin menu - visibility controlled by server setting -->
     <item
         android:id="@+id/menu_admin_preferences"
         android:title="@string/admin_preferences"
+        android:visible="false"
         app:showAsAction="never"/>
 
 </menu>
