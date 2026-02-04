@@ -214,7 +214,7 @@ private class FormUriViewModel(
     private fun assertProjectListNotEmpty(): String? {
         val projects = projectsRepository.getAll()
         return if (projects.isEmpty()) {
-            resources.getString(string.app_not_configured)
+            resources.getString(string.app_not_configured, resources.getString(string.app_name)) // smap
         } else {
             null
         }
@@ -227,7 +227,7 @@ private class FormUriViewModel(
         val projectId = uriProjectId ?: firstProject.uuid
 
         return if (projectId != projectsDataService.requireCurrentProject().uuid) {
-            resources.getString(string.wrong_project_selected_for_form)
+            resources.getString(string.wrong_project_selected_for_form, resources.getString(string.app_name)) // smap
         } else {
             null
         }

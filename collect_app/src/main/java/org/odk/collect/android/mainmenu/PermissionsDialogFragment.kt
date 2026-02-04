@@ -3,6 +3,7 @@ package org.odk.collect.android.mainmenu
 import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -19,9 +20,14 @@ class PermissionsDialogFragment(
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         isCancelable = false
 
+        // smap - use app_name in permission text
+        val view = layoutInflater.inflate(R.layout.permissions_dialog_layout, null)
+        view.findViewById<TextView>(R.id.permission_text).text =
+            getString(org.odk.collect.strings.R.string.permission_dialog_text, getString(org.odk.collect.strings.R.string.app_name))
+
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(org.odk.collect.strings.R.string.permission_dialog_title)
-            .setView(R.layout.permissions_dialog_layout)
+            .setView(view)
             .setPositiveButton(org.odk.collect.strings.R.string.ok) { _, _ ->
                 requestPermissionsViewModel.permissionsRequested()
                 permissionsProvider.requestPermissions(

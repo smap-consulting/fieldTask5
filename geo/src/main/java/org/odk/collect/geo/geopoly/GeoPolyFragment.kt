@@ -609,7 +609,7 @@ class GeoPolyFragment @JvmOverloads constructor(
 
     private fun showBackDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setMessage(getString(org.odk.collect.strings.R.string.geo_exit_warning))
+            .setMessage(getString(org.odk.collect.strings.R.string.geo_exit_warning, getString(org.odk.collect.strings.R.string.app_name))) // smap
             .setPositiveButton(org.odk.collect.strings.R.string.discard) { _, _ -> discard() }
             .setNegativeButton(org.odk.collect.strings.R.string.cancel, null)
             .show()

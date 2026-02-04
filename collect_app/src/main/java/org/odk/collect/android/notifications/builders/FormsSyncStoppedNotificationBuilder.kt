@@ -25,7 +25,7 @@ object FormsSyncStoppedNotificationBuilder {
         ).apply {
             setContentIntent(contentIntent)
             setContentTitle(application.getLocalizedString(org.odk.collect.strings.R.string.form_update_error))
-            setContentText(application.getLocalizedString(org.odk.collect.strings.R.string.form_update_error_massage))
+            setContentText(application.getLocalizedString(org.odk.collect.strings.R.string.form_update_error_massage, application.getLocalizedString(org.odk.collect.strings.R.string.app_name))) // smap
             setSubText(projectName)
             setSmallIcon(org.odk.collect.icons.R.drawable.ic_notification_small)
             setAutoCancel(true)

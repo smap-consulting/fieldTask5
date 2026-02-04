@@ -7,11 +7,11 @@
     android:paddingTop="@dimen/margin_standard"
     android:paddingBottom="@dimen/margin_large">
 
+    <!-- smap - text set programmatically to use app_name -->
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/permission_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/permission_dialog_text"
         android:textAppearance="?textAppearanceBodyMedium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -637,7 +637,8 @@
     <string name="enable_gps">Enable GPS</string>
     <string name="gps_enable_message">GPS is disabled on your device. Would you like to enable it?</string>
     <string name="geo_clear_warning">Feature already created. Would you like to clear the feature?</string>
-    <string name="geo_exit_warning">Discard changes and return to ODK?</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="geo_exit_warning">Discard changes and return to %1$s?</string>
     <string name="polygon_validator">Must have at least 3 points to create Polygon</string>
     <string name="polyline_validator">Must have at least 2 points to create Polyline</string>
     <string name="clear">Clear</string>
@@ -747,7 +748,8 @@
     <string name="form_updates_available">Form updates available</string>
     <string name="newer_version_of_a_form_info">This is an update to a form you have</string>
     <string name="form_update_error">Form update failed</string>
-    <string name="form_update_error_massage">Open ODK Collect to try again</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="form_update_error_massage">Open %1$s to try again</string>
 
     <!-- Text for notification shown while syncing forms with the server -->
     <string name="form_update_notification_title">Syncing forms</string>
@@ -865,9 +867,11 @@
     <string name="change_server_url">Server URL</string>
     <string name="url_error">Sorry, invalid URL!</string>
     <string name="username">Username</string>
-    <string name="change_username">ODK Username</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="change_username">%1$s Username</string>
     <string name="password">Password</string>
-    <string name="change_password">ODK Password</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="change_password">%1$s Password</string>
     <string name="password_error_whitespace">Leading or trailing whitespace not allowed in passwords</string>
     <string name="username_error_whitespace">Leading or trailing whitespace not allowed in usernames</string>
 
@@ -1209,9 +1213,11 @@
     ##############################################
     -->
     <!-- Error shown when a user tries to open a form that's in a different project -->
-    <string name="wrong_project_selected_for_form">To open this form, you must first open ODK Collect and switch to the project that contains it.</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="wrong_project_selected_for_form">To open this form, you must first open %1$s and switch to the project that contains it.</string>
     <!-- Error shown when a user tries to open a form when there are no projects -->
-    <string name="app_not_configured">ODK Collect has not been configured. Try to open ODK Collect and configure it.\n\nIf you tapped on a shortcut, you might need to recreate it after configuring ODK Collect.</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="app_not_configured">%1$s has not been configured. Try to open %1$s and configure it.\n\nIf you tapped on a shortcut, you might need to recreate it after configuring %1$s.</string>
     <!-- Displayed when form filling is attempted to be launched by intent but the intent URI mime type is unknown -->
     <string name="unrecognized_uri">Unrecognized URI: %s</string>
     <!-- Displayed when form filling is attempted to be launched by intent but the intent URI is incorrect -->
@@ -1299,7 +1305,8 @@
     <string name="use_zxing_for_barcode_scanning">Revert to older barcode scanner</string>
 
     <string name="permission_dialog_title">About permissions</string>
-    <string name="permission_dialog_text">You will be asked to allow ODK Collect access to the features below, select “allow” if you want to use them.</string>
+    <!-- smap - use app_name placeholder -->
+    <string name="permission_dialog_text">You will be asked to allow %1$s access to the features below, select "allow" if you want to use them.</string>
     <string name="notifications">Notifications</string>
     <string name="required_for_notifications">Required for showing updates when forms are downloaded, updated and sent.</string>
 

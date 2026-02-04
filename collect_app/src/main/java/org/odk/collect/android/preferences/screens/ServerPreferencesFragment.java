@@ -104,6 +104,8 @@ public class ServerPreferencesFragment extends BaseProjectPreferencesFragment {
 
         usernamePreference.setOnPreferenceChangeListener(createChangeListener());
         usernamePreference.setSummary(usernamePreference.getText());
+        usernamePreference.setDialogTitle(getString(org.odk.collect.strings.R.string.change_username, getString(org.odk.collect.strings.R.string.app_name))); // smap
+        passwordPreference.setDialogTitle(getString(org.odk.collect.strings.R.string.change_password, getString(org.odk.collect.strings.R.string.app_name))); // smap
 
         usernamePreference.setOnBindEditTextListener(editText -> {
             editText.setFilters(new InputFilter[]{new ControlCharacterFilter()});

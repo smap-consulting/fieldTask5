@@ -649,7 +649,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void showBackDialog() {
         new MaterialAlertDialogBuilder(this)
-            .setMessage(getString(org.odk.collect.strings.R.string.geo_exit_warning))
+            .setMessage(getString(org.odk.collect.strings.R.string.geo_exit_warning, getString(org.odk.collect.strings.R.string.app_name))) // smap
             .setPositiveButton(org.odk.collect.strings.R.string.discard, (dialog, id) -> finish())
             .setNegativeButton(org.odk.collect.strings.R.string.cancel, null)
             .show();
