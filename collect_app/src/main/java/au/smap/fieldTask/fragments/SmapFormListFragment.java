@@ -430,12 +430,10 @@ public class SmapFormListFragment extends ListFragment {
 
     private void processEnterData() {
         if (MultiClickGuard.allowClick(getClass().getName())) {
-            /* SMAP BUILD
+            // smap - use BlankFormListActivity (replaces old FillBlankFormActivity)
             Intent i = new Intent(getContext(),
-                    FillBlankFormActivity.class);
+                    org.odk.collect.android.formlists.blankformlist.BlankFormListActivity.class);
             startActivity(i);
-
-             */
         }
     }
 
