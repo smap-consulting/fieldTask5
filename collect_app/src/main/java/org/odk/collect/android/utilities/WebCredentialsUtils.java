@@ -81,6 +81,16 @@ public class WebCredentialsUtils implements OpenRosaXmlFetcher.WebCredentialsPro
         return generalSettings.getString(ProjectKeys.KEY_USERNAME);
     }
 
+    // smap - token authentication support
+    public boolean getUseTokenFromPreferences() {
+        return generalSettings.getBoolean(ProjectKeys.KEY_SMAP_USE_TOKEN);
+    }
+
+    // smap - token authentication support
+    public String getAuthTokenFromPreferences() {
+        return generalSettings.getString(ProjectKeys.KEY_SMAP_AUTH_TOKEN);
+    }
+
     /**
      * Returns a credentials object from the url
      *
@@ -94,13 +104,18 @@ public class WebCredentialsUtils implements OpenRosaXmlFetcher.WebCredentialsPro
 
         HttpCredentialsInterface hostCredentials = HOST_CREDENTIALS.get(host);
 
+        // smap - get token authentication settings
+        boolean useToken = getUseTokenFromPreferences();
+        String authToken = getAuthTokenFromPreferences();
+
         // URL host is the same as the host in preferences
         if (prefsServerHost != null && prefsServerHost.equalsIgnoreCase(host)) {
             // Use the temporary credentials if they exist, otherwise use the credentials saved to preferences
             if (hostCredentials != null) {
                 return hostCredentials;
             } else {
-                return new HttpCredentials(getUserNameFromPreferences(), getPasswordFromPreferences());
+                // smap - include token authentication
+                return new HttpCredentials(getUserNameFromPreferences(), getPasswordFromPreferences(), useToken, authToken);
             }
         } else {
             if (hostCredentials != null) {
