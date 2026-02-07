@@ -131,6 +131,10 @@ public class ExternalSQLiteOpenHelper extends SQLiteOpenHelper {
                     .build();
             String[] headerRow = reader.readNext();
 
+            if (!ExternalDataUtil.containsAnyData(headerRow)) {
+                return;     // smap no data just return and continue
+            }
+
             headerRow[0] = removeByteOrderMark(headerRow[0]);
 
             if (!ExternalDataUtil.containsAnyData(headerRow)) {
