@@ -238,9 +238,15 @@ the specific language governing permissions and limitations under the License.
             android:name="firebase_analytics_collection_enabled"
             android:value="false" />
 
+        <!-- smap - completely deactivate Firebase Analytics to prevent database lock issues -->
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true" />
+
+        <!-- smap - enable Crashlytics for crash reporting -->
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
-            android:value="false" />
+            android:value="true" />
 
         <meta-data
             android:name="google_analytics_adid_collection_enabled"
