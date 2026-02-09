@@ -72,6 +72,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import au.smap.fieldTask.formmanagement.LocalDataManagerSmap; // smap
 import timber.log.Timber;
 
 /**
@@ -227,6 +228,13 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
             Timber.e(e, "Exception thrown while loading external data");
             errorMsg = e.getMessage();
             return null;
+        }
+
+        // smap - load local data from completed instances of linked surveys
+        String searchLocalData = form.getSearchLocalData();
+        if (searchLocalData != null && searchLocalData.equals("yes")) {
+            LocalDataManagerSmap ldm = new LocalDataManagerSmap(this);
+            ldm.loadLocalData(form.getFormId(), formMediaDir);
         }
 
         if (isCancelled()) {
