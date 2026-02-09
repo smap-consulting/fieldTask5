@@ -576,7 +576,7 @@ public class MultiFormDownloaderSmap {
                         org.apache.commons.io.FileUtils.moveFileToDirectory(tempMediaFile, finalMediaDir, true);
                     }
                 } else if (toDownload.getDownloadUrl().endsWith("organisation")) {
-                    // Get latest copy of file in organsiation shared directory
+                    // Get latest copy of file in organisation shared directory
                     org.apache.commons.io.FileUtils.copyFileToDirectory(finalMediaFile, finalMediaDir, false);
                 }
             }

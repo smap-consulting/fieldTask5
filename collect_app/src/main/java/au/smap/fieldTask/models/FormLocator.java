@@ -29,6 +29,5 @@ public class FormLocator {
 	public String url;
 	public String manifestUrl;
 	public boolean hasManifest;
-    public boolean dirty;           // Force refresh - due to dynamicly created CSV
     public List<MediaFile> mediaFiles;
 }

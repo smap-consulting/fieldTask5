@@ -800,9 +800,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         		String formVersionString = String.valueOf(form.version);
         		ManageFormDetails mfd = mf.getFormDetails(form.ident, formVersionString, source);    // Get the form details
                 Timber.i("+++ Form: " + form.ident + ":" + formVersionString);
-        		if(!mfd.exists || form.dirty) {
-                    Timber.i("+++ Form does not exist or is dirty: " + form.ident + ":" + formVersionString +
-                            " dirty: " + form.dirty);
+        		if(!mfd.exists || form.hasManifest) {
+                    Timber.i("+++ Form does not exist or is has a manifest: " + form.ident + ":" + formVersionString +
+                            " has manifest: " + form.hasManifest);
         			form.url = serverUrl + "/formXML?key=" + form.ident;	// Set the form url from the server address and form ident
         			if(form.hasManifest) {
         				form.manifestUrl = serverUrl + "/xformsManifest?key=" + form.ident;
@@ -817,7 +817,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                             form.hasManifest,   // Are newer media files available
                             form.mediaFiles,
                             form.manifestUrl,
-                            mfd.exists && !form.dirty,  // Re-download if form is dirty even if it exists
+                            mfd.exists,
                             form.tasks_only,
                             form.read_only,
                             form.search_local_data,
