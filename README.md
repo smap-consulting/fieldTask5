@@ -392,6 +392,7 @@ The complete Smap ecosystem includes multiple repositories:
 |WebForm       |https://github.com/nap2000/webform            |Browser-based form client  |
 |SmapClient    |https://github.com/nap2000/prop-smapserver    |Administrative web client  |
 |Documentation |https://github.com/nap2000/docs               |User documentation         |
+|Tests         |https://github.com/smap-consulting/prerelease-tests |Pre-release tests    |
 
 ## Additional Resources
 
