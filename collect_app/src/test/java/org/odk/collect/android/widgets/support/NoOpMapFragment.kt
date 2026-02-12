@@ -76,6 +76,9 @@ class NoOpMapFragment : Fragment(), MapFragment {
         TODO("Not yet implemented")
     }
 
+    override fun removeFeature(featureId: Int) {
+    }
+
     override fun clearFeatures() {
     }
 

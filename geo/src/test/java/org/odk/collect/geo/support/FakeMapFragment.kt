@@ -149,6 +149,14 @@ class FakeMapFragment(private val ready: Boolean = false) : Fragment(), MapFragm
         return polyLines[featureId]!!.points
     }
 
+    override fun removeFeature(featureId: Int) {
+        markers.remove(featureId)
+        markerIcons.remove(featureId)
+        polyLines.remove(featureId)
+        polygons.remove(featureId)
+        featureIds.remove(featureId)
+    }
+
     override fun clearFeatures() {
         markers.clear()
         markerIcons.clear()

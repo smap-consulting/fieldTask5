@@ -115,6 +115,9 @@ interface MapFragment {
      */
     fun getPolyLinePoints(featureId: Int): List<MapPoint>
 
+    /** Removes a single map feature by its featureId. */
+    fun removeFeature(featureId: Int)
+
     /** Removes all map features from the map.  */
     fun clearFeatures()
 

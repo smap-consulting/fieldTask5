@@ -395,6 +395,10 @@ class MapboxMapFragment :
         }
     }
 
+    override fun removeFeature(featureId: Int) {
+        features.remove(featureId)?.dispose()
+    }
+
     override fun clearFeatures() {
         for (feature in features.values) {
             feature.dispose()

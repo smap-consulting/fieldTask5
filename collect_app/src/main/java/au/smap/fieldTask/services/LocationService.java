@@ -16,6 +16,7 @@ package au.smap.fieldTask.services;
 
 import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,11 +24,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -100,9 +104,17 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         createLocationRequest();
         requestLocationUpdates();
 
-        // smap - CRITICAL FIX: Start foreground notification on API 26+ (was API 29+)
+        // smap - Start foreground notification on API 26+, with permission check for API 34+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Notification channel already created in Collect.onCreate() by SmapNotificationChannels
+            boolean hasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+            if (!hasLocation) {
+                Timber.w("Location permission not granted, stopping LocationService");
+                stopSelf();
+                return START_NOT_STICKY;
+            }
+
             Notification notification = new NotificationCompat.Builder(this, SmapNotificationChannels.LOCATION_TRACKING_CHANNEL_ID)
                     .setContentTitle(getString(org.odk.collect.strings.R.string.app_name))
                     .setContentText(getString(org.odk.collect.strings.R.string.location_tracking_active))

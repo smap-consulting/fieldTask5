@@ -375,6 +375,15 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
     }
 
     @Override
+    public void removeFeature(int featureId) {
+        MapFeature feature = features.remove(featureId);
+        if (feature != null) {
+            feature.dispose();
+            map.invalidate();
+        }
+    }
+
+    @Override
     public void clearFeatures() {
         for (MapFeature feature : features.values()) {
             feature.dispose();

@@ -339,10 +339,8 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void createMarkersForVertices() {
         List<MapPoint> points = map.getPolyLinePoints(lineFeatureId);
-        for (Integer vertexIdx : markers.keySet()) {
-            if (vertexIdx < points.size()) {
-                createOrUpdateMarker(vertexIdx);
-            }
+        for (int i = 0; i < points.size(); i++) {
+            createOrUpdateMarker(i);
         }
     }
 
@@ -355,26 +353,16 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         MapPoint point = points.get(vertexIdx);
         CompoundMarker cm = markers.get(vertexIdx);
 
-        if (cm == null || cm.type.equals("none")) {
-            // Remove marker if it exists
-            Integer featureId = markerFeatureIds.get(vertexIdx);
-            if (featureId != null) {
-                // Note: MapFragment doesn't have a removeFeature method, so we'll just not recreate it
-                markerFeatureIds.remove(vertexIdx);
-            }
-            return;
-        }
-
-        int iconRes = cm.getDrawableIdForMarker();
+        int iconRes = (cm != null && !cm.type.equals("none"))
+                ? cm.getDrawableIdForMarker()
+                : org.odk.collect.icons.R.drawable.ic_map_point;
         MarkerIconDescription iconDesc = new MarkerIconDescription(iconRes);
-        MarkerDescription markerDesc = new MarkerDescription(point, false, MapFragment.BOTTOM, iconDesc);
 
         Integer existingFeatureId = markerFeatureIds.get(vertexIdx);
         if (existingFeatureId != null) {
-            // Update existing marker
             map.setMarkerIcon(existingFeatureId, iconDesc);
         } else {
-            // Create new marker
+            MarkerDescription markerDesc = new MarkerDescription(point, false, MapFragment.CENTER, iconDesc);
             int newFeatureId = map.addMarker(markerDesc);
             markerFeatureIds.put(vertexIdx, newFeatureId);
         }
@@ -422,13 +410,17 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     @Override
     public void updateMarker(int markerId, String markerType) {
-        CompoundMarker cm = markers.get(markerId);
-        if(cm == null) {
-            cm = new CompoundMarker(markerId, markerType, getMarkerTypeLabel(markerType));
-            markers.put(markerId, cm);
+        if ("none".equals(markerType)) {
+            markers.remove(markerId);
         } else {
-            cm.type = markerType;
-            cm.label = getMarkerTypeLabel(markerType);
+            CompoundMarker cm = markers.get(markerId);
+            if (cm == null) {
+                cm = new CompoundMarker(markerId, markerType, getMarkerTypeLabel(markerType));
+                markers.put(markerId, cm);
+            } else {
+                cm.type = markerType;
+                cm.label = getMarkerTypeLabel(markerType);
+            }
         }
         createOrUpdateMarker(markerId);
     }
@@ -473,7 +465,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
      */
     public void onFeatureClicked(int featureId) {
         if(inputActive) {
-            return; // Don't allow selection of a marker while recording new points
+            return;
         }
 
         // Find which vertex this corresponds to
@@ -485,14 +477,35 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
             }
         }
 
-        if (markerIdx == null) {
-            // Clicked on polyline, find nearest vertex
-            // For simplicity, we'll just return - in a full implementation,
-            // you'd find the nearest vertex to show the dialog
-            return;
+        if (markerIdx == null && featureId == lineFeatureId) {
+            // Clicked on polyline line segment - find nearest vertex
+            markerIdx = findNearestVertex();
         }
 
-        showMarkerDialog(markerIdx);
+        if (markerIdx != null) {
+            showMarkerDialog(markerIdx);
+        }
+    }
+
+    private Integer findNearestVertex() {
+        MapPoint gps = map.getGpsLocation();
+        MapPoint center = map.getCenter();
+        MapPoint ref = (gps != null) ? gps : center;
+        List<MapPoint> points = map.getPolyLinePoints(lineFeatureId);
+        if (points.isEmpty()) {
+            return null;
+        }
+        int nearest = 0;
+        double minDist = Double.MAX_VALUE;
+        for (int i = 0; i < points.size(); i++) {
+            MapPoint p = points.get(i);
+            double dist = Math.pow(p.latitude - ref.latitude, 2) + Math.pow(p.longitude - ref.longitude, 2);
+            if (dist < minDist) {
+                minDist = dist;
+                nearest = i;
+            }
+        }
+        return nearest;
     }
 
     private void showMarkerDialog(int markerIdx) {
@@ -514,6 +527,8 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     private void onClick(MapPoint point) {
         if (inputActive && !recordingEnabled) {
             map.appendPointToPolyLine(lineFeatureId, point);
+            int newIdx = map.getPolyLinePoints(lineFeatureId).size() - 1;
+            createOrUpdateMarker(newIdx);
             updateUi();
         }
     }
@@ -536,6 +551,8 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     private void recordPoint(MapPoint point) {
         if (point != null && isLocationAcceptable(point)) {
             map.appendPointToPolyLine(lineFeatureId, point);
+            int newIdx = map.getPolyLinePoints(lineFeatureId).size() - 1;
+            createOrUpdateMarker(newIdx);
             updateUi();
         }
     }
@@ -556,12 +573,12 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         if (lineFeatureId != -1) {
             int numPoints = map.getPolyLinePoints(lineFeatureId).size();
             if (numPoints > 0) {
-                // Remove marker if the last point had one
-                Integer markerFeatureId = markerFeatureIds.get(numPoints - 1);
+                int lastIdx = numPoints - 1;
+                Integer markerFeatureId = markerFeatureIds.remove(lastIdx);
                 if (markerFeatureId != null) {
-                    markerFeatureIds.remove(numPoints - 1);
-                    markers.remove(numPoints - 1);
+                    map.removeFeature(markerFeatureId);
                 }
+                markers.remove(lastIdx);
                 map.removePolyLineLastPoint(lineFeatureId);
             }
             updateUi();
