@@ -171,6 +171,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         getSupportFragmentManager().setFragmentFactory(new FragmentFactoryBuilder()
                 .forClass(MapFragment.class, () -> (Fragment) mapFragmentFactory.createMapFragment())
                 .forClass(OfflineMapLayersPickerBottomSheetDialogFragment.class, () -> new OfflineMapLayersPickerBottomSheetDialogFragment(getActivityResultRegistry(), referenceLayerRepository, scheduler, settingsProvider, webPageService))
+                .forClass(GeoPolySettingsDialogFragment.class, () -> new GeoPolySettingsDialogFragment(this))
                 .build()
         );
 
