@@ -75,6 +75,7 @@ object Appearances {
     // Maps appearances
     const val PLACEMENT_MAP = "placement-map"
     const val MAPS = "maps"
+    const val HISTORY_MAP = "history-map"
 
     // Groups and repeats
     const val FIELD_LIST = "field-list"

@@ -25,7 +25,7 @@ abstract class WidgetAnswerDialogFragment<T : Fragment>(
     private val viewModelFactory: ViewModelProvider.Factory
 ) : MaterialFullScreenDialogFragment() {
 
-    private val formEntryViewModel: FormEntryViewModel by activityViewModels { viewModelFactory }
+    protected val formEntryViewModel: FormEntryViewModel by activityViewModels { viewModelFactory }
     private val prompt: FormEntryPrompt by lazy {
         formEntryViewModel.getQuestionPrompt(requireArguments().getSerializable(ARG_FORM_INDEX) as FormIndex)
     }

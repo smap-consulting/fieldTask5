@@ -48,7 +48,8 @@ class GeoPolyFragment @JvmOverloads constructor(
     val readOnly: Boolean = false,
     val retainMockAccuracy: Boolean = false,
     val inputPolygon: List<MapPoint> = emptyList(),
-    val invalidMessage: LiveData<String?> = MutableLiveData(null)
+    val invalidMessage: LiveData<String?> = MutableLiveData(null),
+    val previousPolygons: List<List<MapPoint>> = emptyList()
 ) : Fragment(R.layout.geopoly_layout), SettingsDialogCallback {
 
     @Inject
@@ -273,6 +274,18 @@ class GeoPolyFragment @JvmOverloads constructor(
             )
         )
 
+        for (prevPoints in previousPolygons) {
+            map!!.addPolyLine(
+                LineDescription(
+                    prevPoints,
+                    MapConsts.DEFAULT_STROKE_WIDTH.toString(),
+                    "#80808080",
+                    false,
+                    outputMode == OutputMode.GEOSHAPE
+                )
+            )
+        }
+
         if (inputActive && !readOnly) {
             startInput()
         }
@@ -288,8 +301,9 @@ class GeoPolyFragment @JvmOverloads constructor(
         }
 
         if (!map!!.hasCenter()) {
-            if (points.isNotEmpty()) {
-                map!!.zoomToBoundingBox(points, 0.6, false)
+            val allPoints = points + previousPolygons.flatten()
+            if (allPoints.isNotEmpty()) {
+                map!!.zoomToBoundingBox(allPoints, 0.6, false)
             } else {
                 map!!.runOnGpsLocationReady { this.onGpsLocationReady(it) }
             }
@@ -501,6 +515,17 @@ class GeoPolyFragment @JvmOverloads constructor(
                 outputMode == OutputMode.GEOSHAPE
             )
         )
+        for (prevPoints in previousPolygons) {
+            map!!.addPolyLine(
+                LineDescription(
+                    prevPoints,
+                    MapConsts.DEFAULT_STROKE_WIDTH.toString(),
+                    "#80808080",
+                    false,
+                    outputMode == OutputMode.GEOSHAPE
+                )
+            )
+        }
         inputActive = false
         updateUi()
     }
