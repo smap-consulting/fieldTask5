@@ -103,6 +103,7 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
     private Instance instance;
     private Savepoint savepoint;
     private final SavepointsRepository savepointsRepository;
+    private final String initialData;  // smap - initial data XML for form launcher
 
     @Override
     protected void onPreExecute() {
@@ -148,6 +149,13 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
     public FormLoaderTask(Uri uri, String uriMimeType, String xpath, String waitingXPath,
                           FormEntryControllerFactory formEntryControllerFactory, Scheduler scheduler,
                           SavepointsRepository savepointsRepository) {
+        this(uri, uriMimeType, xpath, waitingXPath, formEntryControllerFactory, scheduler, savepointsRepository, null);
+    }
+
+    // smap - constructor with initialData for form launcher
+    public FormLoaderTask(Uri uri, String uriMimeType, String xpath, String waitingXPath,
+                          FormEntryControllerFactory formEntryControllerFactory, Scheduler scheduler,
+                          SavepointsRepository savepointsRepository, String initialData) {
         super(scheduler);
         this.uri = uri;
         this.uriMimeType = uriMimeType;
@@ -155,6 +163,7 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
         this.waitingXPath = waitingXPath;
         this.formEntryControllerFactory = formEntryControllerFactory;
         this.savepointsRepository = savepointsRepository;
+        this.initialData = initialData;
     }
 
     /**
@@ -452,10 +461,24 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
                     }
                 }
             } else {
-                formDef.initialize(true, instanceInit);
+                // smap - import initial data BEFORE initialization so calculate
+                // expressions (e.g. uuid() for meta/instanceID) evaluate afterwards
+                if (initialData != null) {
+                    importInitialData(initialData, fec);
+                    formDef.initialize(false, instanceInit);
+                } else {
+                    formDef.initialize(true, instanceInit);
+                }
             }
         } else {
-            formDef.initialize(true, instanceInit);
+            // smap - import initial data BEFORE initialization so calculate
+            // expressions (e.g. uuid() for meta/instanceID) evaluate afterwards
+            if (initialData != null) {
+                importInitialData(initialData, fec);
+                formDef.initialize(false, instanceInit);
+            } else {
+                formDef.initialize(true, instanceInit);
+            }
         }
         return usedSavepoint;
     }
@@ -518,6 +541,18 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
                             fec.getModel().getForm().getLocalizer());
         }
         Timber.i("Done importing data");
+    }
+
+    // smap - Import initial data XML fragment into form instance for form launcher
+    private void importInitialData(String initialDataXml, FormEntryController fec) {
+        try {
+            byte[] xmlBytes = initialDataXml.getBytes("UTF-8");
+            TreeElement savedRoot = XFormParser.restoreDataModel(xmlBytes, null).getRoot();
+            TreeElement templateRoot = fec.getModel().getForm().getInstance().getRoot();
+            templateRoot.populate(savedRoot, fec.getModel().getForm());
+        } catch (Exception e) {
+            Timber.e(e, "Error importing initial data for launched form");
+        }
     }
 
     @Override

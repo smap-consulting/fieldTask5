@@ -136,6 +136,7 @@ import org.odk.collect.android.instancemanagement.LocalInstancesUseCases;
 import org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider;
 import org.odk.collect.android.javarosawrapper.FailedValidationResult;
 import org.odk.collect.android.javarosawrapper.FormController;
+import org.odk.collect.android.javarosawrapper.InstanceMetadata;
 import org.odk.collect.android.javarosawrapper.RepeatsInFieldListException;
 import org.odk.collect.android.javarosawrapper.SuccessValidationResult;
 import org.odk.collect.android.javarosawrapper.ValidationResult;
@@ -751,7 +752,8 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             uriMimeType = getContentResolver().getType(uri);
         }
 
-        formLoaderTask = new FormLoaderTask(uri, uriMimeType, startingXPath, waitingXPath, formEntryControllerFactory, scheduler, savepointsRepositoryProvider.create());
+        String initialData = intent.getStringExtra(KEY_INITIAL_DATA);  // smap
+        formLoaderTask = new FormLoaderTask(uri, uriMimeType, startingXPath, waitingXPath, formEntryControllerFactory, scheduler, savepointsRepositoryProvider.create(), initialData);
         formLoaderTask.setFormLoaderListener(this);
         showIfNotShowing(FormLoadingDialogFragment.class, getSupportFragmentManager());
         formLoaderTask.execute();
@@ -2196,15 +2198,25 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         if (Intent.ACTION_PICK.equals(action) || Intent.ACTION_EDIT.equals(action)) {
             // caller is waiting on a picked form
             Uri uri = null;
-            String path = getAbsoluteInstancePath();
-            if (path != null) {
-                if (formSaveViewModel.getInstance() != null) {
-                    uri = InstancesContract.getUri(projectsDataService.requireCurrentProject().getUuid(), formSaveViewModel.getInstance().getDbId());
-                }
+            if (formSaveViewModel.getInstance() != null) {
+                uri = InstancesContract.getUri(projectsDataService.requireCurrentProject().getUuid(), formSaveViewModel.getInstance().getDbId());
             }
 
             if (uri != null) {
-                setResult(RESULT_OK, new Intent().setData(uri));
+                Intent resultIntent = new Intent().setData(uri);
+                // smap - pass instanceid, status and uri back to SmapMain for form launcher
+                FormController fc = getFormController();
+                if (fc != null) {
+                    InstanceMetadata meta = fc.getSubmissionMetadata();
+                    if (meta != null && meta.instanceId != null) {
+                        resultIntent.putExtra("instanceid", meta.instanceId);
+                    }
+                }
+                if (formSaveViewModel.getInstance() != null) {
+                    resultIntent.putExtra("status", formSaveViewModel.getInstance().getStatus());
+                }
+                resultIntent.putExtra("uri", uri.toString());
+                setResult(RESULT_OK, resultIntent);
             }
         }
 
