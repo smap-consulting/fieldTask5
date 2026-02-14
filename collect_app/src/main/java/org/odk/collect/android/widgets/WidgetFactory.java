@@ -219,7 +219,7 @@ public class WidgetFactory {
                         } else if (appearance.equals(Appearances.URL)) {
                             questionWidget = new UrlWidget(activity, questionDetails, CustomTabsWebPageService.INSTANCE, dependencies);
                         } else if (questionDetails.getPrompt().getQuestion().getAdditionalAttribute(null, "form_identifier") != null) {        // smap form launcher
-                            questionWidget = new SmapFormWidget(activity, questionDetails, appearance, dependencies);
+                            questionWidget = new SmapFormWidget(activity, questionDetails, appearance, dependencies, formController);
                         } else if (appearance.contains("chart")) {        // smap chart
                             String chartType = questionDetails.getPrompt().getQuestion().getAdditionalAttribute(null, "chart_type");
                             if(chartType == null) {

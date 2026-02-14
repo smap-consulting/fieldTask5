@@ -80,14 +80,17 @@ public class SmapFormWidget extends QuestionWidget implements WidgetDataReceiver
     private final String appearance;
     private final boolean readOnlyOverride;
     private boolean validForm = true;
+    private final FormController formControllerRef;  // smap - use injected FC instead of global singleton
 
 
     public SmapFormWidget(Context context, QuestionDetails questionDetails,
-                         String appearance, Dependencies dependencies) {
+                         String appearance, Dependencies dependencies,
+                         FormController formController) {
         super(context, dependencies, questionDetails);
 
         this.appearance = appearance;
         this.readOnlyOverride = false;
+        this.formControllerRef = formController;
 
         // Initialize form management
         mf = new ManageForm();
@@ -99,9 +102,8 @@ public class SmapFormWidget extends QuestionWidget implements WidgetDataReceiver
 
         // Update initial data with dynamic values from current form
         if (initialData != null) {
-            FormController fc = Collect.getInstance().getFormController();
-            if (fc != null) {
-                FormDef fd = fc.getFormDef();
+            if (formControllerRef != null) {
+                FormDef fd = formControllerRef.getFormDef();
                 HashMap<String, String> dynVariables = getDynamicVariables(initialData);
                 if (dynVariables.size() > 0) {
                     fd.populateLaunchModel(dynVariables);       // Get matching values from the current form
@@ -273,7 +275,7 @@ public class SmapFormWidget extends QuestionWidget implements WidgetDataReceiver
     @Override
     public boolean performAutoLaunch() {
         if (getAnswer() == null && validForm
-                && Collect.getInstance().getFormController() != null) {
+                && formControllerRef != null) {
             launchIntentButton.setVisibility(GONE);
             launching.setVisibility(VISIBLE);
             onButtonClick();
@@ -284,8 +286,14 @@ public class SmapFormWidget extends QuestionWidget implements WidgetDataReceiver
 
     private void onButtonClick() {
         // 1. Save restore information in collect app
-        String instancePath = Collect.getInstance().getFormController().getInstanceFile().getAbsolutePath();
-        FormIndex formIndex = Collect.getInstance().getFormController().getFormIndex();
+        if (formControllerRef == null || formControllerRef.getInstanceFile() == null) {
+            Toast.makeText(getContext(),
+                    "Form not ready",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String instancePath = formControllerRef.getInstanceFile().getAbsolutePath();
+        FormIndex formIndex = formControllerRef.getFormIndex();
 
         String title = (String) mFormFillingActivity.getTitle();
         Collect.getInstance().pushToFormStack(new FormLaunchDetail(new StoragePathProvider().getInstanceDbPath(instancePath), formIndex, title));
