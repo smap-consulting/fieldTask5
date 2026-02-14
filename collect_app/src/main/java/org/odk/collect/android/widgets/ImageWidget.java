@@ -81,6 +81,16 @@ public class ImageWidget extends BaseImageWidget {
         return binding.getRoot();
     }
 
+    // smap - auto launch
+    @Override
+    public boolean performAutoLaunch() {
+        if (getAnswer() == null) {
+            getPermissionsProvider().requestCameraPermission((Activity) getContext(), this::captureImage);
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public Intent addExtrasToIntent(Intent intent) {
         return intent;

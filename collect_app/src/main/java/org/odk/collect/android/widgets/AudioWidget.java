@@ -100,6 +100,16 @@ public class AudioWidget extends QuestionWidget implements FileWidget, WidgetDat
         });
     }
 
+    // smap - auto launch
+    @Override
+    public boolean performAutoLaunch() {
+        if (getAnswer() == null) {
+            binding.recordAudioButton.performClick();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     protected View onCreateWidgetView(Context context, FormEntryPrompt prompt, int answerFontSize) {
         binding = AudioWidgetAnswerBinding.inflate(LayoutInflater.from(context));

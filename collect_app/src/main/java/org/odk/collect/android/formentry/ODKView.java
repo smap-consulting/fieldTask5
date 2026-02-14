@@ -116,6 +116,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
     private final ArrayList<QuestionWidget> widgets;
     FormEntryCaption intentGroup;
     int intentGroupStartIndex = -1;
+    private View exGroupAutoLaunchButton = null;  // smap
 
     private WidgetValueChangedListener widgetValueChangedListener;
 
@@ -226,14 +227,31 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
     private void autoplayIfNeeded(boolean advancingPage) {
         // see if there is an autoplay option.
         // Only execute it during forward swipes through the form
-        if (advancingPage && widgets.size() == 1) {
+        if (advancingPage && widgets.size() > 0) {  // smap: removed == 1 check
             FormEntryPrompt firstPrompt = widgets.get(0).getFormEntryPrompt();
             Boolean autoplayedAudio = autoplayAudio(firstPrompt);
 
             if (!autoplayedAudio) {
-                autoplayVideo(firstPrompt);
+                if (!autoplayVideo(firstPrompt)) {
+                    // smap - auto launch widget or intent group
+                    autoLaunchIfNeeded(firstPrompt);
+                }
             }
+        }
+    }
 
+    // smap - auto launch widget action
+    private void autoLaunchIfNeeded(FormEntryPrompt firstPrompt) {
+        if (exGroupAutoLaunchButton != null) {
+            new Handler().postDelayed(() -> exGroupAutoLaunchButton.performClick(), 150);
+            return;
+        }
+
+        String autoOption = firstPrompt.getFormElement().getAdditionalAttribute(null, "auto");
+        if (autoOption != null && (autoOption.equalsIgnoreCase("yes") || autoOption.equalsIgnoreCase("true"))) {
+            if (widgets.get(0).getAnswer() == null) {
+                new Handler().postDelayed(() -> widgets.get(0).performAutoLaunch(), 150);
+            }
         }
     }
 
@@ -246,7 +264,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
         return promptAutoplayer.autoplayIfNeeded(firstPrompt);
     }
 
-    private void autoplayVideo(FormEntryPrompt prompt) {
+    private boolean autoplayVideo(FormEntryPrompt prompt) {  // smap: changed to boolean
         final String autoplayOption = prompt.getFormElement().getAdditionalAttribute(null, "autoplay");
 
         if (autoplayOption != null) {
@@ -254,8 +272,10 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
                 new Handler().postDelayed(() -> {
                     widgets.get(0).getAudioVideoImageTextLabel().playVideo();
                 }, 150);
+                return true;  // smap
             }
         }
+        return false;  // smap
     }
 
     /**
@@ -277,7 +297,15 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
                     intentGroup = closestParent;
                     intentGroupStartIndex = questionIndex;
                     try {
-                        addIntentLaunchButton(context, formController.getQuestionPrompts(closestParent.getIndex()), intentGroup, intentString, -1);
+                        View button = addIntentLaunchButton(context, formController.getQuestionPrompts(closestParent.getIndex()), intentGroup, intentString, -1);
+                        // smap - check for auto launch on intent group
+                        String autoOption = closestParent.getFormElement().getAdditionalAttribute(null, "auto");
+                        if (autoOption != null && (autoOption.equalsIgnoreCase("yes") || autoOption.equalsIgnoreCase("true"))) {
+                            FormEntryPrompt[] groupPrompts = formController.getQuestionPrompts(closestParent.getIndex());
+                            if (groupPrompts.length > 0 && groupPrompts[0].getAnswerValue() == null) {
+                                exGroupAutoLaunchButton = button;
+                            }
+                        }
                     } catch (RepeatsInFieldListException e) {
                         // ignore because it would have been handled as part of building the view initially
                     }
@@ -476,8 +504,8 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
      * Adds a button to launch an intent at the end of the widgets list. Should be called at the start
      * of the intent group for the current field list.
      */
-    private void addIntentLaunchButton(Context context, FormEntryPrompt[] questionPrompts,
-                                       FormEntryCaption c, String intentString, int viewIndex) {
+    private View addIntentLaunchButton(Context context, FormEntryPrompt[] questionPrompts,
+                                       FormEntryCaption c, String intentString, int viewIndex) {  // smap: changed return type
         String v = c.getSpecialFormQuestionText("buttonText");
         final String buttonText = (v != null) ? v : context.getString(org.odk.collect.strings.R.string.launch_app);
 
@@ -545,6 +573,8 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
                 ToastUtils.showShortToast(errorString);
             }
         });
+
+        return launchIntentButton;  // smap
     }
 
     public void setFocus(Context context) {

@@ -133,6 +133,16 @@ public class ExStringWidget extends QuestionWidget implements WidgetDataReceiver
         return binding.getRoot();
     }
 
+    // smap - auto launch
+    @Override
+    public boolean performAutoLaunch() {
+        if (getAnswer() == null) {
+            binding.launchAppButton.performClick();
+            return true;
+        }
+        return false;
+    }
+
     private String getButtonText() {
         String v = getFormEntryPrompt().getSpecialFormQuestionText("buttonText");
         return v != null ? v : getContext().getString(org.odk.collect.strings.R.string.launch_app);

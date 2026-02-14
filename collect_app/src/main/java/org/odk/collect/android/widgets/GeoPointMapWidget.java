@@ -83,6 +83,16 @@ public class GeoPointMapWidget extends QuestionWidget implements WidgetDataRecei
         return binding.getRoot();
     }
 
+    // smap - auto launch
+    @Override
+    public boolean performAutoLaunch() {
+        if (getAnswer() == null) {
+            binding.simpleButton.performClick();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public IAnswerData getAnswer() {
         double[] parsedGeometryPoint = parseGeometryPoint(answerText);

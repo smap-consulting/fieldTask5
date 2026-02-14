@@ -78,6 +78,15 @@ class BarcodeWidget(
 
     override fun setOnLongClickListener(listener: OnLongClickListener?) = Unit
 
+    // smap - auto launch
+    override fun performAutoLaunch(): Boolean {
+        if (answer == null) {
+            onButtonClick()
+            return true
+        }
+        return false
+    }
+
     private fun onButtonClick() {
         getPermissionsProvider().requestCameraPermission(
             (context as Activity),

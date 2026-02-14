@@ -295,6 +295,11 @@ public abstract class QuestionWidget extends FrameLayout implements Widget {
         return false;
     }
 
+    // smap - auto launch widget action
+    public boolean performAutoLaunch() {
+        return false;
+    }
+
     private TextView setupHelpText(TextView helpText, FormEntryPrompt prompt) {
         String s = prompt.getHelpText();
 

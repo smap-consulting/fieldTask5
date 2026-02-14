@@ -150,6 +150,16 @@ public class NfcWidget extends QuestionWidget implements WidgetDataReceiver {
 		mStringAnswer.cancelLongPress();
 	}
 
+    // smap - auto launch
+    @Override
+    public boolean performAutoLaunch() {
+        if (getAnswer() == null) {
+            onButtonClick();
+            return true;
+        }
+        return false;
+    }
+
     private void onButtonClick() {
         waitingForDataRegistry.waitForData(getFormEntryPrompt().getIndex());
         Intent i = new Intent(getContext(), NFCActivity.class);

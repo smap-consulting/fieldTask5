@@ -269,6 +269,19 @@ public class SmapFormWidget extends QuestionWidget implements WidgetDataReceiver
         launchIntentButton.cancelLongPress();
     }
 
+    // smap - auto launch
+    @Override
+    public boolean performAutoLaunch() {
+        if (getAnswer() == null && validForm
+                && Collect.getInstance().getFormController() != null) {
+            launchIntentButton.setVisibility(GONE);
+            launching.setVisibility(VISIBLE);
+            onButtonClick();
+            return true;
+        }
+        return false;
+    }
+
     private void onButtonClick() {
         // 1. Save restore information in collect app
         String instancePath = Collect.getInstance().getFormController().getInstanceFile().getAbsolutePath();

@@ -88,6 +88,22 @@ class VideoWidget(
         }
     }
 
+    // smap - auto launch
+    override fun performAutoLaunch(): Boolean {
+        if (answer == null) {
+            getPermissionsProvider().requestCameraPermission(
+                context as Activity,
+                object : PermissionListener {
+                    override fun granted() {
+                        captureVideo()
+                    }
+                }
+            )
+            return true
+        }
+        return false
+    }
+
     override fun deleteFile() {
         questionMediaManager.deleteAnswerFile(
             formEntryPrompt.getIndex().toString(),
