@@ -171,62 +171,11 @@ public class ManageForm {
 
     }
 
-	private boolean isIncompleteInstance(String formId, String version) {
-
-		boolean isIncomplete = false;
-   	 	Cursor c = null;
-
-		try {
-
-			// get all complete or failed submission instances
-			String selection = null;
-			String selectionArgs1 [] = { Instance.STATUS_INCOMPLETE,
-					formId
-					};
-
-			String selectionArgs2 [] = 	{ Instance.STATUS_INCOMPLETE,
-					formId,
-                    version
-					};
-
-			if(version == null) {
-				selection = InstanceColumns.STATUS + "=? and "
-						+ InstanceColumns.JR_FORM_ID + "=? and "
-						+ InstanceColumns.JR_VERSION + " is null";
-
-			} else {
-				selection = InstanceColumns.STATUS + "=? and "
-						+ InstanceColumns.JR_FORM_ID + "=? and "
-						+ InstanceColumns.JR_VERSION + "=?";
-
-			}
-
-
-
-        	String [] proj = {InstanceColumns._ID};
-
-        	final ContentResolver resolver = Collect.getInstance().getContentResolver();
-        	if(version == null) {
-        		c = resolver.query(InstanceColumns.CONTENT_URI, proj, selection, selectionArgs1, null);
-        	} else {
-        		c = resolver.query(InstanceColumns.CONTENT_URI, proj, selection, selectionArgs2, null);
-        	}
-
-        	if(c.getCount() > 0) {
-
-            	isIncomplete = true;
-
-        	}
-		 } catch (Exception e) {
-       		 Timber.e("isIncompleteInstance Error: %s", e.getMessage());
-    	 }
-		c.close();
-
-		return isIncomplete;
-	}
-
     /*
-     * Delete any forms not in the passed in HashMap unless there is an incomplete instance
+     * Delete any forms not in the passed in HashMap.
+     * Forms with unsent instances will be soft-deleted by FormsProvider (retaining the DB record
+     * with DELETED_DATE set). Orphan instances are excluded from submission and shown with a
+     * distinct icon in the task list.
      */
     public void deleteForms(HashMap <String, String> formMap, HashMap <String, String> results) {
 

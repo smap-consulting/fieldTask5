@@ -89,6 +89,8 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
             } else {
                 d = ContextCompat.getDrawable(getContext(), R.drawable.form_state_blank_circle);
             }
+        } else if (item.formDeleted) {
+            d = ContextCompat.getDrawable(getContext(), R.drawable.form_state_orphan);
         } else if (item.taskStatus != null) {
             if (item.taskStatus.equals(Utilities.STATUS_T_ACCEPTED)) {
                 if (item.locationTrigger != null && !item.repeat) {

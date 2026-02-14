@@ -45,6 +45,7 @@ import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.android.external.InstanceProvider;
+import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.storage.StoragePathProvider;
@@ -69,7 +70,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
@@ -408,6 +411,31 @@ public class Utilities {
     }
 
     /*
+     * Get form keys (formId_v_version) for all soft-deleted forms
+     */
+    public static Set<String> getSoftDeletedFormKeys() {
+        Set<String> deletedKeys = new HashSet<>();
+        String[] proj = {
+                FormsProviderAPI.FormsColumns.JR_FORM_ID,
+                FormsProviderAPI.FormsColumns.JR_VERSION
+        };
+        String selection = FormsProviderAPI.FormsColumns.DELETED_DATE + " IS NOT NULL";
+        try (Cursor c = Collect.getInstance().getContentResolver().query(
+                FormsProviderAPI.FormsColumns.CONTENT_URI, proj, selection, null, null)) {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    String formId = c.getString(c.getColumnIndexOrThrow(FormsProviderAPI.FormsColumns.JR_FORM_ID));
+                    String version = c.getString(c.getColumnIndexOrThrow(FormsProviderAPI.FormsColumns.JR_VERSION));
+                    deletedKeys.add(formId + "_v_" + version);
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e, "Error getting soft-deleted form keys");
+        }
+        return deletedKeys;
+    }
+
+    /*
      * Get current tasks
      *  set recalculateGeofences to false if the data has not changed and location has not changed (For example the filter has been changed)
      *  set useGeofenceFilter to true if you want to filter out tasks which show distance is less than the distance of the user to the task
@@ -486,6 +514,9 @@ public class Utilities {
         String[] selectArgs = new String[selectArgsList.size()];
         selectArgs = selectArgsList.toArray(selectArgs);
 
+        // Get soft-deleted form keys to detect orphan instances
+        Set<String> softDeletedFormKeys = getSoftDeletedFormKeys();
+
         // Set up geofencing
 
         try (Cursor c = Collect.getInstance().getContentResolver().query(
@@ -530,6 +561,7 @@ public class Utilities {
                 entry.source = c.getString(c.getColumnIndexOrThrow(InstanceColumns.SOURCE));
                 entry.locationTrigger = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_LOCATION_TRIGGER));
                 entry.updateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
+                entry.formDeleted = softDeletedFormKeys.contains(entry.jrFormId + "_v_" + entry.formVersion);
 
                 if (useGeofenceFilter && location != null) {
                     if (entry.showDist > 0 && entry.schedLat != 0.0 && entry.schedLon != 0.0) {

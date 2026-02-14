@@ -91,6 +91,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -535,6 +536,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 Instance.STATUS_SUBMISSION_FAILED
             };
 
+        // Skip instances whose form has been soft-deleted (server will reject them)
+        Set<String> softDeletedFormKeys = Utilities.getSoftDeletedFormKeys();
+
         ArrayList<Long> toUpload = new ArrayList<Long>();
         Cursor c = null;
         try {
@@ -544,6 +548,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             if (c != null && c.getCount() > 0) {
                 c.move(-1);
                 while (c.moveToNext()) {
+                    String formId = c.getString(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
+                    String version = c.getString(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.JR_VERSION));
+                    if (softDeletedFormKeys.contains(formId + "_v_" + version)) {
+                        Timber.i("Skipping upload of orphan instance for deleted form: %s_v_%s", formId, version);
+                        continue;
+                    }
                     Long l = c.getLong(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns._ID));
                     toUpload.add(Long.valueOf(l));
                 }

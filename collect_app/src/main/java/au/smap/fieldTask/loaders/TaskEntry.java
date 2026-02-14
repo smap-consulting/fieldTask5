@@ -40,6 +40,7 @@ public class TaskEntry {
     public String formURI;
     public String updateId;
     public Boolean readOnly = false;
+    public boolean formDeleted = false;  // True if the parent form has been soft-deleted
     //public String geometryXPath;  // Disable
 
 
