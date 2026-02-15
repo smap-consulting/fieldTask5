@@ -177,6 +177,9 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     @Inject
     org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider autoSendSettingsProvider;
 
+    @Inject
+    org.odk.collect.android.instancemanagement.InstancesDataService instancesDataService;
+
     // End scoped storage
 
 
@@ -208,6 +211,10 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         LocationRegister lr = new LocationRegister();
         DaggerUtils.getComponent(this).inject(this);
+
+        // Populate instances data on background thread so DeleteFormsActivity can show saved forms
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() ->
+                instancesDataService.update(projectsDataService.requireCurrentProject().getUuid()));
 
         String[] tabNames = {getString(R.string.smap_forms), getString(R.string.smap_tasks), getString(R.string.smap_map)};
         // Get the ViewPager and set its PagerAdapter so that it can display items
@@ -549,6 +556,10 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     public void taskDownloadingComplete(HashMap<String, String> result) {
 
         Timber.i("Complete - Send intent");
+
+        // Refresh instances data after sync (forms may have been soft-deleted)
+        java.util.concurrent.Executors.newSingleThreadExecutor().execute(() ->
+                instancesDataService.update(projectsDataService.requireCurrentProject().getUuid()));
 
         try {
             dismissProgressDialog();
