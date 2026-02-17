@@ -11,7 +11,7 @@
     <string translatable="false" name="app_name">FieldTask</string>
     <string translatable="false" name="default_server_url">https://sg.smap.com.au</string>
     <string translatable="false" name="default_username">gplay</string>
-    <string translatable="false" name="default_password">gplay</string>
+    <string translatable="false" name="default_password">gplay!2</string>
     <string translatable="false" name="app_url">http://blog.smap.com.au</string>
 
 </resources>
