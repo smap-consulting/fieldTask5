@@ -222,7 +222,7 @@ public abstract class AppListActivity extends LocalizedActivity {
             return true;
         }
 
-        if (item.getItemId() == R.id.menu_sort) {
+        if (item.getItemId() == R.id.menu_sort && sortingOptions != null) {
             new FormListSortingBottomSheetDialog(
                     this,
                     sortingOptions,
