@@ -274,11 +274,11 @@ public class EncryptionUtils {
             formId = instance.getFormId();
             formVersion = instance.getFormVersion();
 
-            List<Form> forms = new FormsRepositoryProvider(Collect.getInstance()).create().getAllByFormIdAndVersion(formId, formVersion);
+            List<Form> forms = new FormsRepositoryProvider(Collect.getInstance()).create().getAllByFormId(formId); // smap - match by formId only, ignore version
 
             // OK to finalize with form definition that was soft-deleted. OK if there are multiple
             // forms with the same formid/version as long as only one is active (not deleted).
-            if (forms.isEmpty() || new FormsRepositoryProvider(Collect.getInstance()).create().getAllNotDeletedByFormIdAndVersion(formId, formVersion).size() > 1) {
+            if (forms.isEmpty() || new FormsRepositoryProvider(Collect.getInstance()).create().getAllNotDeletedByFormId(formId).size() > 1) { // smap - match by formId only, ignore version
                 String msg = getLocalizedString(Collect.getInstance(), org.odk.collect.strings.R.string.not_exactly_one_blank_form_for_this_form_id);
                 Timber.d(msg);
                 throw new EncryptionException(msg, null);

@@ -91,10 +91,8 @@ object LocalInstancesUseCases {
         formsRepository: FormsRepository,
         clock: () -> Long = { System.currentTimeMillis() }
     ): Instance {
-        val formName = formsRepository.getAllByFormIdAndVersion(
-            sourceInstance.formId,
-            sourceInstance.formVersion
-        ).first().displayName
+        val formName = formsRepository.getAllByFormId(sourceInstance.formId) // smap - match by formId only, ignore version
+            .first().displayName
         val targetInstanceFile = copyInstanceDir(File(instanceFilePath), instancesDir, formName, clock)
 
         return instancesRepository.save(

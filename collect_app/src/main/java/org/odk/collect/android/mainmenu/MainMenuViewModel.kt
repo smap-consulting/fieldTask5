@@ -149,7 +149,7 @@ class MainMenuViewModel(
                 org.odk.collect.strings.R.string.form_saved_as_draft
             } else if (instance.status == Instance.STATUS_COMPLETE || instance.status == Instance.STATUS_SUBMISSION_FAILED) {
                 val form = formsRepositoryProvider.create()
-                    .getAllByFormIdAndVersion(instance.formId, instance.formVersion).first()
+                    .getAllByFormId(instance.formId).first() // smap - match by formId only, ignore version
                 if (form.shouldFormBeSentAutomatically(autoSendSettingsProvider.isAutoSendEnabledInSettings())) {
                     org.odk.collect.strings.R.string.form_sending
                 } else {
