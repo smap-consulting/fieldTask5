@@ -278,7 +278,7 @@ private class FormUriViewModel(
                 resources.getString(string.instance_deleted_message)
             } else {
                 val candidateForms = formsRepositoryProvider.create()
-                    .getAllByFormIdAndVersion(instance.formId, instance.formVersion)
+                    .getAllByFormId(instance.formId) // smap - match by formId only, ignore version
 
                 if (candidateForms.isEmpty()) {
                     val version = if (instance.formVersion == null) {

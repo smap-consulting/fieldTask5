@@ -411,28 +411,26 @@ public class Utilities {
     }
 
     /*
-     * Get form keys (formId_v_version) for all active forms in the DB.
-     * Instances whose key is NOT in this set are orphans.
+     * Get formIds for all active forms in the DB.
+     * Instances whose formId is NOT in this set are orphans.
      */
-    public static Set<String> getActiveFormKeys() {
-        Set<String> activeKeys = new HashSet<>();
+    public static Set<String> getActiveFormIds() {
+        Set<String> activeIds = new HashSet<>();
         String[] proj = {
-                FormsProviderAPI.FormsColumns.JR_FORM_ID,
-                FormsProviderAPI.FormsColumns.JR_VERSION
+                FormsProviderAPI.FormsColumns.JR_FORM_ID
         };
         try (Cursor c = Collect.getInstance().getContentResolver().query(
                 FormsProviderAPI.FormsColumns.CONTENT_URI, proj, null, null, null)) {
             if (c != null) {
                 while (c.moveToNext()) {
                     String formId = c.getString(c.getColumnIndexOrThrow(FormsProviderAPI.FormsColumns.JR_FORM_ID));
-                    String version = c.getString(c.getColumnIndexOrThrow(FormsProviderAPI.FormsColumns.JR_VERSION));
-                    activeKeys.add(formId + "_v_" + version);
+                    activeIds.add(formId);
                 }
             }
         } catch (Exception e) {
-            Timber.e(e, "Error getting active form keys");
+            Timber.e(e, "Error getting active form ids");
         }
-        return activeKeys;
+        return activeIds;
     }
 
     /*
@@ -515,7 +513,7 @@ public class Utilities {
         selectArgs = selectArgsList.toArray(selectArgs);
 
         // Get active form keys to detect orphan instances
-        Set<String> activeFormKeys = getActiveFormKeys();
+        Set<String> activeFormIds = getActiveFormIds();
 
         // Set up geofencing
 
@@ -561,7 +559,7 @@ public class Utilities {
                 entry.source = c.getString(c.getColumnIndexOrThrow(InstanceColumns.SOURCE));
                 entry.locationTrigger = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_LOCATION_TRIGGER));
                 entry.updateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
-                entry.formDeleted = !activeFormKeys.contains(entry.jrFormId + "_v_" + entry.formVersion);
+                entry.formDeleted = !activeFormIds.contains(entry.jrFormId);
 
                 if (useGeofenceFilter && location != null) {
                     if (entry.showDist > 0 && entry.schedLat != 0.0 && entry.schedLon != 0.0) {

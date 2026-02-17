@@ -538,7 +538,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             };
 
         // Skip orphan instances whose form no longer exists in DB
-        Set<String> activeFormKeys = Utilities.getActiveFormKeys();
+        Set<String> activeFormIds = Utilities.getActiveFormIds();
 
         ArrayList<Long> toUpload = new ArrayList<Long>();
         Cursor c = null;
@@ -550,9 +550,8 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 c.move(-1);
                 while (c.moveToNext()) {
                     String formId = c.getString(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
-                    String version = c.getString(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.JR_VERSION));
-                    if (!activeFormKeys.contains(formId + "_v_" + version)) {
-                        Timber.i("Skipping upload of orphan instance (form not in DB): %s_v_%s", formId, version);
+                    if (!activeFormIds.contains(formId)) {
+                        Timber.i("Skipping upload of orphan instance (form not in DB): %s", formId);
                         continue;
                     }
                     Long l = c.getLong(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns._ID));
