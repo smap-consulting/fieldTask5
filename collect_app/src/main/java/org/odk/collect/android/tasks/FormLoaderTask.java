@@ -525,6 +525,11 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
         templateRoot.populate(savedRoot, fec.getModel().getForm());
         XFormParser.setAnswerResolver(new DefaultAnswerResolver());
 
+        // smap - populate() marks nodes not present in saved data as irrelevant,
+        // hiding new questions added in later form versions. Reset all nodes to
+        // relevant; formDef.initialize() will apply actual relevance conditions.
+        restoreRelevance(templateRoot);
+
         // FormInstanceParser.parseInstance is responsible for initial creation of instances. It explicitly sets the
         // main instance name to null so we force this again on deserialization because some code paths rely on the main
         // instance not having a name. Must be before the call on setRoot because setRoot also sets the root's name.
@@ -542,6 +547,15 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
                             fec.getModel().getForm().getLocalizer());
         }
         Timber.i("Done importing data");
+    }
+
+    // smap - Reset relevance on all nodes so new questions in updated forms are visible.
+    // populate() sets relevance to false for nodes absent from saved instance data.
+    private static void restoreRelevance(TreeElement node) {
+        node.setRelevant(true);
+        for (int i = 0; i < node.getNumChildren(); i++) {
+            restoreRelevance(node.getChildAt(i));
+        }
     }
 
     // smap - Import initial data XML fragment into form instance for form launcher
