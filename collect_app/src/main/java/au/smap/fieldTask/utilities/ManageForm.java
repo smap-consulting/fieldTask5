@@ -173,9 +173,9 @@ public class ManageForm {
 
     /*
      * Delete any forms not in the passed in HashMap.
-     * Forms with unsent instances will be soft-deleted by FormsProvider (retaining the DB record
-     * with DELETED_DATE set). Orphan instances are excluded from submission and shown with a
-     * distinct icon in the task list.
+     * Forms are always hard-deleted. Instances whose form is missing are treated as
+     * orphans — excluded from submission and shown with a distinct icon in the task list.
+     * When the form is re-downloaded, orphan instances automatically become submittable again.
      */
     public void deleteForms(HashMap <String, String> formMap, HashMap <String, String> results) {
 

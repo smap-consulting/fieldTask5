@@ -332,16 +332,6 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 	            if(isCancelled()) { throw new CancelException("cancelled"); };		// Return if the user cancels
 
                 /*
-                 * Submit any completed forms
-                 */
-                InstanceUploaderTask.Outcome submitOutcome = submitCompletedForms();
-                if(submitOutcome != null && submitOutcome.messagesByInstanceId != null) {
-                    for (String key : submitOutcome.messagesByInstanceId.keySet()) {
-                        results.put(key, submitOutcome.messagesByInstanceId.get(key));
-                    }
-                }
-
-                /*
                  * Get an array of the existing server tasks on the phone and create a hashmap indexed on the assignment id
                  */
                 Utilities.getTasks(tasks, false, ApplicationConstants.SortingOrder.BY_NAME_ASC, "", true, false, true);
@@ -410,6 +400,17 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 if(outcome != null) {
                     for (ServerFormDetailsSmap key : outcome.keySet()) {
                         results.put(key.getFormName(), outcome.get(key));
+                    }
+                }
+
+                /*
+                 * Submit completed forms after form sync so restored forms
+                 * allow previously-orphaned instances to be submitted
+                 */
+                InstanceUploaderTask.Outcome submitOutcome = submitCompletedForms();
+                if(submitOutcome != null && submitOutcome.messagesByInstanceId != null) {
+                    for (String key : submitOutcome.messagesByInstanceId.keySet()) {
+                        results.put(key, submitOutcome.messagesByInstanceId.get(key));
                     }
                 }
 
@@ -536,8 +537,8 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 Instance.STATUS_SUBMISSION_FAILED
             };
 
-        // Skip instances whose form has been soft-deleted (server will reject them)
-        Set<String> softDeletedFormKeys = Utilities.getSoftDeletedFormKeys();
+        // Skip orphan instances whose form no longer exists in DB
+        Set<String> activeFormKeys = Utilities.getActiveFormKeys();
 
         ArrayList<Long> toUpload = new ArrayList<Long>();
         Cursor c = null;
@@ -550,8 +551,8 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 while (c.moveToNext()) {
                     String formId = c.getString(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
                     String version = c.getString(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns.JR_VERSION));
-                    if (softDeletedFormKeys.contains(formId + "_v_" + version)) {
-                        Timber.i("Skipping upload of orphan instance for deleted form: %s_v_%s", formId, version);
+                    if (!activeFormKeys.contains(formId + "_v_" + version)) {
+                        Timber.i("Skipping upload of orphan instance (form not in DB): %s_v_%s", formId, version);
                         continue;
                     }
                     Long l = c.getLong(c.getColumnIndexOrThrow(InstanceProviderAPI.InstanceColumns._ID));

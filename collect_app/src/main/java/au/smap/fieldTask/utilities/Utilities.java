@@ -411,28 +411,28 @@ public class Utilities {
     }
 
     /*
-     * Get form keys (formId_v_version) for all soft-deleted forms
+     * Get form keys (formId_v_version) for all active forms in the DB.
+     * Instances whose key is NOT in this set are orphans.
      */
-    public static Set<String> getSoftDeletedFormKeys() {
-        Set<String> deletedKeys = new HashSet<>();
+    public static Set<String> getActiveFormKeys() {
+        Set<String> activeKeys = new HashSet<>();
         String[] proj = {
                 FormsProviderAPI.FormsColumns.JR_FORM_ID,
                 FormsProviderAPI.FormsColumns.JR_VERSION
         };
-        String selection = FormsProviderAPI.FormsColumns.DELETED_DATE + " IS NOT NULL";
         try (Cursor c = Collect.getInstance().getContentResolver().query(
-                FormsProviderAPI.FormsColumns.CONTENT_URI, proj, selection, null, null)) {
+                FormsProviderAPI.FormsColumns.CONTENT_URI, proj, null, null, null)) {
             if (c != null) {
                 while (c.moveToNext()) {
                     String formId = c.getString(c.getColumnIndexOrThrow(FormsProviderAPI.FormsColumns.JR_FORM_ID));
                     String version = c.getString(c.getColumnIndexOrThrow(FormsProviderAPI.FormsColumns.JR_VERSION));
-                    deletedKeys.add(formId + "_v_" + version);
+                    activeKeys.add(formId + "_v_" + version);
                 }
             }
         } catch (Exception e) {
-            Timber.e(e, "Error getting soft-deleted form keys");
+            Timber.e(e, "Error getting active form keys");
         }
-        return deletedKeys;
+        return activeKeys;
     }
 
     /*
@@ -514,8 +514,8 @@ public class Utilities {
         String[] selectArgs = new String[selectArgsList.size()];
         selectArgs = selectArgsList.toArray(selectArgs);
 
-        // Get soft-deleted form keys to detect orphan instances
-        Set<String> softDeletedFormKeys = getSoftDeletedFormKeys();
+        // Get active form keys to detect orphan instances
+        Set<String> activeFormKeys = getActiveFormKeys();
 
         // Set up geofencing
 
@@ -561,7 +561,7 @@ public class Utilities {
                 entry.source = c.getString(c.getColumnIndexOrThrow(InstanceColumns.SOURCE));
                 entry.locationTrigger = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_LOCATION_TRIGGER));
                 entry.updateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
-                entry.formDeleted = softDeletedFormKeys.contains(entry.jrFormId + "_v_" + entry.formVersion);
+                entry.formDeleted = !activeFormKeys.contains(entry.jrFormId + "_v_" + entry.formVersion);
 
                 if (useGeofenceFilter && location != null) {
                     if (entry.showDist > 0 && entry.schedLat != 0.0 && entry.schedLon != 0.0) {
