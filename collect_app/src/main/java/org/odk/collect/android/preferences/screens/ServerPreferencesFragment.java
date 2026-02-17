@@ -116,6 +116,7 @@ public class ServerPreferencesFragment extends BaseProjectPreferencesFragment {
 
         passwordPreference.setOnBindEditTextListener(editText -> {
             editText.setFilters(new InputFilter[]{new ControlCharacterFilter()});
+            editText.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
         });
 
         // smap - token authentication
