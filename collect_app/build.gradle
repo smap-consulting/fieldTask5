@@ -81,7 +81,7 @@ android {
         applicationId('org.smap.smapTask.android')
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
-        versionCode project.hasProperty('versionCode') ? project.getProperties()['versionCode'].toInteger() : 51002  // smap
+        versionCode project.hasProperty('versionCode') ? project.getProperties()['versionCode'].toInteger() : 51003  // smap
         versionName getVersionName()
         testInstrumentationRunner('androidx.test.runner.AndroidJUnitRunner')
         vectorDrawables.useSupportLibrary = true
@@ -102,71 +102,71 @@ android {
     productFlavors {
         standard {
             applicationId "org.smap.smapTask.android"
-            versionName "5.1.02"
+            versionName "5.1.03"
         }
         fieldTaskMax {
             applicationId "org.smap.smapTask.android.fieldTaskMax"
-            versionName "5.1.02"
+            versionName "5.1.03"
         }
         plan {
             applicationId "org.smap.smapTask.android.plan"
-            versionName "5.1.02-plan"
+            versionName "5.1.03-plan"
         }
         kontrolid {
             applicationId "org.smap.smapTask.android.kontrolid"
-            versionName "5.1.02-kontrolid"
+            versionName "5.1.03-kontrolid"
         }
         xxx4 {
             applicationId "org.smap.smapTask.android.xxx4"
-            versionName "5.1.02-xxx4"
+            versionName "5.1.03-xxx4"
         }
         kontrolid_corporate {
             applicationId "org.smap.smapTask.android.kontrolid_corporate"
-            versionName "5.1.02-kontrolid"
+            versionName "5.1.03-kontrolid"
         }
         xxx3 {
             applicationId "org.smap.smapTask.android.xxx3"
-            versionName "5.1.02-xxx3"
+            versionName "5.1.03-xxx3"
         }
         xxx1 {
             applicationId "org.smap.smapTask.android.xxx1"
-            versionName "5.1.02-xxx1"
+            versionName "5.1.03-xxx1"
         }
         meqa {
             applicationId "org.smap.smapTask.android.meqa"
-            versionName "5.1.02-meqa"
+            versionName "5.1.03-meqa"
         }
         xxx2 {
             applicationId "org.smap.smapTask.android.xxx2"
-            versionName "5.1.02-xxx2"
+            versionName "5.1.03-xxx2"
         }
         pop {
             applicationId "org.smap.smapTask.android.pop"
-            versionName "5.1.02-pop"
+            versionName "5.1.03-pop"
         }
         tdh {
             applicationId "org.smap.smapTask.android.tdh"
-            versionName "5.1.02-tdh"
+            versionName "5.1.03-tdh"
         }
         informEd {
             applicationId "org.smap.smapTask.android.informEd"
-            versionName "5.1.02-informEd"
+            versionName "5.1.03-informEd"
         }
         pangolin {
             applicationId "org.smap.smapTask.android.pangolin"
-            versionName "5.1.02-pangolin"
+            versionName "5.1.03-pangolin"
         }
         stl2 {
             applicationId "org.smap.smapTask.android.stl2"
-            versionName "5.1.02-stl2"
+            versionName "5.1.03-stl2"
         }
         ljstracker {
             applicationId "org.smap.smapTask.android.ljstracker"
-            versionName "5.1.02-ljstracker"
+            versionName "5.1.03-ljstracker"
         }
         bps {
             applicationId "org.smap.smapTask.android.bps"
-            versionName "5.1.02-bps"
+            versionName "5.1.03-bps"
         }
     }
 
