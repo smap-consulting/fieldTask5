@@ -32,14 +32,20 @@ object SavepointUseCases {
             null
         } else {
             val instance = instanceRepository.get(ContentUriHelper.getIdFromUri(uri))!!
-            val form = formsRepository.getLatestByFormIdAndVersion(instance.formId, instance.formVersion)!!
+            val form = formsRepository.getAllByFormId(instance.formId) // smap - match by formId only, ignore version
+                .sortedByDescending { it.date }
+                .firstOrNull()
 
-            val savepoint = savepointsRepository.get(form.dbId, instance.dbId)
-            if (savepoint != null &&
-                File(savepoint.savepointFilePath).exists() &&
-                File(savepoint.savepointFilePath).lastModified() > instance.lastStatusChangeDate
-            ) {
-                savepoint
+            if (form != null) {
+                val savepoint = savepointsRepository.get(form.dbId, instance.dbId)
+                if (savepoint != null &&
+                    File(savepoint.savepointFilePath).exists() &&
+                    File(savepoint.savepointFilePath).lastModified() > instance.lastStatusChangeDate
+                ) {
+                    savepoint
+                } else {
+                    null
+                }
             } else {
                 null
             }
