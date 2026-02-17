@@ -288,9 +288,7 @@ private class FormUriViewModel(
                     }
 
                     resources.getString(string.parent_form_not_present, "${instance.formId}$version")
-                } else if (candidateForms.filter { !it.isDeleted }.size > 1) {
-                    resources.getString(string.survey_multiple_forms_error)
-                } else {
+                } else { // smap - removed multiple forms check, multiple versions of same formId is valid
                     null
                 }
             }
@@ -334,7 +332,7 @@ private class FormUriViewModel(
             formsRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))!!
         } else {
             val instance = instancesRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))!!
-            formsRepositoryProvider.create().getAllByFormId(instance.formId).first() // smap - match by formId only, ignore version
+            formsRepositoryProvider.create().getAllByFormId(instance.formId).maxByOrNull { it.date }!! // smap - match by formId only, use latest version
         }
 
         if (form.usesEntities()) {

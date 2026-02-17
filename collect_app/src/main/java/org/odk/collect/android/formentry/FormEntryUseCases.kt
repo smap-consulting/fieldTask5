@@ -33,8 +33,8 @@ object FormEntryUseCases {
         formDefCache: FormDefCache
     ): Pair<FormDef, Form>? {
         val form =
-            formsRepository.getAllByFormId(instance.formId) // smap - match by formId only, ignore version
-                .firstOrNull()
+            formsRepository.getAllByFormId(instance.formId) // smap - match by formId only, use latest version
+                .maxByOrNull { it.date }
         return if (form == null) {
             null
         } else {

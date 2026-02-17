@@ -180,7 +180,8 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
 
             List<Form> candidateForms = new FormsRepositoryProvider(Collect.getInstance()).create().getAllByFormId(instance.getFormId()); // smap - match by formId only, ignore version
 
-            form = candidateForms.get(0);
+            // smap - pick the latest form version
+            form = candidateForms.stream().max(java.util.Comparator.comparingLong(Form::getDate)).orElse(candidateForms.get(0));
             savepoint = savepointsRepository.get(form.getDbId(), instance.getDbId());
         } else if (uriMimeType != null && uriMimeType.equals(FormsContract.CONTENT_ITEM_TYPE)) {
             form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(uri));
