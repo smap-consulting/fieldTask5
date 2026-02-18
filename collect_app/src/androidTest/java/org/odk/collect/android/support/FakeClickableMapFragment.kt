@@ -78,6 +78,8 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
         return mutableListOf()
     }
 
+    override fun appendPointToPolyLine(featureId: Int, point: MapPoint) {}
+
     override fun removePolyLineLastPoint(featureId: Int) {}
 
     override fun removeFeature(featureId: Int) {}

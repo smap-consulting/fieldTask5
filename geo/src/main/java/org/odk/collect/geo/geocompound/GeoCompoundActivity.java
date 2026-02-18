@@ -50,6 +50,7 @@ import org.odk.collect.geo.geopoint.LocationAccuracy;
 import org.odk.collect.geo.geopoly.GeoPolySettingsDialogFragment;
 import org.odk.collect.location.Location;
 import org.odk.collect.location.tracker.LocationTracker;
+import org.odk.collect.location.tracker.LocationTrackerKt;
 import org.odk.collect.maps.LineDescription;
 import org.odk.collect.maps.MapFragmentFactory;
 import org.odk.collect.maps.MapFragment;
@@ -157,7 +158,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-            if (!intentReadOnly && map != null && !originalPoly.equals(map.getPolyLinePoints(lineFeatureId))) {
+            if (!intentReadOnly && map != null && !originalPoly.equals(map.getPolyPoints(lineFeatureId))) {
                 showBackDialog();
             } else {
                 finish();
@@ -216,7 +217,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
             }
             return;
         }
-        state.putParcelableArrayList(POINTS_KEY, new ArrayList<>(map.getPolyLinePoints(lineFeatureId)));
+        state.putParcelableArrayList(POINTS_KEY, new ArrayList<>(map.getPolyPoints(lineFeatureId)));
         state.putParcelableArrayList(MARKERS_KEY, new ArrayList<>(getMarkerArray()));
         state.putBoolean(INPUT_ACTIVE_KEY, inputActive);
         state.putBoolean(RECORDING_ENABLED_KEY, recordingEnabled);
@@ -266,7 +267,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
         playButton = findViewById(R.id.play);
         playButton.setOnClickListener(v -> {
-            if (map.getPolyLinePoints(lineFeatureId).isEmpty()) {
+            if (map.getPolyPoints(lineFeatureId).isEmpty()) {
                 DialogFragmentUtils.showIfNotShowing(GeoPolySettingsDialogFragment.class, getSupportFragmentManager());
             } else {
                 startInput();
@@ -307,8 +308,8 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
         originalPoly = points;
 
-        if(map.getPolyLinePoints(lineFeatureId).size() > 0) {
-            points = map.getPolyLinePoints(lineFeatureId);
+        if(map.getPolyPoints(lineFeatureId).size() > 0) {
+            points = map.getPolyPoints(lineFeatureId);
         } else {
             // Create the polyline
             lineFeatureId = map.addPolyLine(new LineDescription(points, null, null, true, false));
@@ -338,14 +339,14 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     }
 
     private void createMarkersForVertices() {
-        List<MapPoint> points = map.getPolyLinePoints(lineFeatureId);
+        List<MapPoint> points = map.getPolyPoints(lineFeatureId);
         for (int i = 0; i < points.size(); i++) {
             createOrUpdateMarker(i);
         }
     }
 
     private void createOrUpdateMarker(int vertexIdx) {
-        List<MapPoint> points = map.getPolyLinePoints(lineFeatureId);
+        List<MapPoint> points = map.getPolyPoints(lineFeatureId);
         if (vertexIdx >= points.size()) {
             return;
         }
@@ -356,7 +357,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         int iconRes = (cm != null && !cm.type.equals("none"))
                 ? cm.getDrawableIdForMarker()
                 : org.odk.collect.icons.R.drawable.ic_map_point;
-        MarkerIconDescription iconDesc = new MarkerIconDescription(iconRes);
+        MarkerIconDescription iconDesc = new MarkerIconDescription.DrawableResource(iconRes);
 
         Integer existingFeatureId = markerFeatureIds.get(vertexIdx);
         if (existingFeatureId != null) {
@@ -370,11 +371,11 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void saveAsGeoCompound() {
         String result = "";     // Default result if there are no points
-        if (map.getPolyLinePoints(lineFeatureId).size() == 1) {
+        if (map.getPolyPoints(lineFeatureId).size() == 1) {
             ToastUtils.showShortToast(getString(org.odk.collect.strings.R.string.polyline_validator));
             return;     // do not finish
-        } else if (map.getPolyLinePoints(lineFeatureId).size() > 1) {
-            List<MapPoint> points = map.getPolyLinePoints(lineFeatureId);
+        } else if (map.getPolyPoints(lineFeatureId).size() > 1) {
+            List<MapPoint> points = map.getPolyPoints(lineFeatureId);
             StringBuilder rb = new StringBuilder("line:")
                     .append(GeoUtils.formatPointsResultString(points, false))
                     .append(getMarkersAsText(points));
@@ -391,7 +392,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
             recordPoint(map.getGpsLocation());
             schedulerHandler = executorServiceScheduler.scheduleAtFixedRate(() -> runOnUiThread(() -> {
-                Location currentLocation = locationTracker.getCurrentLocation();
+                Location currentLocation = LocationTrackerKt.getCurrentLocation(locationTracker);
 
                 if (currentLocation != null) {
                     MapPoint currentMapPoint = new MapPoint(
@@ -491,7 +492,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         MapPoint gps = map.getGpsLocation();
         MapPoint center = map.getCenter();
         MapPoint ref = (gps != null) ? gps : center;
-        List<MapPoint> points = map.getPolyLinePoints(lineFeatureId);
+        List<MapPoint> points = map.getPolyPoints(lineFeatureId);
         if (points.isEmpty()) {
             return null;
         }
@@ -527,7 +528,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     private void onClick(MapPoint point) {
         if (inputActive && !recordingEnabled) {
             map.appendPointToPolyLine(lineFeatureId, point);
-            int newIdx = map.getPolyLinePoints(lineFeatureId).size() - 1;
+            int newIdx = map.getPolyPoints(lineFeatureId).size() - 1;
             createOrUpdateMarker(newIdx);
             updateUi();
         }
@@ -551,7 +552,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     private void recordPoint(MapPoint point) {
         if (point != null && isLocationAcceptable(point)) {
             map.appendPointToPolyLine(lineFeatureId, point);
-            int newIdx = map.getPolyLinePoints(lineFeatureId).size() - 1;
+            int newIdx = map.getPolyPoints(lineFeatureId).size() - 1;
             createOrUpdateMarker(newIdx);
             updateUi();
         }
@@ -571,7 +572,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void removeLastPoint() {
         if (lineFeatureId != -1) {
-            int numPoints = map.getPolyLinePoints(lineFeatureId).size();
+            int numPoints = map.getPolyPoints(lineFeatureId).size();
             if (numPoints > 0) {
                 int lastIdx = numPoints - 1;
                 Integer markerFeatureId = markerFeatureIds.remove(lastIdx);
@@ -596,7 +597,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     /** Updates the state of various UI widgets to reflect internal state. */
     private void updateUi() {
-        final int numPoints = map.getPolyLinePoints(lineFeatureId).size();
+        final int numPoints = map.getPolyPoints(lineFeatureId).size();
         final MapPoint location = map.getGpsLocation();
 
         // Visibility state
@@ -656,7 +657,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     }
 
     private void showClearDialog() {
-        if (!map.getPolyLinePoints(lineFeatureId).isEmpty()) {
+        if (!map.getPolyPoints(lineFeatureId).isEmpty()) {
             new MaterialAlertDialogBuilder(this)
                 .setMessage(org.odk.collect.strings.R.string.geo_clear_warning)
                 .setPositiveButton(org.odk.collect.strings.R.string.clear, (dialog, id) -> clear())

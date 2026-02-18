@@ -36,6 +36,9 @@ abstract class WidgetAnswerDialogFragment<T : Fragment>(
         questionViewModel.constraintValidationResult
     }
 
+    // smap - expose formController for subclasses that need it (e.g. GeoPolyDialogFragment history-map)
+    protected fun getFormController() = formEntryViewModel.formController
+
     abstract fun onCreateFragment(prompt: FormEntryPrompt): T
 
     override fun onAttach(context: Context) {

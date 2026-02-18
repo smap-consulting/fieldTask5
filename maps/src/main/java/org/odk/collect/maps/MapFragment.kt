@@ -108,6 +108,9 @@ interface MapFragment {
      */
     fun getPolyPoints(featureId: Int): List<MapPoint>
 
+    /** Appends a point to the polyline specified by featureId. */
+    fun appendPointToPolyLine(featureId: Int, point: MapPoint)
+
     /** Removes the last point from a polyline feature. */
     fun removePolyLineLastPoint(featureId: Int)
 

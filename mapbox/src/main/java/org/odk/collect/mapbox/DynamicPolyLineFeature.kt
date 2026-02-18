@@ -13,6 +13,8 @@ import org.odk.collect.maps.LineDescription
 import org.odk.collect.maps.MapFragment
 import org.odk.collect.maps.MapPoint
 import org.odk.collect.maps.getMarkersForPoints
+import org.odk.collect.maps.markers.MarkerDescription
+import org.odk.collect.maps.markers.MarkerIconDescription
 
 internal class DynamicPolyLineFeature(
     private val context: Context,
@@ -55,6 +57,16 @@ internal class DynamicPolyLineFeature(
                 }
             } ?: false
         }
+    }
+
+    fun appendPoint(point: MapPoint) {
+        val markerDescription = MarkerDescription(
+            point, true, MapFragment.CENTER,
+            MarkerIconDescription.TracePoint(lineDescription.getStrokeWidth(), lineDescription.getStrokeColor())
+        )
+        _points.add(point)
+        pointAnnotations.add(MapUtils.createPointAnnotation(pointAnnotationManager, context, markerDescription))
+        updateLine()
     }
 
     fun removeLastPoint() {

@@ -1,6 +1,7 @@
 package org.odk.collect.geo.geopoly
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
@@ -230,11 +231,9 @@ class GeoPolyFragment @JvmOverloads constructor(
         for (prevPoints in previousPolygons) {
             map!!.addPolyLine(
                 LineDescription(
-                    prevPoints,
-                    MapConsts.DEFAULT_STROKE_WIDTH.toString(),
-                    "#80808080",
-                    false,
-                    outputMode == OutputMode.GEOSHAPE
+                    points = prevPoints,
+                    strokeColor = Color.parseColor("#80808080"),
+                    draggable = false
                 )
             )
         }

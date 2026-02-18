@@ -357,6 +357,13 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         return new ArrayList<>();
     }
 
+    @Override public void appendPointToPolyLine(int featureId, MapPoint point) {
+        MapFeature feature = features.get(featureId);
+        if (feature instanceof DynamicPolyLineFeature) {
+            ((DynamicPolyLineFeature) feature).addPoint(point);
+        }
+    }
+
     @Override public void removePolyLineLastPoint(int featureId) {
         MapFeature feature = features.get(featureId);
         if (feature instanceof DynamicPolyLineFeature) {
@@ -951,6 +958,20 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
                 points.add(fromMarker(marker));
             }
             return points;
+        }
+
+        public void addPoint(MapPoint point) {
+            if (map == null) return;
+            MarkerDescription markerDescription = new MarkerDescription(point, true, MapFragment.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point));
+            markers.add(createMarker(requireContext(), markerDescription, map));
+            update();
+        }
+
+        public void removeLastPoint() {
+            if (!markers.isEmpty()) {
+                markers.remove(markers.size() - 1).remove();
+                update();
+            }
         }
 
         private void clearPolyline() {

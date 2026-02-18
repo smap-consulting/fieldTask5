@@ -387,6 +387,13 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
     }
 
     @Override
+    public void appendPointToPolyLine(int featureId, MapPoint point) {
+        MapFeature feature = features.get(featureId);
+        if (feature instanceof DynamicPolyLineFeature) {
+            ((DynamicPolyLineFeature) feature).addPoint(point);
+        }
+    }
+
     public void removePolyLineLastPoint(int featureId) {
         MapFeature feature = features.get(featureId);
         if (feature instanceof DynamicPolyLineFeature) {
@@ -960,6 +967,19 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
                 points.add(fromMarker(marker));
             }
             return points;
+        }
+
+        public void addPoint(MapPoint point) {
+            markers.add(createMarker(map, new MarkerDescription(point, true, MapFragment.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point))));
+            update();
+        }
+
+        public void removeLastPoint() {
+            if (!markers.isEmpty()) {
+                Marker last = markers.remove(markers.size() - 1);
+                map.getOverlays().remove(last);
+                update();
+            }
         }
     }
 

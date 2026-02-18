@@ -95,7 +95,7 @@ class GeoPolyDialogFragment(viewModelFactory: ViewModelProvider.Factory) :
         }
 
         try {
-            val formController = formEntryViewModel.formController ?: return emptyList()
+            val formController = getFormController() ?: return emptyList()
             val formDef = formController.getFormDef() ?: return emptyList()
             val formInstance = formDef.instance
             val questionPath = prompt.formElement.bind.reference.toString()

@@ -84,6 +84,8 @@ class NoOpMapFragment : Fragment(), MapFragment {
         TODO("Not yet implemented")
     }
 
+    override fun appendPointToPolyLine(featureId: Int, point: MapPoint) {}
+
     override fun removePolyLineLastPoint(featureId: Int) {}
 
     override fun removeFeature(featureId: Int) {

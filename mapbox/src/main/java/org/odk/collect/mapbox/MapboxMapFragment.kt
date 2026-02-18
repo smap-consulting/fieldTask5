@@ -427,6 +427,10 @@ class MapboxMapFragment :
         }
     }
 
+    override fun appendPointToPolyLine(featureId: Int, point: MapPoint) {
+        (features[featureId] as? DynamicPolyLineFeature)?.appendPoint(point)
+    }
+
     override fun removePolyLineLastPoint(featureId: Int) {
         (features[featureId] as? DynamicPolyLineFeature)?.removeLastPoint()
     }
