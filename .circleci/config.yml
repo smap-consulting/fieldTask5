@@ -266,7 +266,7 @@ jobs:
             if [[ -n "$GOOGLE_MAPS_API_KEY" ]]; then \
               ./check-size.sh 23117869
             else
-              ./check-size.sh 13841204
+              ./check-size.sh 13900000
             fi
 
       - run:
@@ -343,6 +343,7 @@ workflows:
             branches:
               ignore:
                 - master
+                - /^v((20)[0-9]{2})\.\d+\.\d+$/
       - compile:
           requires:
             - hold_pr
@@ -369,6 +370,7 @@ workflows:
             branches:
               only:
                 - master
+                - /^v((20)[0-9]{2})\.\d+\.\d+$/
       - check_quality:
           requires:
             - compile

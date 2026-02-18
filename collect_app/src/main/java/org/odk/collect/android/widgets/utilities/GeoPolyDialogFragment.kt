@@ -16,6 +16,7 @@ import org.odk.collect.android.utilities.Appearances
 import org.odk.collect.android.utilities.FormEntryPromptUtils
 import org.odk.collect.android.widgets.utilities.AdditionalAttributes.INCREMENTAL
 import org.odk.collect.android.widgets.utilities.BindAttributes.ALLOW_MOCK_ACCURACY
+import org.odk.collect.androidshared.ui.DisplayString
 import org.odk.collect.geo.GeoUtils.toMapPoint
 import org.odk.collect.geo.geopoly.GeoPolyFragment
 import org.odk.collect.geo.geopoly.GeoPolyFragment.OutputMode
@@ -73,10 +74,13 @@ class GeoPolyDialogFragment(viewModelFactory: ViewModelProvider.Factory) :
             prompt.isReadOnly,
             retainMockAccuracy,
             inputPolygon,
-            validationResult.map {
-                val validationResult = it.value
-                if (validationResult is FailedValidationResult && validationResult.index == prompt.index) {
-                    validationResult.customErrorMessage ?: getString(validationResult.defaultErrorMessage)
+            constraintValidationResult.map {
+                if (it is FailedValidationResult) {
+                    if (it.customErrorMessage != null) {
+                        DisplayString.Raw(it.customErrorMessage)
+                    } else {
+                        DisplayString.Resource(it.defaultErrorMessage)
+                    }
                 } else {
                     null
                 }

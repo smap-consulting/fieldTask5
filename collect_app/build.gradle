@@ -510,6 +510,7 @@ dependencies {
     // with NullPointerException on Intent Parcel during activity transitions
     debugImplementation libs.leakcanary
     debugImplementation(libs.androidXComposeTooling)
+    debugImplementation(libs.androidXComposeUiTestManifest)
 }
 
 // Fix OSS licenses plugin task dependencies for Gradle 9.0

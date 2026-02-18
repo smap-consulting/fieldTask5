@@ -11,7 +11,6 @@ import org.odk.collect.maps.PolygonDescription
 import org.odk.collect.maps.markers.MarkerDescription
 import org.odk.collect.maps.markers.MarkerIconDescription
 import kotlin.random.Random
-
 class FakeMapFragment(private val ready: Boolean = false) : Fragment(), MapFragment {
 
     private var clickListener: PointListener? = null
@@ -128,6 +127,13 @@ class FakeMapFragment(private val ready: Boolean = false) : Fragment(), MapFragm
         return featureId
     }
 
+    override fun updatePolyLine(
+        featureId: Int,
+        lineDescription: LineDescription
+    ) {
+        polyLines[featureId] = lineDescription
+    }
+
     override fun addPolygon(polygonDescription: PolygonDescription): Int {
         val featureId = generateFeatureId()
         polygons[featureId] = polygonDescription
@@ -135,19 +141,18 @@ class FakeMapFragment(private val ready: Boolean = false) : Fragment(), MapFragm
         return featureId
     }
 
-    override fun appendPointToPolyLine(featureId: Int, point: MapPoint) {
-        val poly = polyLines[featureId]!!
-        polyLines[featureId] = poly.copy(points = poly.points + point)
+    override fun updatePolygon(
+        featureId: Int,
+        polygonDescription: PolygonDescription
+    ) {
+        polygons[featureId] = polygonDescription
     }
 
-    override fun removePolyLineLastPoint(featureId: Int) {
-        val poly = polyLines[featureId]!!
-        polyLines[featureId] = poly.copy(points = poly.points.dropLast(1))
+    override fun getPolyPoints(featureId: Int): List<MapPoint> {
+        return polyLines[featureId]?.points ?: polygons[featureId]?.points ?: emptyList()
     }
 
-    override fun getPolyLinePoints(featureId: Int): List<MapPoint> {
-        return polyLines[featureId]?.points ?: emptyList()
-    }
+    override fun removePolyLineLastPoint(featureId: Int) {}
 
     override fun removeFeature(featureId: Int) {
         markers.remove(featureId)
@@ -160,6 +165,8 @@ class FakeMapFragment(private val ready: Boolean = false) : Fragment(), MapFragm
     override fun clearFeatures() {
         markers.clear()
         markerIcons.clear()
+        polyLines.clear()
+        polygons.clear()
     }
 
     override fun setClickListener(listener: PointListener?) {
@@ -242,10 +249,6 @@ class FakeMapFragment(private val ready: Boolean = false) : Fragment(), MapFragm
 
     fun getPolyLines(): List<LineDescription> {
         return polyLines.values.toList()
-    }
-
-    fun isPolyClosed(index: Int): Boolean {
-        return polyLines[featureIds[index]]!!.closed
     }
 
     fun isPolyDraggable(index: Int): Boolean {

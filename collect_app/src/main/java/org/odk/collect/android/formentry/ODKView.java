@@ -69,6 +69,7 @@ import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.HtmlUtils;
 import org.odk.collect.android.utilities.QuestionMediaManager;
 import org.odk.collect.android.utilities.ThemeUtils;
+import org.odk.collect.android.widgets.MediaWidgetAnswerViewModel;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.StringWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
@@ -159,7 +160,8 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
             PrinterWidgetViewModel printerWidgetViewModel,
             InternalRecordingRequester internalRecordingRequester,
             ExternalAppRecordingRequester externalAppRecordingRequester,
-            LifecycleOwner viewLifecycle
+            LifecycleOwner viewLifecycle,
+            MediaWidgetAnswerViewModel mediaWidgetAnswerViewModel
     ) {
         super(context);
         updateQuestions(questionPrompts);
@@ -188,7 +190,8 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
                 this.viewLifecycle,
                 new FileRequesterImpl(intentLauncher, externalAppIntentProvider, formController),
                 new StringRequesterImpl(intentLauncher, externalAppIntentProvider, formController),
-                formController
+                formController,
+                mediaWidgetAnswerViewModel
         );
 
         widgets = new ArrayList<>();
@@ -592,18 +595,19 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
         return qw.getLocalVisibleRect(scrollBounds);
     }
 
-    public void scrollToTopOf(FormIndex index) {
+    public void focusToTopOf(FormIndex index) {
         for (QuestionWidget widget : widgets) {
             if (widget.getFormEntryPrompt().getIndex().equals(index)) {
-                scrollToTopOf(widget);
+                focusToTopOf(widget);
                 break;
             }
         }
     }
 
-    public void scrollToTopOf(@Nullable QuestionWidget qw) {
+    public void focusToTopOf(@Nullable QuestionWidget qw) {
         if (qw != null && widgets.contains(qw)) {
-            postDelayed(() -> findViewById(R.id.odk_view_container).scrollTo(0, qw.getTop()), 400);
+            findViewById(R.id.odk_view_container).scrollTo(0, qw.getTop());
+            qw.setFocus(getContext());
         }
     }
 
@@ -730,7 +734,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
         for (QuestionWidget questionWidget : getWidgets()) {
             if (formIndex.equals(questionWidget.getFormEntryPrompt().getIndex())) {
                 questionWidget.displayError(errorMessage);
-                scrollToTopOf(questionWidget);
+                focusToTopOf(questionWidget);
             } else {
                 questionWidget.hideError();
             }
