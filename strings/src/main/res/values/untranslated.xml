@@ -10,7 +10,7 @@ the specific language governing permissions and limitations under the License. -
     <string name="collect_app_name" translatable="false">ODK Collect</string>
     <string name="action_name" translatable="false">FieldTask Form</string>
     <string name="app_name" translatable="false">FieldTask</string>
-    <string name="app_version" translatable="false">5.1.03</string>
+    <string name="app_version" translatable="false">5.1.04</string>
     <string name="default_username" translatable="false">gplay</string>
     <string name="default_password" translatable="false">gplay</string>
     <string name="default_server_url" translatable="false">https://sg.smap.com.au</string>
