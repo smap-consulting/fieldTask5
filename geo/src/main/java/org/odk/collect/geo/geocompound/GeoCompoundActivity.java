@@ -312,7 +312,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
             points = map.getPolyPoints(lineFeatureId);
         } else {
             // Create the polyline
-            lineFeatureId = map.addPolyLine(new LineDescription(points, null, null, true, false));
+            lineFeatureId = map.addPolyLine(new LineDescription(points, null, null, false, false)); // smap - draggable=false avoids TracePoint circles that obscure compound markers
 
             // Create markers for marked vertices
             createMarkersForVertices();
@@ -588,7 +588,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void clear() {
         map.clearFeatures();
-        lineFeatureId = map.addPolyLine(new LineDescription(new ArrayList<>(), null, null, true, false));
+        lineFeatureId = map.addPolyLine(new LineDescription(new ArrayList<>(), null, null, false, false)); // smap
         markerFeatureIds.clear();
         markers.clear();
         inputActive = false;

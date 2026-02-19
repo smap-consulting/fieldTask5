@@ -361,6 +361,8 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         MapFeature feature = features.get(featureId);
         if (feature instanceof DynamicPolyLineFeature) {
             ((DynamicPolyLineFeature) feature).addPoint(point);
+        } else if (feature instanceof StaticPolyLineFeature) { // smap - GeoCompoundActivity uses StaticPolyLineFeature
+            ((StaticPolyLineFeature) feature).addPoint(point);
         }
     }
 
@@ -368,6 +370,8 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         MapFeature feature = features.get(featureId);
         if (feature instanceof DynamicPolyLineFeature) {
             ((DynamicPolyLineFeature) feature).removeLastPoint();
+        } else if (feature instanceof StaticPolyLineFeature) { // smap
+            ((StaticPolyLineFeature) feature).removeLastPoint();
         }
     }
 
@@ -823,24 +827,51 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
 
         private List<MapPoint> points;
         private Polyline polyline;
+        private final GoogleMap map;
+        private final LineDescription lineDescription;
 
         StaticPolyLineFeature(LineDescription lineDescription, GoogleMap map) {
+            this.map = map;
+            this.lineDescription = lineDescription;
+
             if (map == null) {  // during Robolectric tests, map will be null
+                points = new ArrayList<>(lineDescription.getPoints());
                 return;
             }
 
-            points = lineDescription.getPoints();
-            List<LatLng> latLngs = StreamSupport.stream(points.spliterator(), false).map(mapPoint -> new LatLng(mapPoint.latitude, mapPoint.longitude)).collect(Collectors.toList());
-            if (latLngs.isEmpty()) {
+            points = new ArrayList<>(lineDescription.getPoints());
+            updatePolyline();
+        }
+
+        // smap - used by GeoCompoundActivity which needs a mutable polyline without TracePoint circle annotations
+        void addPoint(MapPoint point) {
+            points.add(point);
+            updatePolyline();
+        }
+
+        void removeLastPoint() {
+            if (!points.isEmpty()) {
+                points.remove(points.size() - 1);
+                updatePolyline();
+            }
+        }
+
+        private void updatePolyline() {
+            List<LatLng> latLngs = StreamSupport.stream(points.spliterator(), false)
+                    .map(p -> new LatLng(p.latitude, p.longitude))
+                    .collect(Collectors.toList());
+            if (latLngs.size() < 2) {
                 clearPolyline();
             } else if (polyline == null) {
-                polyline = map.addPolyline(new PolylineOptions()
-                        .color(lineDescription.getStrokeColor())
-                        .zIndex(1)
-                        .width(lineDescription.getStrokeWidth())
-                        .addAll(latLngs)
-                        .clickable(true)
-                );
+                if (map != null) {
+                    polyline = map.addPolyline(new PolylineOptions()
+                            .color(lineDescription.getStrokeColor())
+                            .zIndex(1)
+                            .width(lineDescription.getStrokeWidth())
+                            .addAll(latLngs)
+                            .clickable(true)
+                    );
+                }
             } else {
                 polyline.setPoints(latLngs);
             }

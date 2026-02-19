@@ -428,11 +428,17 @@ class MapboxMapFragment :
     }
 
     override fun appendPointToPolyLine(featureId: Int, point: MapPoint) {
-        (features[featureId] as? DynamicPolyLineFeature)?.appendPoint(point)
+        when (val feature = features[featureId]) {
+            is DynamicPolyLineFeature -> feature.appendPoint(point)
+            is StaticPolyLineFeature -> feature.appendPoint(point) // smap - GeoCompoundActivity uses StaticPolyLineFeature
+        }
     }
 
     override fun removePolyLineLastPoint(featureId: Int) {
-        (features[featureId] as? DynamicPolyLineFeature)?.removeLastPoint()
+        when (val feature = features[featureId]) {
+            is DynamicPolyLineFeature -> feature.removeLastPoint()
+            is StaticPolyLineFeature -> feature.removeLastPoint() // smap
+        }
     }
 
     override fun removeFeature(featureId: Int) {

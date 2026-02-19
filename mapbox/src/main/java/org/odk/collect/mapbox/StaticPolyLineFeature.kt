@@ -56,6 +56,41 @@ internal class StaticPolyLineFeature(
         }
     }
 
+    // smap - used by GeoCompoundActivity which needs a mutable polyline without TracePoint circle annotations
+    fun appendPoint(point: MapPoint) {
+        points.add(point)
+        updateLine()
+    }
+
+    fun removeLastPoint() {
+        if (points.isNotEmpty()) {
+            points.removeAt(points.size - 1)
+            updateLine()
+        }
+    }
+
+    private fun updateLine() {
+        val pts = points.map {
+            Point.fromLngLat(it.longitude, it.latitude, it.altitude)
+        }.toMutableList()
+
+        polylineAnnotation?.let {
+            polylineAnnotationManager.delete(it)
+            polylineAnnotation = null
+        }
+
+        if (pts.size > 1) {
+            polylineAnnotation = polylineAnnotationManager.create(
+                PolylineAnnotationOptions()
+                    .withPoints(pts)
+                    .withLineColor(lineDescription.getStrokeColor())
+                    .withLineWidth(MapUtils.convertStrokeWidth(lineDescription))
+            ).also {
+                polylineAnnotationManager.update(it)
+            }
+        }
+    }
+
     override fun dispose() {
         polylineAnnotation?.let {
             polylineAnnotationManager.delete(it)

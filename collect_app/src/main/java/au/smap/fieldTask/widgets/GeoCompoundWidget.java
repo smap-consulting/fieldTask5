@@ -118,6 +118,7 @@ public class GeoCompoundWidget extends QuestionWidget implements WidgetDataRecei
     @Override
     public void setData(Object answer) {
         binding.geoAnswerText.setText(answer.toString());
+        binding.geoAnswerText.setVisibility(answer.toString().isEmpty() ? GONE : VISIBLE);
         binding.simpleButton.setText(answer.toString().isEmpty() ? org.odk.collect.android.R.string.get_geocompound : org.odk.collect.android.R.string.geocompound_view_change_location);
         widgetValueChanged();
     }

@@ -391,6 +391,8 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         MapFeature feature = features.get(featureId);
         if (feature instanceof DynamicPolyLineFeature) {
             ((DynamicPolyLineFeature) feature).addPoint(point);
+        } else if (feature instanceof StaticPolyLineFeature) { // smap - GeoCompoundActivity uses StaticPolyLineFeature
+            ((StaticPolyLineFeature) feature).addPoint(point);
         }
     }
 
@@ -398,6 +400,8 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         MapFeature feature = features.get(featureId);
         if (feature instanceof DynamicPolyLineFeature) {
             ((DynamicPolyLineFeature) feature).removeLastPoint();
+        } else if (feature instanceof StaticPolyLineFeature) { // smap
+            ((StaticPolyLineFeature) feature).removeLastPoint();
         }
     }
 
@@ -861,8 +865,27 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
             paint.setStrokeWidth(lineDescription.getStrokeWidth());
             map.getOverlays().add(polyline);
 
-            points = lineDescription.getPoints();
-            List<GeoPoint> geoPoints = StreamSupport.stream(points.spliterator(), false).map(mapPoint -> new GeoPoint(mapPoint.latitude, mapPoint.longitude, mapPoint.altitude)).collect(Collectors.toList());
+            points = new ArrayList<>(lineDescription.getPoints());
+            refreshPolyline();
+        }
+
+        // smap - used by GeoCompoundActivity which needs a mutable polyline without TracePoint circle annotations
+        void addPoint(MapPoint point) {
+            points.add(point);
+            refreshPolyline();
+        }
+
+        void removeLastPoint() {
+            if (!points.isEmpty()) {
+                points.remove(points.size() - 1);
+                refreshPolyline();
+            }
+        }
+
+        private void refreshPolyline() {
+            List<GeoPoint> geoPoints = StreamSupport.stream(points.spliterator(), false)
+                    .map(p -> new GeoPoint(p.latitude, p.longitude, p.altitude))
+                    .collect(Collectors.toList());
             polyline.setPoints(geoPoints);
             map.invalidate();
         }
