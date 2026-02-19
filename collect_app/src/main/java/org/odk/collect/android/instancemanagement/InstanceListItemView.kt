@@ -16,7 +16,7 @@ import java.util.Locale
 
 object InstanceListItemView {
 
-    private const val DISABLED_ALPHA = 0.38f
+    private const val DISABLED_ALPHA = 0.60f // smap - 0.38f is too low contrast in dark mode
 
     @JvmStatic
     @Deprecated("This should eventually be replaced by a ViewHolder or View implementation")
