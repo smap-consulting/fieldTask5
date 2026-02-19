@@ -52,6 +52,7 @@ import org.odk.collect.location.Location;
 import org.odk.collect.location.tracker.LocationTracker;
 import org.odk.collect.location.tracker.LocationTrackerKt;
 import org.odk.collect.maps.LineDescription;
+import org.odk.collect.maps.MapConsts;
 import org.odk.collect.maps.MapFragmentFactory;
 import org.odk.collect.maps.MapFragment;
 import org.odk.collect.maps.MapPoint;
@@ -354,10 +355,16 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         MapPoint point = points.get(vertexIdx);
         CompoundMarker cm = markers.get(vertexIdx);
 
-        int iconRes = (cm != null && !cm.type.equals("none"))
-                ? cm.getDrawableIdForMarker()
-                : org.odk.collect.icons.R.drawable.ic_map_point;
-        MarkerIconDescription iconDesc = new MarkerIconDescription.DrawableResource(iconRes);
+        // smap - untyped vertices use TracePoint circles to match GeoTrace node appearance
+        MarkerIconDescription iconDesc;
+        if (cm != null && !cm.type.equals("none")) {
+            iconDesc = new MarkerIconDescription.DrawableResource(cm.getDrawableIdForMarker());
+        } else {
+            iconDesc = new MarkerIconDescription.TracePoint(
+                    MapConsts.DEFAULT_STROKE_WIDTH,
+                    MapConsts.DEFAULT_STROKE_COLOR
+            );
+        }
 
         Integer existingFeatureId = markerFeatureIds.get(vertexIdx);
         if (existingFeatureId != null) {
