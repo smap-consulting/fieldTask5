@@ -47,6 +47,29 @@ public class OkHttpOpenRosaServerClientProviderTest extends OpenRosaServerClient
     }
 
     @Test
+    // smap - token and password credentials must produce separate cached clients
+    // so that switching auth modes (or rotating tokens) does not reuse a stale client
+    public void tokenAndPasswordCredentials_haveDifferentInstances() {
+        OpenRosaServerClientProvider provider = buildSubject();
+
+        OpenRosaServerClient passwordClient = provider.get("http", "Android", new HttpCredentials("user", "pass", false, null));
+        OpenRosaServerClient tokenClient = provider.get("http", "Android", new HttpCredentials("user", "pass", true, "mytoken"));
+
+        assertThat(passwordClient, not(equalTo(tokenClient)));
+    }
+
+    @Test
+    // smap - a rotated token must produce a new client, not reuse one with the old token
+    public void differentTokenValues_haveDifferentInstances() {
+        OpenRosaServerClientProvider provider = buildSubject();
+
+        OpenRosaServerClient oldTokenClient = provider.get("http", "Android", new HttpCredentials("user", "pass", true, "oldtoken"));
+        OpenRosaServerClient newTokenClient = provider.get("http", "Android", new HttpCredentials("user", "pass", true, "newtoken"));
+
+        assertThat(oldTokenClient, not(equalTo(newTokenClient)));
+    }
+
+    @Test
     public void whenCacheDirDoesNotExist_doesNotCreateCache() throws Exception {
         File noneExistingFile = new File(TempFiles.getPathInTempDir());
         assertThat(noneExistingFile.exists(), equalTo(false));
