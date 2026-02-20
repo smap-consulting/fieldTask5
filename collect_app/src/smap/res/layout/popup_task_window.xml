@@ -19,56 +19,62 @@
 
     <Button
         android:id="@+id/locate"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="5dp"
-        android:background="?selectableItemBackground"
-        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_locate" />
 
     <Button
         android:id="@+id/phone"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="5dp"
-        android:background="?selectableItemBackground"
-        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_phone" />
 
     <Button
         android:id="@+id/sms"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="5dp"
-        android:background="?selectableItemBackground"
-        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_sms" />
 
     <Button
         android:id="@+id/directions"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="5dp"
-        android:background="?selectableItemBackground"
-        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_directions" />
 
     <Button
         android:id="@+id/accept"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="5dp"
-        android:background="?selectableItemBackground"
-        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_accept" />
 
     <Button
         android:id="@+id/reject"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="5dp"
-        android:background="?selectableItemBackground"
-        android:textColor="?android:attr/textColorPrimary"
         android:text="@string/smap_reject_task" />
 
 </LinearLayout>

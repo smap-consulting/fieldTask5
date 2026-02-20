@@ -20,7 +20,6 @@
 package au.smap.fieldTask.adapters;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -34,6 +33,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
@@ -69,7 +70,6 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View view;
-        DatabaseInstancesRepository di = new DatabaseInstancesRepository();
 
         if (convertView == null) {
             view = mInflater.inflate(mLayout, parent, false);
@@ -159,70 +159,57 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
                 }
             }
         }
-        Instance instance = di.getInstanceByTaskId(item.assId);
-        View popupTaskView = mInflater.inflate(R.layout.popup_task_window, parent, false);
-        TextView textView = popupTaskView.findViewById(R.id.task_name);
-        textView.setText(taskNameText.getText());
-        if(item.taskType != null && item.taskType.equals("case")) {
-            Button rejectButton = popupTaskView.findViewById(R.id.reject);
-            rejectButton.setText(getContext().getString(R.string.smap_release_case));
 
-            Button acceptButton = popupTaskView.findViewById(R.id.accept);
-            acceptButton.setVisibility(View.GONE);
-        }
-
-        AlertDialog alertDialog = new AlertDialog.Builder(getContext())
-                .setView(popupTaskView)
-                .create();
-
+        // smap: show menu button for task rows only; restore visibility on recycled views
         View imageButton = view.findViewById(R.id.menu_button);
-        Button accept = popupTaskView.findViewById(R.id.accept);
-        Button locate = popupTaskView.findViewById(R.id.locate);
-        Button sms = popupTaskView.findViewById(R.id.sms);
-        Button directions = popupTaskView.findViewById(R.id.directions);
-        Button phone = popupTaskView.findViewById(R.id.phone);
-        Button reject = popupTaskView.findViewById(R.id.reject);
-
         if (item.type.equals("form")) {
             imageButton.setVisibility(View.GONE);
+        } else {
+            imageButton.setVisibility(View.VISIBLE);
+            imageButton.setOnClickListener(view16 -> { // smap
+                DatabaseInstancesRepository di = new DatabaseInstancesRepository();
+                Instance instance = di.getInstanceByTaskId(item.assId);
+
+                View popupTaskView = mInflater.inflate(R.layout.popup_task_window, null, false);
+                TextView textView = popupTaskView.findViewById(R.id.task_name);
+                textView.setText(taskNameText != null ? taskNameText.getText() : item.name);
+
+                Button accept = popupTaskView.findViewById(R.id.accept);
+                Button locate = popupTaskView.findViewById(R.id.locate);
+                Button sms = popupTaskView.findViewById(R.id.sms);
+                Button directions = popupTaskView.findViewById(R.id.directions);
+                Button phone = popupTaskView.findViewById(R.id.phone);
+                Button reject = popupTaskView.findViewById(R.id.reject);
+
+                if (item.taskType != null && item.taskType.equals("case")) {
+                    reject.setText(getContext().getString(R.string.smap_release_case));
+                    accept.setVisibility(View.GONE);
+                }
+
+                if (instance == null || instance.getPhone() == null) {
+                    sms.setEnabled(false);
+                    phone.setEnabled(false);
+                }
+
+                if (item.schedLat == 0 && item.schedLon == 0) {
+                    locate.setEnabled(false);
+                    directions.setEnabled(false);
+                }
+
+                androidx.appcompat.app.AlertDialog alertDialog = new MaterialAlertDialogBuilder(getContext())
+                        .setView(popupTaskView)
+                        .create();
+
+                accept.setOnClickListener(v -> { alertDialog.dismiss(); taskClickLisener.onAcceptClicked(item); });
+                phone.setOnClickListener(v -> { alertDialog.dismiss(); taskClickLisener.onPhoneClicked(item); });
+                sms.setOnClickListener(v -> { alertDialog.dismiss(); taskClickLisener.onSMSClicked(item); });
+                directions.setOnClickListener(v -> { alertDialog.dismiss(); taskClickLisener.onDirectionsClicked(item); });
+                reject.setOnClickListener(v -> { alertDialog.dismiss(); taskClickLisener.onRejectClicked(item); });
+                locate.setOnClickListener(v -> { alertDialog.dismiss(); taskClickLisener.onLocateClick(item); });
+
+                alertDialog.show();
+            });
         }
-
-        if (instance == null || instance.getPhone() == null) {
-            sms.setEnabled(false);
-            phone.setEnabled(false);
-        }
-
-        if (item.schedLat == 0 && item.schedLon == 0) {
-            locate.setEnabled(false);
-            directions.setEnabled(false);
-        }
-
-        accept.setOnClickListener(view1 -> {
-            alertDialog.dismiss();
-            taskClickLisener.onAcceptClicked(item);
-        });
-        phone.setOnClickListener(view13 -> {
-            alertDialog.dismiss();
-            taskClickLisener.onPhoneClicked(item);
-        });
-        sms.setOnClickListener(view12 -> {
-            alertDialog.dismiss();
-            taskClickLisener.onSMSClicked(item);
-        });
-        directions.setOnClickListener(view17 -> {
-            alertDialog.dismiss();
-            taskClickLisener.onDirectionsClicked(item);
-        });
-        reject.setOnClickListener(view14 -> {
-            alertDialog.dismiss();
-            taskClickLisener.onRejectClicked(item);
-        });
-        locate.setOnClickListener(view15 -> {
-            alertDialog.dismiss();
-            taskClickLisener.onLocateClick(item);
-        });
-
-        imageButton.setOnClickListener(view16 -> alertDialog.show());
 
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
         view.startAnimation(animation);
