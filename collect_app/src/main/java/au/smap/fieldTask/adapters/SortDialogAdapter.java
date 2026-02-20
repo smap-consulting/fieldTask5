@@ -16,6 +16,7 @@ package au.smap.fieldTask.adapters;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.odk.collect.android.R;
 import au.smap.fieldTask.listeners.RecyclerViewClickListener;
+import au.smap.fieldTask.utilities.LocationProvider;
 import org.odk.collect.android.utilities.ApplicationConstants;
 import org.odk.collect.android.utilities.ThemeUtils;
 
@@ -36,15 +38,17 @@ import timber.log.Timber;
 
 public class SortDialogAdapter extends RecyclerView.Adapter<SortDialogAdapter.ViewHolder> {
     private final RecyclerViewClickListener listener;
+    private final LocationProvider locationProvider;
     private int selectedSortingOrder;
     private final ThemeUtils themeUtils;
     private final int[] sortList;
 
-    public SortDialogAdapter(Context context, int[] sortList, int selectedSortingOrder, RecyclerViewClickListener recyclerViewClickListener) {
+    public SortDialogAdapter(Context context, int[] sortList, int selectedSortingOrder, RecyclerViewClickListener recyclerViewClickListener, LocationProvider locationProvider) {
         themeUtils = new ThemeUtils(context);
         this.sortList = sortList;
         this.selectedSortingOrder = selectedSortingOrder;
         listener = recyclerViewClickListener;
+        this.locationProvider = locationProvider;
     }
 
     @NonNull
@@ -62,11 +66,27 @@ public class SortDialogAdapter extends RecyclerView.Adapter<SortDialogAdapter.Vi
         int sortTextId = sortList[position];
         viewHolder.txtViewTitle.setText(sortTextId);
 
-        viewHolder.itemView.setEnabled(true);
-        int color = position == selectedSortingOrder ? themeUtils.getAccentColor()
-                : themeUtils.getColorOnSurface();
-        setImageView(viewHolder.imgViewIcon, position, position == selectedSortingOrder ? ColorStateList.valueOf(color) : null);
-        tintTextView(viewHolder.txtViewTitle, color);
+        Location location = locationProvider != null ? locationProvider.getLastLocation() : null;
+
+        if (location == null
+                && (sortTextId == org.odk.collect.strings.R.string.sort_by_distance_asc
+                || sortTextId == org.odk.collect.strings.R.string.sort_by_distance_desc)) {
+            viewHolder.itemView.setEnabled(false);
+
+            int disabledColor = ResourcesCompat.getColor(
+                    context.getResources(),
+                    R.color.disabled_view,
+                    context.getTheme()
+            );
+            setImageView(viewHolder.imgViewIcon, position, ColorStateList.valueOf(disabledColor));
+            tintTextView(viewHolder.txtViewTitle, disabledColor);
+        } else {
+            viewHolder.itemView.setEnabled(true);
+            int color = position == selectedSortingOrder ? themeUtils.getAccentColor()
+                    : themeUtils.getColorOnSurface();
+            setImageView(viewHolder.imgViewIcon, position, position == selectedSortingOrder ? ColorStateList.valueOf(color) : null);
+            tintTextView(viewHolder.txtViewTitle, color);
+        }
     }
 
     @Override

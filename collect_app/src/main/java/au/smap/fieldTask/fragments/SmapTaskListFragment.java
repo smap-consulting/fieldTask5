@@ -47,6 +47,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import org.odk.collect.android.R;
 import au.smap.fieldTask.adapters.SortDialogAdapter;
+import au.smap.fieldTask.utilities.SystemLocationProvider;
 import org.odk.collect.android.activities.AboutActivity;
 import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
@@ -297,7 +298,7 @@ public class SmapTaskListFragment extends ListFragment {
                     itAdapter.updateSelectedPosition(position);
                     reloadData();
                     bottomSheetDialog.dismiss();
-                });
+                }, new SystemLocationProvider(getActivity()));
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);

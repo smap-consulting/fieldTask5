@@ -524,7 +524,9 @@ public class Utilities {
                 selectArgs,
                 getTaskSortOrderExpr(sortOrder)
         )) {
-            Location location = Collect.getInstance().getLocation();
+            Location collectLocation = Collect.getInstance().getLocation();
+            final Location location = collectLocation != null ? collectLocation
+                    : new SystemLocationProvider(Collect.getInstance()).getLastLocation();
             ArrayList<GeofenceEntry> geofences = new ArrayList<>();
 
             c.moveToFirst();

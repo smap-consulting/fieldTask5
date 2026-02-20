@@ -216,7 +216,7 @@ public class SmapFormListFragment extends ListFragment {
                     itAdapter.updateSelectedPosition(position);
                     reloadData();
                     bottomSheetDialog.dismiss();
-                });
+                }, null);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
