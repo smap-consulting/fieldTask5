@@ -48,12 +48,21 @@ public class HttpCredentials implements HttpCredentialsInterface {
             return true;
         }
 
-        return ((HttpCredentials) obj).getUsername().equals(getUsername()) &&
-                ((HttpCredentials) obj).getPassword().equals(getPassword());
+        if (!(obj instanceof HttpCredentials)) {
+            return false;
+        }
+
+        HttpCredentials other = (HttpCredentials) obj;
+        // smap - include token fields so cached clients are not reused across auth modes
+        return other.getUsername().equals(getUsername()) &&
+                other.getPassword().equals(getPassword()) &&
+                other.getUseToken() == getUseToken() &&
+                (authToken == null ? other.getAuthToken() == null : authToken.equals(other.getAuthToken()));
     }
 
     @Override
     public int hashCode() {
-        return (getUsername() + getPassword()).hashCode();
+        // smap - include token fields to distinguish token vs password auth cache entries
+        return (getUsername() + getPassword() + useToken + (authToken != null ? authToken : "")).hashCode();
     }
 }
