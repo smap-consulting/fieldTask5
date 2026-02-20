@@ -1,19 +1,24 @@
 package au.smap.fieldTask.receivers;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 
+import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.gms.location.LocationResult;
 
 import org.odk.collect.android.R;
 import au.smap.fieldTask.activities.NotificationActivity;
+import au.smap.fieldTask.activities.SmapMain;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.injection.DaggerUtils;
 import au.smap.fieldTask.loaders.GeofenceEntry;
+import org.odk.collect.android.notifications.NotificationManagerNotifier;
 import org.odk.collect.android.notifications.Notifier;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.utilities.ApplicationConstants;
@@ -100,13 +105,21 @@ public class LocationReceiver extends BroadcastReceiver {
                         Timber.i("######## send org.smap.smapTask.refresh from location service");  // smap
                     }
                     if (notify) {
-                        /* SMAP BUILD
-                        notifier.showNotification(null,
-                                NotificationActivity.NOTIFICATION_ID,
-                                R.string.app_name,
-                                context.getString(R.string.smap_geofence_tasks), false);
-
-                         */
+                        // smap - audible notification when user enters a geofence
+                        Intent notifyIntent = new Intent(context, SmapMain.class);
+                        notifyIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                                notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                                context,
+                                NotificationManagerNotifier.COLLECT_NOTIFICATION_CHANNEL)
+                                .setContentTitle(context.getString(R.string.app_name))
+                                .setContentText(context.getString(R.string.smap_geofence_tasks))
+                                .setSmallIcon(org.odk.collect.icons.R.drawable.ic_notification_small)
+                                .setContentIntent(pendingIntent)
+                                .setAutoCancel(true);
+                        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                        nm.notify(NotificationActivity.GEOFENCE_NOTIFICATION_ID, builder.build());
                     }
                 }
 
