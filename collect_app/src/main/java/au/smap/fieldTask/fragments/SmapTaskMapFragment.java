@@ -24,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -133,6 +134,11 @@ public class SmapTaskMapFragment extends Fragment {
         this.mapFragment = map;
         mapFragment.setLongPressListener(this::onMapLongPress);
         mapFragment.setFeatureClickListener(this::onFeatureClick);
+        mapFragment.setGpsLocationEnabled(true);
+
+        ImageButton locationButton = rootView.findViewById(R.id.show_location);
+        locationButton.setOnClickListener(v ->
+            mapFragment.zoomToCurrentLocation(mapFragment.getGpsLocation()));
 
         if (mo == null) {
             mo = new MapLocationObserver(getContext(), this);
