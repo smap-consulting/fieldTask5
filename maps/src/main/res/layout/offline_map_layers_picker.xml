@@ -74,7 +74,7 @@
         android:id="@+id/mbtiles_info_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="visible"
+        android:visibility="gone"
         app:constraint_referenced_ids="mbtiles_info_icon,mbtiles_info_icon_text" />
 
     <View
