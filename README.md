@@ -108,20 +108,12 @@ The `master` branch contains the latest stable code.
 
 #### 3. Configure API Keys
 
-Create a `secrets.gradle` file in the project root directory based on the example:
+Create a `secrets.properties` file in the project root directory:
 
-```bash
-cp secrets.gradle.example secrets.gradle
-```
-
-Edit `secrets.gradle` and add your API keys:
-
-```groovy
-ext {
-    MAPBOX_ACCESS_TOKEN = "pk.eyJ1..." // Your Mapbox access token
-    MAPBOX_DOWNLOADS_TOKEN = "sk.ey..." // Your Mapbox downloads token
-    GOOGLE_MAPS_API_KEY = "AIzaSy..." // Your Google Maps API key
-}
+```properties
+MAPBOX_ACCESS_TOKEN=pk.eyJ1...
+MAPBOX_DOWNLOADS_TOKEN=sk.eyJ1...
+GOOGLE_MAPS_API_KEY=AIzaSy...
 ```
 
 **Getting API Keys:**
