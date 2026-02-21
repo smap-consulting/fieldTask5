@@ -80,6 +80,7 @@ public class SmapTaskMapFragment extends Fragment {
     private MapFragment mapFragment;
     private int polyFeatureId = -1;
     private Map<Integer, TaskEntry> markerTaskMap = new HashMap<>();
+    private String currentBasemap = null;
 
     SurveyDataViewModel model;
 
@@ -132,6 +133,9 @@ public class SmapTaskMapFragment extends Fragment {
 
     private void initMap(MapFragment map) {
         this.mapFragment = map;
+        currentBasemap = DaggerUtils.getComponent(getContext())
+            .settingsProvider().getUnprotectedSettings()
+            .getString(ProjectKeys.KEY_BASEMAP_SOURCE);
         mapFragment.setLongPressListener(this::onMapLongPress);
         mapFragment.setFeatureClickListener(this::onFeatureClick);
         mapFragment.setGpsLocationEnabled(true);
@@ -230,7 +234,29 @@ public class SmapTaskMapFragment extends Fragment {
     public void onResume() {
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.mipmap.ic_nav);
+        if (currentBasemap != null) {
+            String newBasemap = DaggerUtils.getComponent(getContext())
+                .settingsProvider().getUnprotectedSettings()
+                .getString(ProjectKeys.KEY_BASEMAP_SOURCE);
+            if (!newBasemap.equals(currentBasemap)) {
+                reinitializeMap();
+                return; // initMap() will trigger refresh and loadData()
+            }
+        }
         model.loadData();   // Update the user trail display with latest points
+        super.onResume();
+    }
+
+    private void reinitializeMap() {
+        mapFragment = null;
+        polyFeatureId = -1;
+        markerTaskMap.clear();
+        Fragment newMapFrag = (Fragment) mapFragmentFactory.createMapFragment();
+        getChildFragmentManager()
+            .beginTransaction()
+            .replace(R.id.map_container, newMapFrag)
+            .commitNow();
+        ((MapFragment) newMapFrag).init(this::initMap, () -> {});
         super.onResume();
     }
 
