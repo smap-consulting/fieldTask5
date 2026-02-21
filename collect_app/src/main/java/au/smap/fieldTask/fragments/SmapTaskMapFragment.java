@@ -14,58 +14,24 @@
 
 package au.smap.fieldTask.fragments;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.activities.AboutActivity;
@@ -77,7 +43,13 @@ import au.smap.fieldTask.loaders.MapLocationObserver;
 import au.smap.fieldTask.loaders.PointEntry;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
-import org.odk.collect.permissions.PermissionsProvider;
+import org.odk.collect.androidshared.ui.FragmentFactoryBuilder;
+import org.odk.collect.maps.LineDescription;
+import org.odk.collect.maps.MapFragment;
+import org.odk.collect.maps.MapFragmentFactory;
+import org.odk.collect.maps.MapPoint;
+import org.odk.collect.maps.markers.MarkerDescription;
+import org.odk.collect.maps.markers.MarkerIconDescription;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
 import org.odk.collect.settings.keys.ProjectKeys;  // smap admin menu
 import org.odk.collect.shared.settings.Settings;  // smap admin menu
@@ -89,8 +61,8 @@ import au.smap.fieldTask.utilities.Utilities;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -99,61 +71,36 @@ import timber.log.Timber;
 /**
  * Responsible for displaying tasks on the main fieldTask screen
  */
-public class SmapTaskMapFragment extends Fragment
-        implements OnMapReadyCallback,
-        GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationClickListener {
-
-    private static final int REQUEST_LOCATION = 100;
+public class SmapTaskMapFragment extends Fragment {
 
     View rootView;
 
-    protected LinearLayout searchBoxLayout;
-    protected SimpleCursorAdapter listAdapter;
-    protected LinkedHashSet<Long> selectedInstances = new LinkedHashSet<>();
-
     private MapLocationObserver mo = null;
-    private GoogleMap mMap;
-    private Polyline mPath;
-    private ImageButton layers_button;
-    private ImageButton location_button;
-
-    ArrayList<Marker> markers = null;
-    HashMap<Marker, Integer> markerMap = null;
-    ArrayList<LatLng> mPoints = new ArrayList<LatLng>();
-
-    BitmapDescriptor complete = null;
-    BitmapDescriptor accepted = null;
-    BitmapDescriptor late = null;
-    BitmapDescriptor repeat = null;
-    BitmapDescriptor rejected = null;
-    BitmapDescriptor newtask = null;
-    BitmapDescriptor submitted = null;
-    BitmapDescriptor triggered = null;
-    BitmapDescriptor triggered_repeat = null;
-
-    private double tasksNorth;
-    private double tasksSouth;
-    private double tasksEast;
-    private double tasksWest;
+    private MapFragment mapFragment;
+    private int polyFeatureId = -1;
+    private Map<Integer, TaskEntry> markerTaskMap = new HashMap<>();
 
     SurveyDataViewModel model;
 
     @Inject
-    PermissionsProvider permissionsProvider;
+    MapFragmentFactory mapFragmentFactory;
 
     public static SmapTaskMapFragment newInstance() {
         return new SmapTaskMapFragment();
     }
 
     public SmapTaskMapFragment() {
-
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         DaggerUtils.getComponent(context).inject(this);
+        getChildFragmentManager().setFragmentFactory(
+            new FragmentFactoryBuilder()
+                .forClass(MapFragment.class, () -> (Fragment) mapFragmentFactory.createMapFragment())
+                .build()
+        );
     }
 
     @Nullable
@@ -161,8 +108,6 @@ public class SmapTaskMapFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.ft_map_layout, container, false);
-        Timber.i("######## onCreateView");
-
         setHasOptionsMenu(true);
         return rootView;
     }
@@ -172,16 +117,31 @@ public class SmapTaskMapFragment extends Fragment
     }
 
     @Override
-    public void onViewCreated(View rootView, Bundle savedInstanceState) {
-
-        Timber.i("######## onViewCreated");
-        super.onViewCreated(rootView, savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         model = getViewMode();
         model.getSurveyData().observe(getViewLifecycleOwner(), surveyData -> {
             Timber.i("-------------------------------------- Task Map Fragment got Data ");
             setData(surveyData);
         });
 
+        Fragment fragment = ((FragmentContainerView) view.findViewById(R.id.map_container)).getFragment();
+        ((MapFragment) fragment).init(this::initMap, () -> {});
+    }
+
+    private void initMap(MapFragment map) {
+        this.mapFragment = map;
+        mapFragment.setLongPressListener(this::onMapLongPress);
+        mapFragment.setFeatureClickListener(this::onFeatureClick);
+
+        if (mo == null) {
+            mo = new MapLocationObserver(getContext(), this);
+        }
+
+        // Refresh the data
+        Intent intent = new Intent("org.smap.smapTask.refresh");
+        LocalBroadcastManager.getInstance(Collect.getInstance()).sendBroadcast(intent);
+        Timber.i("######## send org.smap.smapTask.refresh from smapTaskMapFragment");
     }
 
     @Override
@@ -190,22 +150,12 @@ public class SmapTaskMapFragment extends Fragment
         super.onDestroyView();
     }
 
-    @Override
-    public void onActivityCreated(Bundle b) {
-        super.onActivityCreated(b);
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle bundle) {
-        super.onViewStateRestored(bundle);
+    public void permissionsGranted() {
+        // No-op: map abstraction handles location internally
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-
         menu.clear(); // smap - prevent duplicates from multiple fragments
         getActivity().getMenuInflater().inflate(R.menu.smap_menu_map, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -256,138 +206,9 @@ public class SmapTaskMapFragment extends Fragment
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Timber.i("######## onMapReady");
-        mMap = googleMap;
-        boolean hasFineLocation = ContextCompat.checkSelfPermission(((SmapMain) getActivity()), ACCESS_FINE_LOCATION) == PERMISSION_GRANTED;
-        boolean hasCoarseLocation = ContextCompat.checkSelfPermission(((SmapMain) getActivity()), ACCESS_COARSE_LOCATION) == PERMISSION_GRANTED;
-        if (hasFineLocation || hasCoarseLocation) {
-            mapReadyPermissionGranted();
-        }
-    }
-
-    public void permissionsGranted() {
-        if(mMap != null) {
-            mapReadyPermissionGranted();
-        }
-    }
-    @SuppressLint("MissingPermission")
-    private void mapReadyPermissionGranted() {
-
-        if (mo == null) {
-
-            mMap.setMyLocationEnabled(true);
-            mMap.setOnMyLocationButtonClickListener(this);
-            mMap.setOnMyLocationClickListener(this);
-
-            mMap.setMyLocationEnabled(true);
-
-            complete = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_finalized_circle, null));
-            accepted = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_saved_circle, null));
-            late = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_late, null));
-            repeat = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_repeat, null));
-            rejected = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_rejected, null));
-            newtask = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_new, null));
-            submitted = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_submitted_circle, null));
-            triggered = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_triggered, null));
-            triggered_repeat = getMarkerIconFromDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.form_state_triggered, null));
-
-
-            mo = new MapLocationObserver(getContext(), this);
-
-            /*
-             * Add multiline info window
-             * From: Hiren Patel, http://stackoverflow.com/questions/13904651/android-google-maps-v2-how-to-add-marker-with-multiline-snippet
-             */
-            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
-                @Override
-                public View getInfoWindow(Marker arg0) {
-                    return null;
-                }
-
-                @Override
-                public View getInfoContents(Marker marker) {
-
-                    LinearLayout info = new LinearLayout(getContext());
-                    info.setOrientation(LinearLayout.VERTICAL);
-
-                    TextView title = new TextView(getContext());
-                    title.setTextColor(Color.BLACK);
-                    title.setGravity(Gravity.CENTER);
-                    title.setTypeface(null, Typeface.BOLD);
-                    title.setText(marker.getTitle());
-
-                    TextView snippet = new TextView(getContext());
-                    snippet.setTextColor(Color.GRAY);
-                    snippet.setText(marker.getSnippet());
-
-                    info.addView(title);
-                    info.addView(snippet);
-
-                    return info;
-                }
-            });
-
-            /*
-             * Add long click listener
-             */
-            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-
-                @Override
-                public void onMapLongClick(LatLng latLng) {
-                    // Get closest marker
-                    double minDistance = 1000;
-                    Marker selMarker = null;
-                    if (markers != null) {
-                        for (Marker marker : markers) {
-                            double roughDistance = Math.sqrt(
-                                    Math.pow(marker.getPosition().latitude - latLng.latitude, 2) +
-                                            Math.pow(marker.getPosition().longitude - latLng.longitude, 2));
-                            if (roughDistance < minDistance) {
-                                minDistance = roughDistance;
-                                selMarker = marker;
-                            }
-                        }
-                    }
-                    if (selMarker != null) {
-                        Toast.makeText(getActivity(), "marker selected: " + selMarker.getTitle(), Toast.LENGTH_LONG).show();
-
-                        Integer iPos = markerMap.get(selMarker);
-                        if (iPos != null) {
-
-                            int position = iPos;
-                            List<TaskEntry> tasks = ((SmapMain) getActivity()).getTasks();
-                            TaskEntry entry = tasks.get(position);
-
-                            if (entry.locationTrigger != null) {
-                                Toast.makeText(
-                                        getActivity(),
-                                        getString(R.string.smap_must_start_from_nfc),
-                                        Toast.LENGTH_LONG).show();
-                            } else {
-                                ((SmapMain) getActivity()).completeTask(entry, false);
-                            }
-
-
-                        }
-                    }
-
-                }
-            });
-
-            // Refresh the data
-            Intent intent = new Intent("org.smap.smapTask.refresh");
-            LocalBroadcastManager.getInstance(Collect.getInstance()).sendBroadcast(intent);
-            Timber.i("######## send org.smap.smapTask.refresh from smapTaskMapFragment");
-        }
     }
 
     public void setData(SurveyData data) {
@@ -408,209 +229,132 @@ public class SmapTaskMapFragment extends Fragment
     }
 
     private void clearTasks() {
-
-        if (markers != null && markers.size() > 0) {
-            for (int i = 0; i < markers.size(); i++) {
-                markers.get(i).remove();
-            }
+        if (mapFragment == null) return;
+        for (int featureId : markerTaskMap.keySet()) {
+            mapFragment.removeFeature(featureId);
         }
+        markerTaskMap.clear();
     }
 
     private void showTasks(List<TaskEntry> data) {
+        if (mapFragment == null) return;
+        clearTasks();
 
-        if (mMap != null) {
-
-            clearTasks();   // remove existing markers
-
-            // Update markers
-            markers = new ArrayList<Marker>();
-            markerMap = new HashMap<Marker, Integer>();
-
-            // Add the tasks to the marker array and to the map
-            int index = 0;
-            for (TaskEntry t : data) {
-                if (t.type.equals("task")) {
-                    LatLng ll = getTaskCoords(t);
-                    if (ll != null) {
-                        String taskTime = Utilities.getTaskTime(t.taskStatus, t.actFinish, t.taskStart);
-                        String addressText = KeyValueJsonFns.getValues(t.taskAddress);
-                        MarkerOptions markerOptions = new MarkerOptions()
-                                .position(ll)
-                                .title(t.name)
-                                .snippet(taskTime + "\n" + addressText);
-
-                        markerOptions.icon(getIcon(t.taskStatus, t.repeat, t.locationTrigger != null, t.taskFinish));
-                        Marker m = mMap.addMarker(markerOptions);
-                        markers.add(m);
-                        markerMap.put(m, index);
-
-                    }
+        for (TaskEntry t : data) {
+            if (t.type.equals("task")) {
+                MapPoint point = getTaskMapPoint(t);
+                if (point != null) {
+                    int iconDrawable = getIconDrawable(t.taskStatus, t.repeat, t.locationTrigger != null, t.taskFinish);
+                    MarkerDescription desc = new MarkerDescription(
+                        point, false, MapFragment.BOTTOM,
+                        new MarkerIconDescription.DrawableResource(iconDrawable)
+                    );
+                    int featureId = mapFragment.addMarker(desc);
+                    markerTaskMap.put(featureId, t);
                 }
-                index++;
             }
         }
-
     }
 
     private void showPoints(List<PointEntry> data) {
-
-        if (mMap != null) {
-            mPoints = new ArrayList<LatLng>();
-            if (mPath != null) {
-                mPath.remove();
-            }
-            mPath = mMap.addPolyline((new PolylineOptions()));
-
-            //Add in reverse order
-            for (int i = data.size() - 1; i >= 0; i--) {
-                PointEntry p = data.get(i);
-                mPoints.add(new LatLng(p.lat, p.lon));
-            }
-            mPath.setPoints(mPoints);
+        if (mapFragment == null) return;
+        if (polyFeatureId != -1) {
+            mapFragment.removeFeature(polyFeatureId);
+            polyFeatureId = -1;
         }
+        List<MapPoint> points = new ArrayList<>();
+        // Add in reverse order
+        for (int i = data.size() - 1; i >= 0; i--) {
+            points.add(new MapPoint(data.get(i).lat, data.get(i).lon));
+        }
+        polyFeatureId = mapFragment.addPolyLine(new LineDescription(points, null, null, false, false));
     }
 
-    public void updatePath(LatLng point) {
-        if (mPath != null && mPoints != null) {
-            mPoints.add(point);
-            mPath.setPoints(mPoints);
+    public void updatePath(MapPoint point) {
+        if (mapFragment != null && polyFeatureId != -1) {
+            mapFragment.appendPointToPolyLine(polyFeatureId, point);
         }
     }
 
     /*
-     * Get the coordinates of the task and update the bounding box
+     * Get the coordinates of the task
      */
-    private LatLng getTaskCoords(TaskEntry t) {
-
-        double lat = 0.0;
-        double lon = 0.0;
-        LatLng locn = null;
-
-        if ((t.actLat == 0.0) && (t.actLon == 0.0)) {
-            lat = t.schedLat;       // Scheduled coordinates of task
-            lon = t.schedLon;
-        } else {
-            lat = t.actLat;         // Actual coordinates of task
-            lon = t.actLon;
-        }
-
-        if (lat != 0.0 && lon != 0.0) {
-            // Update bounding box
-            if (lat > tasksNorth) {
-                tasksNorth = lat;
-            }
-            if (lat < tasksSouth) {
-                tasksSouth = lat;
-            }
-            if (lon > tasksEast) {
-                tasksEast = lon;
-            }
-            if (lat < tasksWest) {
-                tasksWest = lon;
-            }
-
-            // Create Point
-            locn = new LatLng(lat, lon);
-        }
-
-
-        return locn;
+    private MapPoint getTaskMapPoint(TaskEntry t) {
+        double lat = (t.actLat == 0.0 && t.actLon == 0.0) ? t.schedLat : t.actLat;
+        double lon = (t.actLat == 0.0 && t.actLon == 0.0) ? t.schedLon : t.actLon;
+        return (lat != 0.0 || lon != 0.0) ? new MapPoint(lat, lon) : null;
     }
 
     /*
-     * Get the icon to represent the passed in task status
+     * Get the drawable resource to represent the passed in task status
      */
-    private BitmapDescriptor getIcon(String status, boolean isRepeat, boolean hasTrigger, long taskFinish) {
-
+    private int getIconDrawable(String status, boolean isRepeat, boolean hasTrigger, long taskFinish) {
         if (status.equals(Utilities.STATUS_T_REJECTED) || status.equals(Utilities.STATUS_T_CANCELLED)) {
-            return rejected;
+            return R.drawable.form_state_rejected;
         } else if (status.equals(Utilities.STATUS_T_ACCEPTED)) {
-            if (hasTrigger && !isRepeat) {
-                return triggered;
-            } else if (hasTrigger && isRepeat) {
-                return triggered_repeat;
+            if (hasTrigger) {
+                return R.drawable.form_state_triggered;
             } else if (isRepeat) {
-                return repeat;
+                return R.drawable.form_state_repeat;
             } else if (taskFinish != 0 && taskFinish < (new Date()).getTime()) {
-                return late;
+                return R.drawable.form_state_late;
             } else {
-                return accepted;
+                return R.drawable.form_state_saved_circle;
             }
         } else if (status.equals(Utilities.STATUS_T_COMPLETE)) {
-            return complete;
+            return R.drawable.form_state_finalized_circle;
         } else if (status.equals(Utilities.STATUS_T_SUBMITTED)) {
-            return submitted;
+            return R.drawable.form_state_submitted_circle;
         } else if (status.equals(Utilities.STATUS_T_NEW)) {
-            return newtask;
+            return R.drawable.form_state_new;
         } else {
             Timber.i("Unknown task status: %s", status);
-            return accepted;
+            return R.drawable.form_state_saved_circle;
+        }
+    }
+
+    private void onMapLongPress(MapPoint point) {
+        double minDistance = 1000;
+        TaskEntry nearest = null;
+        for (Map.Entry<Integer, TaskEntry> entry : markerTaskMap.entrySet()) {
+            TaskEntry t = entry.getValue();
+            MapPoint tp = getTaskMapPoint(t);
+            if (tp != null) {
+                double d = Math.sqrt(
+                    Math.pow(tp.latitude - point.latitude, 2) +
+                    Math.pow(tp.longitude - point.longitude, 2)
+                );
+                if (d < minDistance) {
+                    minDistance = d;
+                    nearest = t;
+                }
+            }
+        }
+        if (nearest != null) {
+            Toast.makeText(getActivity(), "marker selected: " + nearest.name, Toast.LENGTH_LONG).show();
+            if (nearest.locationTrigger != null) {
+                Toast.makeText(
+                    getActivity(),
+                    getString(R.string.smap_must_start_from_nfc),
+                    Toast.LENGTH_LONG).show();
+            } else {
+                ((SmapMain) getActivity()).completeTask(nearest, false);
+            }
+        }
+    }
+
+    private void onFeatureClick(int featureId) {
+        TaskEntry t = markerTaskMap.get(featureId);
+        if (t != null) {
+            String taskTime = Utilities.getTaskTime(t.taskStatus, t.actFinish, t.taskStart);
+            String addressText = KeyValueJsonFns.getValues(t.taskAddress);
+            Toast.makeText(getActivity(), t.name + "\n" + taskTime + "\n" + addressText, Toast.LENGTH_SHORT).show();
         }
     }
 
     public void locateTask(TaskEntry task) {
-        mMap.moveCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(task.schedLat, task.schedLon),
-                        16f
-                )
-        );
-    }
-
-    /*
-     * Convert an xml drawable to a bitmap
-     * From: https://stackoverflow.com/questions/18053156/set-image-from-drawable-as-marker-in-google-map-version-2
-     */
-    @TargetApi(19)
-    private BitmapDescriptor getMarkerIconFromDrawable(Drawable drawable) {
-
-        Bitmap bitmap = null;
-
-        if (drawable instanceof BitmapDrawable) {
-            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
-            if (bitmapDrawable.getBitmap() != null) {
-                bitmap = bitmapDrawable.getBitmap();
-            }
+        if (mapFragment != null) {
+            mapFragment.zoomToPoint(new MapPoint(task.schedLat, task.schedLon), 16.0, true);
         }
-
-        if (bitmap == null) {
-            if (drawable.getIntrinsicWidth() <= 0 || drawable.getIntrinsicHeight() <= 0) {
-                bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888); // Single color bitmap will be created of 1x1 pixel
-            } else {
-                bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            }
-
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            float maxHeight = displaymetrics.heightPixels / 15;
-
-            int intHeight = drawable.getIntrinsicHeight();
-            if (bitmap.getHeight() > maxHeight) {
-                double ratio = (double) drawable.getIntrinsicHeight() / (double) drawable.getIntrinsicWidth();
-                int width = (int) Math.round(maxHeight / ratio);
-
-                if (Build.VERSION.SDK_INT > 18) {
-                    bitmap.setHeight((int) maxHeight);
-                    bitmap.setWidth(width);
-                }
-            }
-
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
-        }
-
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
-
-    @Override
-    public void onMyLocationClick(@NonNull Location location) {
-
-    }
-
-    @Override
-    public boolean onMyLocationButtonClick() {
-        return false;
-    }
-
 }

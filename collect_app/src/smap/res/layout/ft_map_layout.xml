@@ -5,21 +5,11 @@
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
-	<LinearLayout
-		android:id="@+id/location_buttons"
-		android:orientation="vertical"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center_horizontal"
-		android:padding="0dip"
-		android:background="#BF000000">
-
-		<fragment
-        	android:id="@+id/map"
-        	android:layout_width="fill_parent"
-        	android:layout_height="fill_parent"
-        	class="com.google.android.gms.maps.SupportMapFragment" />
-	</LinearLayout>
+	<androidx.fragment.app.FragmentContainerView
+		android:id="@+id/map_container"
+		android:name="org.odk.collect.maps.MapFragment"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
 
 	<ScrollView
 		android:layout_width="wrap_content"

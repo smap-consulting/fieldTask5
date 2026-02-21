@@ -366,9 +366,7 @@ dependencies {
     implementation project(':open-rosa')
     implementation project(':mobile-device-management')
 
-    if (getSecrets().getProperty('MAPBOX_DOWNLOADS_TOKEN', '') != '') {
-        implementation project(':mapbox')
-    }
+    implementation project(':mapbox')
 
     implementation libs.androidxStartup
     implementation libs.androidxCoreKtx
