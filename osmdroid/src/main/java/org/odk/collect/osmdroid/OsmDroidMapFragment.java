@@ -628,7 +628,18 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         // A Marker's position is a GeoPoint with latitude, longitude, and
         // altitude fields.  We need to store the standard deviation value
         // somewhere, so it goes in the marker's sub-description field.
-        Marker marker = new Marker(map);
+        Marker marker = new Marker(map) {
+            @Override
+            public boolean onLongPress(android.view.MotionEvent event, org.osmdroid.views.MapView mapView) {
+                if (hitTest(event, mapView)) {
+                    if (longPressListener != null) {
+                        longPressListener.onPoint(fromGeoPoint(getPosition()));
+                    }
+                    return true;
+                }
+                return false;
+            }
+        };
         marker.setPosition(toGeoPoint(markerDescription.getPoint()));
         marker.setSubDescription(Double.toString(markerDescription.getPoint().accuracy));
         marker.setDraggable(markerDescription.isDraggable());
