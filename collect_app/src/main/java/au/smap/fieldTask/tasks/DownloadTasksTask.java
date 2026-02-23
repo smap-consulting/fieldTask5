@@ -329,6 +329,18 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                  */
                 Utilities.markClosedTasksWithStatus(Utilities.STATUS_T_SUBMITTED);
 
+                /*
+                 * Submit completed forms before fetching tasks from server so the server
+                 * response reflects up-to-date task statuses. Newly-unorphaned instances
+                 * (whose form was just re-downloaded) will be submitted on the next refresh.
+                 */
+                InstanceUploaderTask.Outcome submitOutcome = submitCompletedForms();
+                if(submitOutcome != null && submitOutcome.messagesByInstanceId != null) {
+                    for (String key : submitOutcome.messagesByInstanceId.keySet()) {
+                        results.put(key, submitOutcome.messagesByInstanceId.get(key));
+                    }
+                }
+
 	            if(isCancelled()) { throw new CancelException("cancelled"); };		// Return if the user cancels
 
                 /*
@@ -403,30 +415,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                     }
                 }
 
-                /*
-                 * Submit completed forms after form sync so restored forms
-                 * allow previously-orphaned instances to be submitted
-                 */
-                InstanceUploaderTask.Outcome submitOutcome = submitCompletedForms();
-                if(submitOutcome != null && submitOutcome.messagesByInstanceId != null) {
-                    for (String key : submitOutcome.messagesByInstanceId.keySet()) {
-                        results.put(key, submitOutcome.messagesByInstanceId.get(key));
-                    }
-                }
-
                 if(isCancelled()) { throw new CancelException("cancelled"); };		// Return if the user cancels
-
-                /*
-                 * Rebuild taskMap after submitCompletedForms so submitted tasks are not re-inserted.
-                 * The map built earlier is stale: InstanceSyncTask may have submitted tasks between
-                 * the initial getTasks() call and now, causing addAndUpdateEntries to treat them as new.
-                 */
-                tasks.clear();
-                taskMap.clear();
-                Utilities.getTasks(tasks, false, ApplicationConstants.SortingOrder.BY_NAME_ASC, "", true, false, true);
-                for(TaskEntry t : tasks) {
-                    taskMap.put(getTaskCaseString(t.taskType, t.assId, t.updateId), new TaskStatus(t.id, t.taskStatus));
-                }
 
                 /*
                  * Apply task changes
