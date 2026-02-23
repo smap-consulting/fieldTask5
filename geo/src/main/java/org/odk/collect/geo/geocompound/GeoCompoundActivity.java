@@ -348,7 +348,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void createOrUpdateMarker(int vertexIdx) {
         List<MapPoint> points = map.getPolyPoints(lineFeatureId);
-        if (vertexIdx >= points.size()) {
+        if (vertexIdx < 0 || vertexIdx >= points.size()) {
             return;
         }
 
