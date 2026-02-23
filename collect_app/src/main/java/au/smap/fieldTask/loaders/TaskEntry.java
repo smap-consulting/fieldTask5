@@ -31,6 +31,7 @@ public class TaskEntry {
     public long actFinish;          // Date time the task was finalised
     public String isSynced;
     public long assId;
+    public int taskId;      // Server task id
     public String uuid;
     public String source;
     public String locationTrigger;

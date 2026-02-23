@@ -43,6 +43,7 @@ import static org.odk.collect.android.database.instances.DatabaseInstanceColumns
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_SHOW_DIST;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_HIDE;
 import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.PHONE;
+import static org.odk.collect.android.database.instances.DatabaseInstanceColumns.T_TASK_SRV_ID;
 import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.addColumn;
 import static org.odk.collect.db.sqlite.SQLiteDatabaseExt.doesColumnExist;
 
@@ -198,6 +199,9 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
         }
         if (!doesColumnExist(db, INSTANCES_TABLE_NAME, PHONE)) {
             addColumn(db, INSTANCES_TABLE_NAME, PHONE, "text");
+        }
+        if (!doesColumnExist(db, INSTANCES_TABLE_NAME, T_TASK_SRV_ID)) {
+            addColumn(db, INSTANCES_TABLE_NAME, T_TASK_SRV_ID, "integer");
         }
     }
 
@@ -521,7 +525,8 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
                 + UUID + " text, "
                 + T_SHOW_DIST + " integer, "
                 + T_HIDE + " integer, "
-                + PHONE + " text"
+                + PHONE + " text, "
+                + T_TASK_SRV_ID + " integer"
                 + ");"
         );
     }

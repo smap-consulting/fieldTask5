@@ -327,6 +327,7 @@ public class ManageForm {
         values.put(InstanceColumns.ACT_LAT, 0.0);
         values.put(InstanceColumns.T_TITLE, ta.task.title);
         values.put(InstanceColumns.T_ASS_ID, ta.assignment.assignment_id);
+        values.put(InstanceColumns.T_TASK_SRV_ID, ta.task.id);
         values.put(InstanceColumns.T_TASK_STATUS, ta.assignment.assignment_status);
 		values.put(InstanceColumns.T_REPEAT, ta.task.repeat ? 1 : 0);
 		values.put(InstanceColumns.T_UPDATEID, ta.task.update_id);

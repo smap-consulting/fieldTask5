@@ -474,7 +474,8 @@ public class Utilities {
                 InstanceColumns.UUID,
                 InstanceColumns.SOURCE,
                 InstanceColumns.T_LOCATION_TRIGGER,
-                InstanceColumns.T_UPDATEID
+                InstanceColumns.T_UPDATEID,
+                InstanceColumns.T_TASK_SRV_ID
         };
 
         String selectClause;
@@ -561,6 +562,7 @@ public class Utilities {
                 entry.source = c.getString(c.getColumnIndexOrThrow(InstanceColumns.SOURCE));
                 entry.locationTrigger = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_LOCATION_TRIGGER));
                 entry.updateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
+                entry.taskId = c.getInt(c.getColumnIndexOrThrow(InstanceColumns.T_TASK_SRV_ID));
                 entry.formDeleted = !activeFormIds.contains(entry.jrFormId);
 
                 // smap - delete orphan tasks that were downloaded from server but never opened

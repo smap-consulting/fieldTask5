@@ -417,6 +417,18 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 if(isCancelled()) { throw new CancelException("cancelled"); };		// Return if the user cancels
 
                 /*
+                 * Rebuild taskMap after submitCompletedForms so submitted tasks are not re-inserted.
+                 * The map built earlier is stale: InstanceSyncTask may have submitted tasks between
+                 * the initial getTasks() call and now, causing addAndUpdateEntries to treat them as new.
+                 */
+                tasks.clear();
+                taskMap.clear();
+                Utilities.getTasks(tasks, false, ApplicationConstants.SortingOrder.BY_NAME_ASC, "", true, false, true);
+                for(TaskEntry t : tasks) {
+                    taskMap.put(getTaskCaseString(t.taskType, t.assId, t.updateId), new TaskStatus(t.id, t.taskStatus));
+                }
+
+                /*
                  * Apply task changes
                  *  Add new tasks
                  *  Update the status of tasks on the phone that have been cancelled on the server
@@ -622,6 +634,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
                 // Details required for cases
                 ta.task = new TrTask();
+                ta.task.id = t.taskId;
                 ta.task.type = t.taskType;
                 ta.task.update_id = t.updateId;
                 ta.task.form_id = t.jrFormId;

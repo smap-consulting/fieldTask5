@@ -48,4 +48,5 @@ object DatabaseInstanceColumns : BaseColumns {
     const val T_SHOW_DIST = "tShowDist" // Distance at which task will be shown, 0 for always show
     const val T_HIDE = "tHide" // Set true if task is to be hidden from view
     const val PHONE = "phone" // Phone number of task
+    const val T_TASK_SRV_ID = "tTaskSrvId" // Server task ID from myassignments response
 }

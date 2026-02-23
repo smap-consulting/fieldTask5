@@ -95,5 +95,6 @@ public final class InstanceProviderAPI {
         public static final String T_SHOW_DIST = DatabaseInstanceColumns.T_SHOW_DIST;
         public static final String T_HIDE = DatabaseInstanceColumns.T_HIDE;
         public static final String PHONE = DatabaseInstanceColumns.PHONE;
+        public static final String T_TASK_SRV_ID = DatabaseInstanceColumns.T_TASK_SRV_ID;
     }
 }
