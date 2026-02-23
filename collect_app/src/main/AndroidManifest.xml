@@ -49,6 +49,8 @@ the specific language governing permissions and limitations under the License.
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> <!-- smap - Restart services after reboot -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- smap - Required for foreground services (API 28+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" /> <!-- smap - Required for location foreground service (API 34+) -->
 
     <!--
         Since we use Scoped Storage, we should not need this permission. However, we discovered that

@@ -123,8 +123,16 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                     .setPriority(NotificationCompat.PRIORITY_LOW)
                     .build();
 
-            startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
-            Timber.i("Foreground service started for location tracking");
+            try {
+                startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
+                Timber.i("Foreground service started for location tracking");
+            } catch (Exception e) {
+                // smap - On Android 12+ (API 31+) startForeground throws ForegroundServiceStartNotAllowedException
+                // when the app is in the background. Stop gracefully rather than crash.
+                Timber.w("Cannot start foreground location service: " + e.getMessage());
+                stopSelf();
+                return START_NOT_STICKY;
+            }
         }
 
         return START_STICKY;
