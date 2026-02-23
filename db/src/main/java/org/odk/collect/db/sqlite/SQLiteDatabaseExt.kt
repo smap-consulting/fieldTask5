@@ -2,7 +2,9 @@ package org.odk.collect.db.sqlite
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteQueryBuilder
+import timber.log.Timber
 
 object SQLiteDatabaseExt {
     fun SQLiteDatabase.query(
@@ -44,18 +46,26 @@ object SQLiteDatabaseExt {
         type: String,
         default: String? = null
     ) {
-        if (default != null) {
-            this.execSQL(
-                """
-                ALTER TABLE $table ADD $column $type DEFAULT $default;
-                """.trimIndent()
-            )
-        } else {
-            this.execSQL(
-                """
-                ALTER TABLE $table ADD $column $type;
-                """.trimIndent()
-            )
+        try {
+            if (default != null) {
+                this.execSQL(
+                    """
+                    ALTER TABLE $table ADD $column $type DEFAULT $default;
+                    """.trimIndent()
+                )
+            } else {
+                this.execSQL(
+                    """
+                    ALTER TABLE $table ADD $column $type;
+                    """.trimIndent()
+                )
+            }
+        } catch (e: SQLiteException) {
+            if (e.message?.contains("duplicate column name", ignoreCase = true) == true) {
+                Timber.w("Column $column already exists in $table, skipping")
+            } else {
+                throw e
+            }
         }
     }
 }
