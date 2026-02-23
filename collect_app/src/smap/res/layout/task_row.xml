@@ -57,7 +57,7 @@
         app:tint="?android:attr/textColorPrimary"
         android:background="?selectableItemBackgroundBorderless"
         android:clickable="true"
-        android:focusable="true" />
+        android:focusable="false" />
 
     <FrameLayout
         android:id="@+id/map_view"
