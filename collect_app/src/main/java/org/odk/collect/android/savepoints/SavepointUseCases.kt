@@ -18,7 +18,8 @@ object SavepointUseCases {
         savepointsRepository: SavepointsRepository
     ): Savepoint? {
         return if (uriMimeType == FormsContract.CONTENT_ITEM_TYPE) {
-            val selectedForm = formsRepository.get(ContentUriHelper.getIdFromUri(uri))!!
+            val selectedForm = formsRepository.get(ContentUriHelper.getIdFromUri(uri))
+                ?: return null
 
             formsRepository.getAllByFormId(selectedForm.formId)
                 .filter { it.date <= selectedForm.date }
@@ -31,7 +32,8 @@ object SavepointUseCases {
                 }
             null
         } else {
-            val instance = instanceRepository.get(ContentUriHelper.getIdFromUri(uri))!!
+            val instance = instanceRepository.get(ContentUriHelper.getIdFromUri(uri))
+                ?: return null
             val form = formsRepository.getAllByFormId(instance.formId) // smap - match by formId only, ignore version
                 .sortedByDescending { it.date }
                 .firstOrNull()
