@@ -563,6 +563,16 @@ public class Utilities {
                 entry.updateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
                 entry.formDeleted = !activeFormIds.contains(entry.jrFormId);
 
+                // smap - delete orphan tasks that were downloaded from server but never opened
+                if (entry.formDeleted && entry.assId > 0 && !new File(entry.instancePath).exists()) {
+                    Timber.i("Deleting unmodified orphan task: %s (assId=%d)", entry.name, entry.assId);
+                    Collect.getInstance().getContentResolver().delete(
+                            Uri.withAppendedPath(InstanceColumns.CONTENT_URI, String.valueOf(entry.id)),
+                            null, null);
+                    c.moveToNext();
+                    continue;
+                }
+
                 if (useGeofenceFilter && location != null) {
                     if (entry.showDist > 0 && entry.schedLat != 0.0 && entry.schedLon != 0.0) {
 
