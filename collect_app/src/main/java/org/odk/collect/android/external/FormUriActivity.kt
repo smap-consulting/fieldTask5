@@ -332,7 +332,8 @@ private class FormUriViewModel(
             formsRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))!!
         } else {
             val instance = instancesRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))!!
-            formsRepositoryProvider.create().getAllByFormId(instance.formId).maxByOrNull { it.date }!! // smap - match by formId only, use latest version
+            formsRepositoryProvider.create().getAllByFormId(instance.formId).maxByOrNull { it.date }
+                ?: return null // smap - no form found, skip entity check
         }
 
         if (form.usesEntities()) {
