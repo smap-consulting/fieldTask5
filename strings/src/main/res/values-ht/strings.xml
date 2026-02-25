@@ -115,6 +115,7 @@
   <string name="finalize">Finalize</string>
   <!--Button text for sending a submission.-->
   <string name="send">Voye ale</string>
+    <string name="quit_entry">Anrejitre fòm epi soti</string>
   <string name="data_saved_error">Dezole, sovgad fomilè a echwe</string>
   <string name="data_saved_ok">Fòmilè sovgade ak siksè!</string>
   <!--Used when exiting a form filling session in which a form was not properly loaded. &lt; and &gt; surrounds the text so it will appear as <no form loaded>-->

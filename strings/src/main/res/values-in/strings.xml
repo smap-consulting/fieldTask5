@@ -140,6 +140,7 @@
   <string name="finalize">Finalisasi</string>
   <!--Button text for sending a submission.-->
   <string name="send">Kirim</string>
+    <string name="quit_entry">Simpan formulir dan keluar</string>
   <string name="data_saved_error">Maaf, tidak berhasil menyimpan formulir.</string>
   <string name="data_saved_ok">Formulir berhasil disimpan.</string>
   <string name="save_point_error">Terjadi kesalahan saat menyimpan titik pemulihan: %s</string>

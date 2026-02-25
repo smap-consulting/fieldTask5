@@ -130,6 +130,7 @@
   <string name="finalize">نهایی</string>
   <!--Button text for sending a submission.-->
   <string name="send">ارسال شد</string>
+    <string name="quit_entry">ذخیره فرم و خروج</string>
   <string name="data_saved_error">متاسفانه فرم ذخیره نشد!</string>
   <string name="data_saved_ok">فرم با موفقیت ذخیره شد!</string>
   <string name="save_point_error">خطا در ذخیره نقطه یابی: %s</string>

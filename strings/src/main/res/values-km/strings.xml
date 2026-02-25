@@ -119,6 +119,7 @@
   <string name="finalize">បញ្ចប់</string>
   <!--Button text for sending a submission.-->
   <string name="send">ផ្ញើ</string>
+    <string name="quit_entry">រក្សាទុកបែបបទ ហើយចាកចេញ</string>
   <string name="data_saved_error">សុំទោស, រក្សា​ទុកសំណុំ​បែបបទ​មិន​បាន​សម្រេច!</string>
   <string name="data_saved_ok">បាន​រក្សាទុកសំណុំ​បែបបទ​ដោយ​ជោគជ័យ!</string>
   <string name="save_point_error">បញ្ហាក្នុងការរក្សាទុកនូវចំនុចស្តារឡើងវិញ: %s</string>

@@ -74,6 +74,7 @@
   <!--Button text for saving as draft-->
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
+  <string name="quit_entry">Išsaugoti formą ir išeiti</string>
   <string name="data_saved_error">Deja, formos išsaugoti nepavyko!</string>
   <string name="data_saved_ok">Forma sėkmingai išsaugota!</string>
   <!--Used when exiting a form filling session in which a form was not properly loaded. &lt; and &gt; surrounds the text so it will appear as <no form loaded>-->

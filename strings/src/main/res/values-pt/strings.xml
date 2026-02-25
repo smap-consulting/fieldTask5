@@ -141,6 +141,7 @@
   <string name="finalize">Finalizar</string>
   <!--Button text for sending a submission.-->
   <string name="send">Enviar</string>
+    <string name="quit_entry">Guardar formulário e sair</string>
   <string name="data_saved_error">Desculpe, falha ao salvar formulário!</string>
   <string name="data_saved_ok">Formulário salvo com sucesso!</string>
   <string name="save_point_error">Erro ao salvar ponto de recuperação: %s</string>

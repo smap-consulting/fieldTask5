@@ -131,6 +131,7 @@
   <string name="finalize">Финализирай</string>
   <!--Button text for sending a submission.-->
   <string name="send">Изпрати</string>
+    <string name="quit_entry">Запазване на формуляра и изход</string>
   <string name="data_saved_error">Запазването на формуляра беше неуспешно!</string>
   <string name="data_saved_ok">Успешно запазване на формуляра!</string>
   <string name="save_point_error">Грешка при запис на точка за възстановяване: %s</string>

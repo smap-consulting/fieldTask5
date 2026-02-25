@@ -140,6 +140,7 @@
   <string name="finalize">Abschließen</string>
   <!--Button text for sending a submission.-->
   <string name="send">Senden</string>
+    <string name="quit_entry">Formular speichern und beenden</string>
   <string name="data_saved_error">Speichervorgang gescheitert!</string>
   <string name="data_saved_ok">Speichervorgang erfolgreich!</string>
   <string name="save_point_error">Fehler beim Speichern des Wiederherstellungspunkts: %s</string>

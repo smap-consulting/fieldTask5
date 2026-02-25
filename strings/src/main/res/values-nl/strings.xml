@@ -123,6 +123,7 @@
   <string name="finalize">Afronden</string>
   <!--Button text for sending a submission.-->
   <string name="send">Verzend</string>
+    <string name="quit_entry">Formulier opslaan en afsluiten</string>
   <string name="data_saved_error">Sorry, formulier opslaan mislukt!</string>
   <string name="data_saved_ok">Formulier is opgeslagen!</string>
   <string name="save_point_error">Fout bij maken herstelpunt: %s</string>

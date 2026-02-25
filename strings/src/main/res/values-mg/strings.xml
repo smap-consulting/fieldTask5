@@ -377,4 +377,5 @@
   <!--Text for the dialog message displayed when a user attempts to edit a finalized form and a newer finalized version exists. Please format date appropriately for your language: http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html-->
   <!--Text for the dialog positive button displayed when a user attempts to edit a finalized form and a newer finalized version exists-->
   <!--Text for the snackbar shown when editing of a finalized form begins-->
+  <string name="quit_entry">Tehirizo ny endrika ary mivoaka</string>
 </resources>

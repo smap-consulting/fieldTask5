@@ -125,6 +125,7 @@
   <string name="finalize">Malizia</string>
   <!--Button text for sending a submission.-->
   <string name="send">Tuma</string>
+    <string name="quit_entry">Hifadhi fomu na uondoke</string>
   <string name="data_saved_error">Samahani, uhifadhi wa fomu umeshindikana!</string>
   <string name="data_saved_ok">Umefanikiwa kuhifadhi fomu!</string>
   <string name="save_point_error">Hitilafu katika kuhifadhi alama ya urejeshi \"recovery point\" :%s</string>

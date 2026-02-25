@@ -84,6 +84,7 @@
   <!--Button text for saving as draft-->
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
+  <string name="quit_entry">Salvesta vorm ja välju</string>
   <string name="data_saved_error">Kahjuks ebaõnnestus vormi salvestamine!</string>
   <string name="data_saved_ok">Vorm on edukalt salvestatud!</string>
   <string name="save_point_error">Vea parndamise taastuspunkt %s </string>

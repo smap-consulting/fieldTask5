@@ -95,6 +95,7 @@
   <!--Button text for saving as draft-->
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
+  <string name="quit_entry">Gem formular og afslut</string>
   <string name="data_saved_error">Formularen kunne ikke gemmes</string>
   <string name="data_saved_ok">Formular gemt </string>
   <string name="save_point_error">Kunne ikke gemme gendannelsespunkt: %s</string>

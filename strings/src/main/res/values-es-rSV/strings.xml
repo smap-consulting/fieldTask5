@@ -9,4 +9,5 @@
   <!--http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html-->
   <!--http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html-->
   <!--Geo string added in feature-geofeatures branch-->
+  <string name="quit_entry">Guardar formulario y salir</string>
 </resources>

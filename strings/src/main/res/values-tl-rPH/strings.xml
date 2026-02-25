@@ -16,6 +16,7 @@
   <string name="clear_answer_ask">Tanggalin ang tugon na ito?</string>
   <string name="clear_answer_no">Urong</string>
   <string name="data">Mga Inimpok na Form</string>
+  <string name="quit_entry">I-save ang Form at Lumabas</string>
   <string name="data_saved_error">Paumanhin, nabigo ang pag-impok ng form!</string>
   <string name="data_saved_ok">Matagumpay na inimpok ang Form!</string>
   <string name="delete_confirm">Burahin ang %s form(s)?</string>

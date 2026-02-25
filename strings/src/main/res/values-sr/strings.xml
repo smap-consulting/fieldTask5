@@ -112,6 +112,7 @@
   <!--Button text for saving as draft-->
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
+  <string name="quit_entry">Сачувај образац и изађи</string>
   <string name="data_saved_error">Izvini, čuvanje formulara nije uspjelo!</string>
   <string name="data_saved_ok">Formular je uspješno sačuvan!</string>
   <string name="save_point_error">Greška u čuvanju tačke povratka: %s </string>

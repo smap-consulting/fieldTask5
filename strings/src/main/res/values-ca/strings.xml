@@ -86,6 +86,7 @@
   <!--Button text for saving as draft-->
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
+  <string name="quit_entry">Desa el formulari i surt</string>
   <string name="data_saved_error">Ho sentim, el formulari no s\'ha desat be!</string>
   <string name="data_saved_ok">Formulari desat correctament!</string>
   <string name="save_point_error">Error al guardar el punt de recuperació: %s</string>

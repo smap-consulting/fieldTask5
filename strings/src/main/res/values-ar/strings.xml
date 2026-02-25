@@ -129,6 +129,7 @@
   <string name="finalize">إنهاء</string>
   <!--Button text for sending a submission.-->
   <string name="send">إرسال</string>
+    <string name="quit_entry">حفظ النموذج والخروج</string>
   <string name="data_saved_error">عذرًا، لم يتمّ حفظ الاستمارة!</string>
   <string name="data_saved_ok">تمّ حفظ الاستمارة بنجاح!</string>
   <string name="save_point_error">خطأ في حفظ نقطة الاسترداد %s</string>

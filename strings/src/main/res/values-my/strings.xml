@@ -91,6 +91,7 @@
   <!--Button text for saving as draft-->
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
+  <string name="quit_entry">ပုံစံကိုသိမ်းဆည်းပြီး ထွက်ရန်</string>
   <string name="data_saved_error">ပုံစံအား မသိမ်းဆည်းနိုင်ပါ</string>
   <string name="data_saved_ok">ပုံစံအားအောင်မြင်စွာ သိမ်းဆည်းနိုင်ပါသည်</string>
   <string name="save_point_error">ပြန်လည်ရယူသည့် နေရာ အမှားဖြစ်ပေါ်%s</string>

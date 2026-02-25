@@ -140,6 +140,7 @@
   <string name="finalize">Finalizzare</string>
   <!--Button text for sending a submission.-->
   <string name="send">Invia</string>
+    <string name="quit_entry">Salva modulo ed esci</string>
   <string name="data_saved_error">Spiacenti, salvataggio modulo fallito!</string>
   <string name="data_saved_ok">Modulo salvato correttamente!</string>
   <string name="save_point_error">Errore nel salvataggio del punto di ripristino: %s</string>
