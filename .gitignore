@@ -64,7 +64,7 @@ secrets.properties
 google-services.json
 .claude
 *.md
-!CLAUDE.md
+CLAUDE.md
 
 collect_app/collect_app.iml
 
