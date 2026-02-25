@@ -132,6 +132,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">Pošlji</string>
     <string name="quit_entry">Shrani obrazec in zapusti</string>
+    <string name="mark_finished">Označi obrazec kot zaključen</string>
   <string name="data_saved_error">Shranjevanje obrazca ni uspelo!</string>
   <string name="data_saved_ok">Obrazec uspešno shranjen!</string>
   <string name="save_point_error">Napaka pri shranjevanju obnovitvene točke %s</string>

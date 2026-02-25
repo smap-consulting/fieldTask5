@@ -141,6 +141,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">提交</string>
     <string name="quit_entry">保存表单并退出</string>
+    <string name="mark_finished">标记表格为完成</string>
   <string name="data_saved_error">表单保存失败!</string>
   <string name="data_saved_ok">表单已成功保存!</string>
   <string name="save_point_error">保存恢复点时出错：%s</string>

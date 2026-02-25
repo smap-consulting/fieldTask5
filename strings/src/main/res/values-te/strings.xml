@@ -115,6 +115,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">ఫారమ్‌ను సేవ్ చేసి నిష్క్రమించండి</string>
+    <string name="mark_finished">ఫారంను ఖరారు చేసినట్లుగా గుర్తించండి</string>
   <string name="data_saved_error">క్షమించండి, ఫారం సేవ్ అవ్వలేదు</string>
   <string name="data_saved_ok">ఫారం విజయవంతంగా సేవ్ చేయబడింది!</string>
   <string name="save_point_error">రికవరీ పాయింట్‌ను సేవ్ చేయడంలో లోపం ఉంది: %s</string>

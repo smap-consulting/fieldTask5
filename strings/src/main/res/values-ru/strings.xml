@@ -132,6 +132,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">Отправить</string>
     <string name="quit_entry">Сохранить форму и выйти</string>
+    <string name="mark_finished">Пометить опрос как финализированный</string>
   <string name="data_saved_error">Не удалось сохранить ответы</string>
   <string name="data_saved_ok">Ответы успешно сохранены</string>
   <string name="save_point_error">Ошибка сохранения точки восстановления: %s</string>

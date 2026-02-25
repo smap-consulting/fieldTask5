@@ -109,6 +109,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">Gönder</string>
     <string name="quit_entry">Formu kaydet ve çık</string>
+    <string name="mark_finished">Bitirilen Formu işaretle</string>
   <string name="data_saved_error">Form kaydedilirken hata oluştu</string>
   <string name="data_saved_ok">From başarılı bir şekilde saklandi</string>
   <!--Used when exiting a form filling session in which a form was not properly loaded. &lt; and &gt; surrounds the text so it will appear as <no form loaded>-->

@@ -141,6 +141,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">Envoyer</string>
     <string name="quit_entry">Enregistrer le formulaire et quitter</string>
+    <string name="mark_finished">Marquer le formulaire comme finalisé</string>
   <string name="data_saved_error">Désolé, l\'enregistrement du formulaire a échoué.</string>
   <string name="data_saved_ok">Le formulaire a été enregistré avec succès.</string>
   <string name="save_point_error">Erreur lors de l\'enregistrement du point de récupération: %s</string>

@@ -115,6 +115,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">Zapisz formularz i wyjdź</string>
+    <string name="mark_finished">Zaznacz formularz jako zakończony</string>
   <string name="data_saved_error">Przykro mi, zapis formularza się nie powiódł!</string>
   <string name="data_saved_ok">Formularz został zapisany pomyślnie!</string>
   <string name="save_point_error">Błąd przy zapisywaniu punktu odtwarzania: %s</string>

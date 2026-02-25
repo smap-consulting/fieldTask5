@@ -111,6 +111,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">Зберегти форму та вийти</string>
+    <string name="mark_finished">Позначити анкету як завершену</string>
   <string name="data_saved_error">Вибачте, не вдалось зберегти анкету!</string>
   <string name="data_saved_ok">Анкету успішно збережено!</string>
   <string name="save_point_error">Помилка при збереженні точки відновлення: %s</string>

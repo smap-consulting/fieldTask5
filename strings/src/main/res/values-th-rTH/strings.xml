@@ -97,6 +97,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">ส่งแบบสำรวจ</string>
     <string name="quit_entry">บันทึกแบบฟอร์มและออก</string>
+    <string name="mark_finished">ทำเครื่องหมายแบบสำรวจว่าเสร็จเรียบร้อยแล้ว</string>
   <string name="data_saved_error">ขออภัย ไม่สามารถบันทึกแบบสำรวจได้</string>
   <string name="data_saved_ok">บันทึกแบบสำรวจเรียบร้อยแล้ว</string>
   <string name="save_point_error">มีข้อผิดพลาดในการบันทึกจุดย้อนคืน : %s</string>

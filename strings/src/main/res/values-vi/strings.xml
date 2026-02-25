@@ -75,6 +75,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">Lưu biểu mẫu và thoát</string>
+    <string name="mark_finished">Đánh dấu biểu mẫu là hoàn thành</string>
   <string name="data_saved_error">Xin lỗi, biểu mẫu không lưu được!</string>
   <string name="data_saved_ok">Biểu mẫu đã được lưu!</string>
   <string name="save_point_error">Lỗi lưu lại điểm khôi phục: %s</string>

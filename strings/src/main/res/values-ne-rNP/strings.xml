@@ -90,6 +90,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">फारम बचत गर्नुहोस् र बाहिर निस्कनुहोस्</string>
+    <string name="mark_finished">फारामलाई अन्तिम रुप दिइएको अंकित गर्नुहोस्</string>
   <string name="data_saved_error">माफ गर्नुहोला , फारम संचित हुन सकेन !</string>
   <string name="data_saved_ok">फारम सफलतापूर्वक संचित भयो !</string>
   <string name="save_point_error">रिकभरी बिन्दु संचित गर्दा गल्ति भयो: %s</string>

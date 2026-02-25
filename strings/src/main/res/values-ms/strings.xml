@@ -387,4 +387,5 @@
   <!--Text for the dialog positive button displayed when a user attempts to edit a finalized form and a newer finalized version exists-->
   <!--Text for the snackbar shown when editing of a finalized form begins-->
   <string name="quit_entry">Simpan Borang dan Keluar</string>
+    <string name="mark_finished">Tandakan borang sebagai dimuktamadkan</string>
 </resources>

@@ -78,6 +78,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">Gcina ifomu uphume</string>
+    <string name="mark_finished">Bonisa ukuthi ifomu liphothuliwe</string>
   <string name="data_saved_error">Uxolo ifomu alilondolozekanga</string>
   <string name="data_saved_ok">Ifomu lilondolozeke ngempumelelo</string>
   <!--Used when exiting a form filling session in which a form was not properly loaded. &lt; and &gt; surrounds the text so it will appear as <no form loaded>-->

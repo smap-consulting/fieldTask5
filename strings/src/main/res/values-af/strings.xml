@@ -81,6 +81,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">Stoor vorm en verlaat</string>
+    <string name="mark_finished">Merk vorm as gefinaliseer</string>
   <string name="data_saved_error">Jammer, stoor van vorm het misluk!</string>
   <string name="data_saved_ok">Vorm suksesvol gestoor!</string>
   <string name="save_point_error">Fout tydens stoor van herstel-punt: %s</string>

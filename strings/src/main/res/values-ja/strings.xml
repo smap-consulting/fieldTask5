@@ -115,6 +115,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">フォームを保存して終了</string>
+    <string name="mark_finished">フォームを確定済にします</string>
   <string name="data_saved_error">申し訳ありません、フォームが保存できませんでした!</string>
   <string name="data_saved_ok">フォームを保存しました!</string>
   <string name="save_point_error">リカバリーポイントの保存中にエラー: %s</string>

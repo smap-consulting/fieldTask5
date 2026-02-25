@@ -132,6 +132,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">بھیجیں</string>
     <string name="quit_entry">فارم محفوظ کریں اور باہر نکلیں</string>
+    <string name="mark_finished">فارم کو حتمی کردیں</string>
   <string name="data_saved_error">معذرت, فارم محفوظ نہیں ہوسکا</string>
   <string name="data_saved_ok">فارم کامیابی سے محفوظ ہو گیا</string>
   <string name="save_point_error">ریکوری پوانٹ سیو کرتے وقت خرابی: %s</string>

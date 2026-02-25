@@ -90,6 +90,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">फॉर्म जतन करा आणि बाहेर पडा</string>
+    <string name="mark_finished">अंतिम रूपाने फॉर्म चिन्हांकित करा</string>
   <string name="data_saved_error">क्षमस्व, एक फॉर्म हटविणे क्रिया आधीच प्रगतीपथावर आहे!</string>
   <string name="data_saved_ok">फॉर्म यशस्वीरित्या जतन केला!</string>
   <string name="save_point_error">पुनर्प्राप्ती बिंदू जतन करताना त्रुटी: %s</string>

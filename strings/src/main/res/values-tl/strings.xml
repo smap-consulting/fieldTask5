@@ -82,6 +82,7 @@
   <!--Button text for finalizing a submission. Displayed instead of "Send" when auto-send is off or the device is offline-->
   <!--Button text for sending a submission.-->
   <string name="quit_entry">I-save ang Form at Lumabas</string>
+    <string name="mark_finished">Markahan Yari ang Form</string>
   <string name="data_saved_error">Paumanhin, nabigo ang pag-impok ng form!</string>
   <string name="data_saved_ok">Matagumpay na inimpok ang Form!</string>
   <!--Used when exiting a form filling session in which a form was not properly loaded. &lt; and &gt; surrounds the text so it will appear as <no form loaded>-->

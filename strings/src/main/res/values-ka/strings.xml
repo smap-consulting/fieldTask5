@@ -113,6 +113,7 @@
   <!--Button text for sending a submission.-->
   <string name="send">გაგზავნა</string>
     <string name="quit_entry">ფორმის შენახვა და გასვლა</string>
+    <string name="mark_finished">აღვნიშნოთ ფორმა დასრულებულად</string>
   <string name="data_saved_error">უკაცრავად, ფორმა ვერ შეინახა!</string>
   <string name="data_saved_ok">ფორმა წარმატებით შეინახა!</string>
   <string name="save_point_error">შეცდომა აღდგენის წერტილის შენახვისას: %s</string>

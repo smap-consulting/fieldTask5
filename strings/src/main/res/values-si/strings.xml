@@ -391,4 +391,5 @@
   <!--Text for the dialog positive button displayed when a user attempts to edit a finalized form and a newer finalized version exists-->
   <!--Text for the snackbar shown when editing of a finalized form begins-->
   <string name="quit_entry">ආකෘති පත්‍රය සුරකින්න සහ පිටවන්න</string>
+    <string name="mark_finished">ආකෘති පත්‍රය අවසාන කළ ලෙස සලකුණු කරන්න</string>
 </resources>
