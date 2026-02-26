@@ -240,11 +240,27 @@ public class InstanceDatabaseMigrator implements DatabaseMigrator {
         // Columns from ODK Collect v9
         if (!doesColumnExist(db, INSTANCES_TABLE_NAME, EDIT_OF)) {
             Timber.i("Adding missing editOf column");
-            db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME + " ADD COLUMN " + EDIT_OF + " integer REFERENCES " + INSTANCES_TABLE_NAME + "(" + _ID + ") CHECK (" + EDIT_OF + " != " + _ID + ")");
+            try {
+                db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME + " ADD COLUMN " + EDIT_OF + " integer REFERENCES " + INSTANCES_TABLE_NAME + "(" + _ID + ") CHECK (" + EDIT_OF + " != " + _ID + ")");
+            } catch (android.database.sqlite.SQLiteException e) {
+                if (e.getMessage() != null && e.getMessage().contains("duplicate column name")) {
+                    Timber.w("Column %s already exists, skipping", EDIT_OF);
+                } else {
+                    throw e;
+                }
+            }
         }
         if (!doesColumnExist(db, INSTANCES_TABLE_NAME, EDIT_NUMBER)) {
             Timber.i("Adding missing editNumber column");
-            db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME + " ADD COLUMN " + EDIT_NUMBER + " integer CHECK ((" + EDIT_OF + " IS NULL AND " + EDIT_NUMBER + " IS NULL) OR + (" + EDIT_OF + " IS NOT NULL AND + " + EDIT_NUMBER + " IS NOT NULL))");
+            try {
+                db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME + " ADD COLUMN " + EDIT_NUMBER + " integer CHECK ((" + EDIT_OF + " IS NULL AND " + EDIT_NUMBER + " IS NULL) OR + (" + EDIT_OF + " IS NOT NULL AND + " + EDIT_NUMBER + " IS NOT NULL))");
+            } catch (android.database.sqlite.SQLiteException e) {
+                if (e.getMessage() != null && e.getMessage().contains("duplicate column name")) {
+                    Timber.w("Column %s already exists, skipping", EDIT_NUMBER);
+                } else {
+                    throw e;
+                }
+            }
         }
         // Columns from ODK Collect v10
         if (!doesColumnExist(db, INSTANCES_TABLE_NAME, FINALIZATION_DATE)) {
