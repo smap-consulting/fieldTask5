@@ -124,7 +124,11 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                     .build();
 
             try {
-                startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
+                } else {
+                    startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification);
+                }
                 Timber.i("Foreground service started for location tracking");
             } catch (Exception e) {
                 // smap - On Android 12+ (API 31+) startForeground throws ForegroundServiceStartNotAllowedException
