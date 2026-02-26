@@ -1,9 +1,11 @@
 package org.odk.collect.android.formentry.audit
 
 import org.javarosa.form.api.FormEntryController
+import org.javarosa.xpath.XPathException
 import org.odk.collect.android.javarosawrapper.FormController
 import org.odk.collect.android.javarosawrapper.FormControllerExt.getQuestionPrompts
 import org.odk.collect.android.javarosawrapper.RepeatsInFieldListException
+import timber.log.Timber
 
 object AuditUtils {
     @JvmStatic
@@ -18,12 +20,12 @@ object AuditUtils {
         ) {
             try {
                 for (question in formController.getQuestionPrompts()) {
-                    val answer =
-                        if (question.answerValue != null) {
-                            question.answerValue!!.displayText
-                        } else {
-                            null
-                        }
+                    val answer = try {
+                        question.answerValue?.displayText
+                    } catch (e: XPathException) {
+                        Timber.w(e, "Could not get answer for audit log: %s", question.index)
+                        null
+                    }
 
                     auditEventLogger.logEvent(
                         AuditEvent.AuditEventType.QUESTION,
