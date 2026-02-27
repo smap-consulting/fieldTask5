@@ -47,7 +47,7 @@
   <string name="search">Poišči</string>
   <string name="not_granted_permission">Željena aktivnost nima potrebnih dovoljenj za dostop.</string>
   <string name="storage_runtime_permission_denied_title">Dovoljenja za shranjevanje</string>
-  <string name="storage_runtime_permission_denied_desc">Brez teh dovoljenj, FieldTask ne more dostopati do vaših obrazcev ali shraniti odgovorov. Aplikacijo znova odprite, ko ste jih pripravljeni odobriti.</string>
+  <string name="storage_runtime_permission_denied_desc">Brez teh dovoljenj, aplikacija ne more dostopati do vaših obrazcev ali shraniti odgovorov. Aplikacijo znova odprite, ko ste jih pripravljeni odobriti.</string>
   <string name="location_runtime_permissions_denied_title">Dovoljenja za dostop do lokacije</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="location_runtime_permissions_denied_desc">Brez dovoljenja za <b> lokacijo</b> Collect ne more zabeležiti vaše lokacije. Prosimo, poskusite znova, ko boste pripravljeni, da ga odobrite.</string>

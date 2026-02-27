@@ -47,7 +47,7 @@
   <string name="search">Cari</string>
   <string name="not_granted_permission">Aktivitas yang Anda lakukan memerlukan izin akses.</string>
   <string name="storage_runtime_permission_denied_title">Izin untuk penyimpanan</string>
-  <string name="storage_runtime_permission_denied_desc">Tanpa izin akses, FieldTask tidak dapat mengakses formulir Anda ataupun menyimpan jawaban. Buka ulang aplikasi jika Anda sudah yakin untuk memberikan izin.</string>
+  <string name="storage_runtime_permission_denied_desc">Tanpa izin akses, aplikasi tidak dapat mengakses formulir Anda ataupun menyimpan jawaban. Buka ulang aplikasi jika Anda sudah yakin untuk memberikan izin.</string>
   <string name="location_runtime_permissions_denied_title">Izin untuk mengakses lokasi</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="location_runtime_permissions_denied_desc">Tanpa izin <b> Lokasi Akurat </b>, Collect tidak dapat merekam lokasi anda. Silakan coba lagi ketika anda sudah memberikan izin.</string>

@@ -46,7 +46,7 @@
   <string name="search">Rechèch</string>
   <string name="not_granted_permission">Aktivite w ap eseye kòmanse a mande yon pèmisyon ke w poko bay.</string>
   <string name="storage_runtime_permission_denied_title">Pèmisyon pou stokaj</string>
-  <string name="storage_runtime_permission_denied_desc">San pèmisyon sa yo, FieldTask pa p kapab gen aksè ak fom yo oubyen stoke repons yo. Relouvri aplikasyon an lè w pare pou bay pèmisyon yo.</string>
+  <string name="storage_runtime_permission_denied_desc">San pèmisyon sa yo, aplikasyon an pa p kapab gen aksè ak fom yo oubyen stoke repons yo. Relouvri aplikasyon an lè w pare pou bay pèmisyon yo.</string>
   <string name="location_runtime_permissions_denied_title">Pèmisyon pou lokalizasyon</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="camera_runtime_permission_denied_title">Pèmisyon pou kamera</string>

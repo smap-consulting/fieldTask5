@@ -38,7 +38,7 @@
   <string name="search">検索</string>
   <string name="not_granted_permission">開始しようとしているアクティビティは、必要なアクセス許可が付与されていません。</string>
   <string name="storage_runtime_permission_denied_title">ストレージのアクセス許可</string>
-  <string name="storage_runtime_permission_denied_desc">これらのアクセス許可がないと、FieldTask はフォームにアクセスしたり、回答を保存することができません。 アクセス許可を付与する準備ができたら、アプリをもう一度開いてください。</string>
+  <string name="storage_runtime_permission_denied_desc">これらのアクセス許可がないと、アプリはフォームにアクセスしたり、回答を保存することができません。 アクセス許可を付与する準備ができたら、アプリをもう一度開いてください。</string>
   <string name="location_runtime_permissions_denied_title">位置情報アクセス許可</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="camera_runtime_permission_denied_title">カメラアクセス許可</string>

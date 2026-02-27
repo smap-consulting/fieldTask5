@@ -47,7 +47,7 @@
   <string name="search">بحث</string>
   <string name="not_granted_permission">النشاط الذي تحاول بدء القيام به يحتاج إلى إذن لم تحصل عليه بعد.</string>
   <string name="storage_runtime_permission_denied_title">أذونات التخزين</string>
-  <string name="storage_runtime_permission_denied_desc">بدون هذه الأذونات لا يمكن لبرنامج FieldTask الوصول إلى الاستمارات أو حفظ الإجابات. أعد فتح التطبيق عندما تكون مستعدًا لمنحهم.</string>
+  <string name="storage_runtime_permission_denied_desc">بدون هذه الأذونات لا يمكن للتطبيق الوصول إلى الاستمارات أو حفظ الإجابات. أعد فتح التطبيق عندما تكون مستعدًا لمنحهم.</string>
   <string name="location_runtime_permissions_denied_title">الأذونات الخاصة بالموقع</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="camera_runtime_permission_denied_title">إذن الكاميرا</string>
