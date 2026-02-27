@@ -195,6 +195,12 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
             instancePath = savepoint != null ? savepoint.getInstanceFilePath() : null;
         }
 
+        if (form == null) { // smap
+            Timber.e(new Error("form is null"));
+            errorMsg = "Form could not be found, please email smap-suite@googlegroups.com with a description of what you were doing when this happened."; // smap
+            return null;
+        }
+
         if (form.getFormFilePath() == null) {
             Timber.e(new Error("formPath is null"));
             errorMsg = "formPath is null, please email smap-suite@googlegroups.com with a description of what you were doing when this happened."; // smap
