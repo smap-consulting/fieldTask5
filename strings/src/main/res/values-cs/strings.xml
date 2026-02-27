@@ -1014,7 +1014,7 @@
   <!--Label for entity that has been created offline and is not on the server yet-->
   <string name="offline">Offline</string>
   <!--Error message displayed when a user opens a form with an unrecognized entity version-->
-  <string name="unrecognized_entity_version">Tento formulář není v této verzi ODK Collect podporován. Upgradujte prosím aplikaci Collect. Pokud máte tento problém i nadále, nahlaste ho osobě, která vás požádala o sběr dat. \n\nVerze specifikace formulářových entit: %s</string>
+  <string name="unrecognized_entity_version">Tento formulář není v této verzi FieldTask podporován. Upgradujte prosím aplikaci FieldTask. Pokud máte tento problém i nadále, nahlaste ho osobě, která vás požádala o sběr dat. \n\nVerze specifikace formulářových entit: %s</string>
   <!--##############################################
     # Crash handling
     ##############################################-->
@@ -1031,7 +1031,7 @@
   <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
   <string name="min_sdk_deprecation_banner_title">Vaše zařízení již brzy nebude možné aktualizovat.</string>
   <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <string name="min_sdk_deprecation_banner_message">Od začátku roku 2026 bude aplikace ODK Collect vyžadovat systém Android 8+.</string>
+  <string name="min_sdk_deprecation_banner_message">Od začátku roku 2026 bude aplikace FieldTask vyžadovat systém Android 8+.</string>
   <!--Button text that opens a forum post with more information about upcoming device support changes-->
   <string name="min_sdk_deprecation_learn_more">Více informací</string>
   <!--Button text to dismiss the banner-->

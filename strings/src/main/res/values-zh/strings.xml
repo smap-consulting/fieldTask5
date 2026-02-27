@@ -1022,7 +1022,7 @@
   <!--Label for entity that has been created offline and is not on the server yet-->
   <string name="offline">离线</string>
   <!--Error message displayed when a user opens a form with an unrecognized entity version-->
-  <string name="unrecognized_entity_version">此表单不受当前版本的 ODK Collect。请升级 Collect应用。
+  <string name="unrecognized_entity_version">此表单不受当前版本的 FieldTask。请升级 FieldTask应用。
 如果问题仍然存在，请告知收集您数据的人员。
 
 表单实体规范版本：1%s</string>
@@ -1044,7 +1044,7 @@
   <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
   <string name="min_sdk_deprecation_banner_title">您的设备即将无法升级。</string>
   <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <string name="min_sdk_deprecation_banner_message">自2026年初起，ODK Collect将要求Android 8及以上版本。</string>
+  <string name="min_sdk_deprecation_banner_message">自2026年初起，FieldTask将要求Android 8及以上版本。</string>
   <!--Button text that opens a forum post with more information about upcoming device support changes-->
   <string name="min_sdk_deprecation_learn_more">了解更多</string>
   <!--Button text to dismiss the banner-->
@@ -1158,7 +1158,7 @@
   <!--Title displayed in a dialog before starting a form if there is a work to recover-->
   <string name="savepoint_recovery_dialog_title">恢复您的作业？</string>
   <!--Message displayed in a dialog before starting a form if there is a work to recover. Please format date appropriately for your language: http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html-->
-  <string name="savepoint_recovery_dialog_message">\'Collect 于 \'EEE, MMM dd, yyyy HH:mm\' 意外关闭并保存了您的工作。\n\n您想恢复还是放弃它？\'</string>
+  <string name="savepoint_recovery_dialog_message">\'FieldTask 于 \'EEE, MMM dd, yyyy HH:mm\' 意外关闭并保存了您的工作。\n\n您想恢复还是放弃它？\'</string>
   <!--Text for the button that accepts the recovery of the work-->
   <string name="recover">恢复</string>
   <!--Text for the button that declines the recovery of the work-->

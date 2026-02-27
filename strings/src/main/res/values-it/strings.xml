@@ -1030,7 +1030,7 @@
   <!--Label for entity that has been created offline and is not on the server yet-->
   <string name="offline">Non in linea</string>
   <!--Error message displayed when a user opens a form with an unrecognized entity version-->
-  <string name="unrecognized_entity_version">Questo formulario non è supportato da questa versione di ODK Collect. Aggiornare Collect. Se continuate a riscontrare questo problema, segnalatelo alla persona che vi ha chiesto di raccogliere i dati.\n\nForm Entities spec version: %s</string>
+  <string name="unrecognized_entity_version">Questo formulario non è supportato da questa versione di FieldTask. Aggiornare FieldTask. Se continuate a riscontrare questo problema, segnalatelo alla persona che vi ha chiesto di raccogliere i dati.\n\nForm Entities spec version: %s</string>
   <!--##############################################
     # Crash handling
     ##############################################-->
@@ -1047,7 +1047,7 @@
   <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
   <string name="min_sdk_deprecation_banner_title">A breve Il tuo dispositivo non potrà più essere aggiornato.</string>
   <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <string name="min_sdk_deprecation_banner_message">A partire dall\'inizio del 2026, ODK Collect richiederà Android 8+.</string>
+  <string name="min_sdk_deprecation_banner_message">A partire dall\'inizio del 2026, FieldTask richiederà Android 8+.</string>
   <!--Button text that opens a forum post with more information about upcoming device support changes-->
   <string name="min_sdk_deprecation_learn_more">Saperne di più</string>
   <!--Button text to dismiss the banner-->
@@ -1175,7 +1175,7 @@
   <!--Title displayed in a dialog before starting a form if there is a work to recover-->
   <string name="savepoint_recovery_dialog_title">Recuperare il tuo lavoro?</string>
   <!--Message displayed in a dialog before starting a form if there is a work to recover. Please format date appropriately for your language: http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html-->
-  <string name="savepoint_recovery_dialog_message">\'Collect si è chiuso inaspettatamente il \'EEE, MMM dd, yyyy \'alle\' HH:mm\' ed ha salvato il tuo lavoro.\n\nVolete recuperarlo o scartarlo?\'</string>
+  <string name="savepoint_recovery_dialog_message">\'FieldTask si è chiuso inaspettatamente il \'EEE, MMM dd, yyyy \'alle\' HH:mm\' ed ha salvato il tuo lavoro.\n\nVolete recuperarlo o scartarlo?\'</string>
   <!--Text for the button that accepts the recovery of the work-->
   <string name="recover">Recupera</string>
   <!--Text for the button that declines the recovery of the work-->

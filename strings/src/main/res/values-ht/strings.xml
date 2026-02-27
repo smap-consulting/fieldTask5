@@ -50,9 +50,9 @@
   <string name="location_runtime_permissions_denied_title">Pèmisyon pou lokalizasyon</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="camera_runtime_permission_denied_title">Pèmisyon pou kamera</string>
-  <string name="camera_runtime_permission_denied_desc">San pèmisyon sa Collect pa p ka aksede a Kamera a. Tanpri eseye ankò lè pare pou w bay li.</string>
+  <string name="camera_runtime_permission_denied_desc">San pèmisyon sa FieldTask pa p ka aksede a Kamera a. Tanpri eseye ankò lè pare pou w bay li.</string>
   <string name="record_audio_runtime_permission_denied_title">Pèmisyon pou anrejistre son</string>
-  <string name="record_audio_runtime_permission_denied_desc">San pèmisyon sa Collect pa p ka aksede a mikro a. Tanpri eseye ankò lè pare pou w bay li.</string>
+  <string name="record_audio_runtime_permission_denied_desc">San pèmisyon sa FieldTask pa p ka aksede a mikro a. Tanpri eseye ankò lè pare pou w bay li.</string>
   <!--##############################################
     # FILL BLANK FORM
     ##############################################-->

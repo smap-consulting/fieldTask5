@@ -979,7 +979,7 @@
   <!--Label for entity that has been created offline and is not on the server yet-->
   <string name="offline">離線</string>
   <!--Error message displayed when a user opens a form with an unrecognized entity version-->
-  <string name="unrecognized_entity_version">此版本的 ODK Collect 不支援此表格。請升級Collect。如果您仍然遇到此問題，請將其報告給要求您收集資料的人員。\n\nForm Entities spec version: %s</string>
+  <string name="unrecognized_entity_version">此版本的 FieldTask 不支援此表格。請升級FieldTask。如果您仍然遇到此問題，請將其報告給要求您收集資料的人員。\n\nForm Entities spec version: %s</string>
   <!--##############################################
     # Crash handling
     ##############################################-->
@@ -1104,7 +1104,7 @@
   <!--Title displayed in a dialog before starting a form if there is a work to recover-->
   <string name="savepoint_recovery_dialog_title">恢復您的作業？</string>
   <!--Message displayed in a dialog before starting a form if there is a work to recover. Please format date appropriately for your language: http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html-->
-  <string name="savepoint_recovery_dialog_message">\'Collect 於 \'EEE, MMM dd, yyyy HH:mm\' 意外關閉並儲存了您的工作。\n\n您想恢復還是放棄它？\'</string>
+  <string name="savepoint_recovery_dialog_message">\'FieldTask 於 \'EEE, MMM dd, yyyy HH:mm\' 意外關閉並儲存了您的工作。\n\n您想恢復還是放棄它？\'</string>
   <!--Text for the button that accepts the recovery of the work-->
   <string name="recover">恢復</string>
   <!--Text for the button that declines the recovery of the work-->

@@ -936,7 +936,7 @@
   <!--Label for entity that has been created offline and is not on the server yet-->
   <string name="offline">Оффлайн</string>
   <!--Error message displayed when a user opens a form with an unrecognized entity version-->
-  <string name="unrecognized_entity_version">Эта форма не поддерживается этой версией ODK Collect. Пожалуйста, обновите программу. Если у вас продолжает возникать эта проблема, сообщите о ней тому, кто попросил вас собрать данные.\n\nВерсия Entities: %s</string>
+  <string name="unrecognized_entity_version">Эта форма не поддерживается этой версией FieldTask. Пожалуйста, обновите программу. Если у вас продолжает возникать эта проблема, сообщите о ней тому, кто попросил вас собрать данные.\n\nВерсия Entities: %s</string>
   <!--##############################################
     # Crash handling
     ##############################################-->
