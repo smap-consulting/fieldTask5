@@ -47,7 +47,7 @@
   <string name="search">سرچ </string>
   <string name="not_granted_permission">آپ کو یہ کام کرنے کی اجازت نہیں ہے</string>
   <string name="storage_runtime_permission_denied_title">سٹوریج پرمیشن</string>
-  <string name="storage_runtime_permission_denied_desc">اس اجازت کے بغیر کولیکٹ آپ کے فارم تک رسائی حاصل نہیں کرسکتایا جواب محفوظ نہیں کر سکتا جب آپ پرمیشن دینے کے لئے تیار ہو تو ایپلکیشن دوبارہ کھولیں.</string>
+  <string name="storage_runtime_permission_denied_desc">اس اجازت کے بغیر FieldTask آپ کے فارم تک رسائی حاصل نہیں کرسکتایا جواب محفوظ نہیں کر سکتا جب آپ پرمیشن دینے کے لئے تیار ہو تو ایپلکیشن دوبارہ کھولیں.</string>
   <string name="location_runtime_permissions_denied_title">لوکیشن کی اجازت</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="location_runtime_permissions_denied_desc">اس <b>مخصوص</b> اجازت کے بغیر کولیکٹ آپ کی لوکیشن ریکارڈ نہیں کرسکتا۔ برائےمہربانی دوبارہ کوشش کریں جب آپ پرمیشن دینے کے لئے تیار ہو </string>

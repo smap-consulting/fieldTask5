@@ -37,7 +37,7 @@
   <!--Displayed in search boxes for form lists or question types that involve search-->
   <string name="search">Пошук</string>
   <string name="storage_runtime_permission_denied_title">Дозволи сховища</string>
-  <string name="storage_runtime_permission_denied_desc">Без цих дозволів Collect не матиме дотупу до ваших анкет (читання, запис відповідей). Відкрийте програму знову, ящо ви вже їх надали.</string>
+  <string name="storage_runtime_permission_denied_desc">Без цих дозволів FieldTask не матиме дотупу до ваших анкет (читання, запис відповідей). Відкрийте програму знову, ящо ви вже їх надали.</string>
   <string name="location_runtime_permissions_denied_title">Місцеві дозволи</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="camera_runtime_permission_denied_title">Дозвіл використання камери</string>

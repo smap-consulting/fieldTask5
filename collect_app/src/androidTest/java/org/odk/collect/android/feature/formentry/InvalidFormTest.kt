@@ -23,7 +23,7 @@ class InvalidFormTest {
         rule.startAtMainMenu()
             .copyForm("invalid-form.xml")
             .startBlankFormWithError("invalid-form", true)
-            .assertTextInDialog("An unknown error has occurred. Please ask your project leadership to email support@getodk.org with information about this form.\n" +
+            .assertTextInDialog("An unknown error has occurred. Please ask your project leadership to email smap-suite@googlegroups.com with information about this form.\n" // smap +
                 "\n" +
                 "Cycle detected in form's relevant and calculation logic!\n" +
                 "The following nodes are likely involved in the loop:\n" +

@@ -46,7 +46,7 @@
   <string name="search">ស្វែងរក</string>
   <string name="not_granted_permission">សកម្មភាពដែលអ្នកកំពុងព្យាយាមធ្វើទាមទារការអនុញ្ញាតដែលមិនត្រូវបានផ្តល់ឱ្យ។</string>
   <string name="storage_runtime_permission_denied_title">សិទ្ធិក្នុងការផ្ទុក</string>
-  <string name="storage_runtime_permission_denied_desc">បើគ្មានការអនុញ្ញាតទាំងនេះ Collect មិនអាចចូលប្រើទម្រង់របស់អ្នក ឬរក្សាទុកចម្លើយ​បើក​កម្មវិធី​ឡើង​វិញ​នៅ​ពេល​អ្នក​រួចរាល់​ដើម្បី​ផ្តល់​សិទ្ធិ​ទាំងនេះ។</string>
+  <string name="storage_runtime_permission_denied_desc">បើគ្មានការអនុញ្ញាតទាំងនេះ FieldTask មិនអាចចូលប្រើទម្រង់របស់អ្នក ឬរក្សាទុកចម្លើយ​បើក​កម្មវិធី​ឡើង​វិញ​នៅ​ពេល​អ្នក​រួចរាល់​ដើម្បី​ផ្តល់​សិទ្ធិ​ទាំងនេះ។</string>
   <string name="location_runtime_permissions_denied_title">ការអនុញ្ញាតទីតាំង</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <!--##############################################

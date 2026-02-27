@@ -69,7 +69,7 @@
 
     <string name="not_granted_permission">The activity you are trying to start requires a permission which is not granted.</string>
     <string name="storage_runtime_permission_denied_title">Storage permissions</string>
-    <string name="storage_runtime_permission_denied_desc">Without these permissions Collect can\'t access your forms or save answers. Reopen the app when you are ready to grant them.</string>
+    <string name="storage_runtime_permission_denied_desc">Without these permissions FieldTask can\'t access your forms or save answers. Reopen the app when you are ready to grant them.</string> <!-- smap -->
     <string name="location_runtime_permissions_denied_title">Location permissions</string>
     <!-- Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted. -->
     <string name="location_runtime_permissions_denied_desc">Without the <b>Precise Location</b> permission Collect can\'t record your location. Please try again when you are ready to grant it.</string>

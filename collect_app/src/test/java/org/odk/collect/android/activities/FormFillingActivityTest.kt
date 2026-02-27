@@ -258,7 +258,7 @@ class FormFillingActivityTest {
         val scenario = scenarioLauncherRule.launch<FormFillingActivity>(intent)
         scheduler.flush()
         assertVisible(
-            withText("This form no longer exists, please email support@getodk.org with a description of what you were doing when this happened."),
+            withText("This form no longer exists, please email smap-suite@googlegroups.com with a description of what you were doing when this happened."), // smap
             root = isDialog()
         )
 

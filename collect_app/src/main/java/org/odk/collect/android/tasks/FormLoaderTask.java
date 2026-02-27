@@ -187,7 +187,7 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
             form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(uri));
             if (form == null) {
                 Timber.e(new Error("form is null"));
-                errorMsg = "This form no longer exists, please email support@getodk.org with a description of what you were doing when this happened.";
+                errorMsg = "This form no longer exists, please email smap-suite@googlegroups.com with a description of what you were doing when this happened."; // smap
                 return null;
             }
 
@@ -197,7 +197,7 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
 
         if (form.getFormFilePath() == null) {
             Timber.e(new Error("formPath is null"));
-            errorMsg = "formPath is null, please email support@getodk.org with a description of what you were doing when this happened.";
+            errorMsg = "formPath is null, please email smap-suite@googlegroups.com with a description of what you were doing when this happened."; // smap
             return null;
         }
 
@@ -219,7 +219,7 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
             errorMsg = getLocalizedString(Collect.getInstance(), org.odk.collect.strings.R.string.unrecognized_entity_version, e.getEntityVersion());
         } catch (Exception e) {
             Timber.w(e);
-            errorMsg = "An unknown error has occurred. Please ask your project leadership to email support@getodk.org with information about this form.";
+            errorMsg = "An unknown error has occurred. Please ask your project leadership to email smap-suite@googlegroups.com with information about this form."; // smap
             errorMsg += "\n\n" + e.getMessage();
         }
 
@@ -457,7 +457,7 @@ public class FormLoaderTask extends SchedulerAsyncTaskMimic<Void, String, FormLo
                     } else {
                         // The saved instance is corrupted.
                         Timber.e(e, "Corrupt saved instance");
-                        throw new RuntimeException("An unknown error has occurred. Please ask your project leadership to email support@getodk.org with information about this form."
+                        throw new RuntimeException("An unknown error has occurred. Please ask your project leadership to email smap-suite@googlegroups.com with information about this form." // smap
                             + "\n\n" + e.getMessage());
                     }
                 }

@@ -16,7 +16,7 @@ object PathUtils {
             if (absoluteFile.sanitizedCanonicalPath().startsWith(File(dirPath).sanitizedCanonicalPath())) {
                 absoluteFilePath
             } else {
-                throw SecurityException("Contact support@getodk.org. Attempt to access file outside of Collect directory: $absoluteFilePath")
+                throw SecurityException("Contact smap-suite@googlegroups.com. Attempt to access file outside of FieldTask directory: $absoluteFilePath") // smap
             }
         } catch (e: IOException) {
             Timber.e(
