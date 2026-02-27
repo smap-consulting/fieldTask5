@@ -329,7 +329,8 @@ private class FormUriViewModel(
         }
 
         val form = if (uriMimeType == FormsContract.CONTENT_ITEM_TYPE) {
-            formsRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))!!
+            formsRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))
+                ?: return null // smap - no form found, skip entity check
         } else {
             val instance = instancesRepositoryProvider.create().get(ContentUriHelper.getIdFromUri(uri))!!
             formsRepositoryProvider.create().getAllByFormId(instance.formId).maxByOrNull { it.date }
