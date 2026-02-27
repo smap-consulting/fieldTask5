@@ -47,7 +47,7 @@
   <string name="search">Ricerca</string>
   <string name="not_granted_permission">L\'attività che stai tentando di avviare richiede un\'autorizzazione che non viene concessa.</string>
   <string name="storage_runtime_permission_denied_title">Autorizzazione all\'uso della memoria</string>
-  <string name="storage_runtime_permission_denied_desc">Senza questi permessi l'applicazione non può accedere ai tuoi questionari o salvare le risposte. Riapri la applicazione quando sei pronto ad autorizzarli.</string>
+  <string name="storage_runtime_permission_denied_desc">Senza questi permessi l\'applicazione non può accedere ai tuoi questionari o salvare le risposte. Riapri la applicazione quando sei pronto ad autorizzarli.</string>
   <string name="location_runtime_permissions_denied_title">Autorizzazione all\'uso dei servizi di localizzazione</string>
   <!--Starting in Android 12, Android makes it possible to give precise or approximate location permissions to an application. ODK Collect only captures location if the precise location permission is granted.-->
   <string name="location_runtime_permissions_denied_desc">Senza<b>il permesso sulla posizione esatta</b>Collect non può registrare la tua posizione. Riprova quando sei pronto a concederlo. </string>
