@@ -102,71 +102,71 @@ android {
     productFlavors {
         standard {
             applicationId "org.smap.smapTask.android"
-            versionName "5.1.06"
+            versionName "5.1.07"
         }
         fieldTaskMax {
             applicationId "org.smap.smapTask.android.fieldTaskMax"
-            versionName "5.1.06"
+            versionName "5.1.07"
         }
         plan {
             applicationId "org.smap.smapTask.android.plan"
-            versionName "5.1.06-plan"
+            versionName "5.1.07-plan"
         }
         kontrolid {
             applicationId "org.smap.smapTask.android.kontrolid"
-            versionName "5.1.06-kontrolid"
+            versionName "5.1.07-kontrolid"
         }
         xxx4 {
             applicationId "org.smap.smapTask.android.xxx4"
-            versionName "5.1.06-xxx4"
+            versionName "5.1.07-xxx4"
         }
         kontrolid_corporate {
             applicationId "org.smap.smapTask.android.kontrolid_corporate"
-            versionName "5.1.06-kontrolid"
+            versionName "5.1.07-kontrolid"
         }
         xxx3 {
             applicationId "org.smap.smapTask.android.xxx3"
-            versionName "5.1.06-xxx3"
+            versionName "5.1.07-xxx3"
         }
         xxx1 {
             applicationId "org.smap.smapTask.android.xxx1"
-            versionName "5.1.06-xxx1"
+            versionName "5.1.07-xxx1"
         }
         meqa {
             applicationId "org.smap.smapTask.android.meqa"
-            versionName "5.1.06-meqa"
+            versionName "5.1.07-meqa"
         }
         xxx2 {
             applicationId "org.smap.smapTask.android.xxx2"
-            versionName "5.1.06-xxx2"
+            versionName "5.1.07-xxx2"
         }
         pop {
             applicationId "org.smap.smapTask.android.pop"
-            versionName "5.1.06-pop"
+            versionName "5.1.07-pop"
         }
         tdh {
             applicationId "org.smap.smapTask.android.tdh"
-            versionName "5.1.06-tdh"
+            versionName "5.1.07-tdh"
         }
         informEd {
             applicationId "org.smap.smapTask.android.informEd"
-            versionName "5.1.06-informEd"
+            versionName "5.1.07-informEd"
         }
         pangolin {
             applicationId "org.smap.smapTask.android.pangolin"
-            versionName "5.1.06-pangolin"
+            versionName "5.1.07-pangolin"
         }
         stl2 {
             applicationId "org.smap.smapTask.android.stl2"
-            versionName "5.1.06-stl2"
+            versionName "5.1.07-stl2"
         }
         ljstracker {
             applicationId "org.smap.smapTask.android.ljstracker"
-            versionName "5.1.06-ljstracker"
+            versionName "5.1.07-ljstracker"
         }
         bps {
             applicationId "org.smap.smapTask.android.bps"
-            versionName "5.1.06-bps"
+            versionName "5.1.07-bps"
         }
     }
 
