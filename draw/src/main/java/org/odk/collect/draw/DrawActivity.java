@@ -170,15 +170,15 @@ public class DrawActivity extends LocalizedActivity {
 
         Bundle extras = getIntent().getExtras();
         String imagePath = drawView.getImagePath();
-        if (extras.getInt(SCREEN_ORIENTATION) == 1) {
+        if (extras != null && extras.getInt(SCREEN_ORIENTATION) == 1) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-        loadOption = extras.getString(OPTION);
+        loadOption = extras != null ? extras.getString(OPTION) : null;
         if (loadOption == null) {
             loadOption = OPTION_DRAW;
         }
         // refImage can also be present if resuming a drawing
-        Uri uri = (Uri) extras.get(REF_IMAGE);
+        Uri uri = extras != null ? (Uri) extras.get(REF_IMAGE) : null;
         if (uri != null) {
             refImage = new File(uri.getPath());
         }
