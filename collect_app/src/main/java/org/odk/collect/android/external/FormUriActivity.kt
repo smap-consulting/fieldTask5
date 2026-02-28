@@ -311,6 +311,11 @@ private class FormUriViewModel(
     }
 
     private fun assertNonEditableFormsAreStartedWithCorrectMode(): String? {
+        // smap - if SmapMain opened this form it has already validated access (KEY_CAN_UPDATE
+        // present), so don't force VIEW_SENT mode; this allows reviewing finalized tasks
+        if (intent.hasExtra(FormFillingActivity.KEY_CAN_UPDATE)) {
+            return null
+        }
         if (!canFormBeEdited()) {
             intent.putExtra(
                 FormOpeningMode.FORM_MODE_KEY,

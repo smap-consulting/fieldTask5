@@ -134,6 +134,7 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
     IntentLauncher intentLauncher;
 
     private final WidgetFactory widgetFactory;
+    private boolean allReadOnly = false;  // smap
     @NonNull
     private List<ImmutableDisplayableQuestion> questions = new ArrayList<>();
     private final LifecycleOwner viewLifecycle;
@@ -161,9 +162,11 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
             InternalRecordingRequester internalRecordingRequester,
             ExternalAppRecordingRequester externalAppRecordingRequester,
             LifecycleOwner viewLifecycle,
-            MediaWidgetAnswerViewModel mediaWidgetAnswerViewModel
+            MediaWidgetAnswerViewModel mediaWidgetAnswerViewModel,
+            boolean allReadOnly  // smap - force all widgets read-only (e.g. review-final mode)
     ) {
         super(context);
+        this.allReadOnly = allReadOnly;  // smap - must be set before updateQuestions
         updateQuestions(questionPrompts);
 
         this.viewLifecycle = viewLifecycle;
@@ -399,10 +402,10 @@ public class ODKView extends SwipeHandler.View implements OnLongClickListener, W
      * Note: if the given question is of an unsupported type, a text widget will be created.
      */
     private QuestionWidget configureWidgetForQuestion(FormEntryPrompt question) {
-        boolean forceReadOnly = false;
+        boolean forceReadOnly = allReadOnly;  // smap - allReadOnly forces all widgets read-only
 
         if (intentGroup != null) {
-            forceReadOnly = isInIntentGroup(question);
+            forceReadOnly = forceReadOnly || isInIntentGroup(question);
         }
 
         QuestionWidget qw = widgetFactory.createWidgetFromPrompt(question, permissionsProvider, forceReadOnly);

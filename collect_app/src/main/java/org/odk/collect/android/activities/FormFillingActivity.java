@@ -1133,7 +1133,10 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             findViewById(R.id.loading_screen).setVisibility(isLoading ? View.VISIBLE : View.GONE);
         });
 
-        return new ODKView(this, prompts, groups, advancingPage, formSaveViewModel, waitingForDataRegistry, audioPlayer, audioRecorder, formEntryViewModel, printerWidgetViewModel, internalRecordingRequester, externalAppRecordingRequester, odkViewLifecycle, mediaWidgetAnswerViewModel);
+        // smap - force read-only when canUpdate=false (review-final mode: comments only)
+        boolean allReadOnly = !getIntent().getBooleanExtra(KEY_CAN_UPDATE, true);
+
+        return new ODKView(this, prompts, groups, advancingPage, formSaveViewModel, waitingForDataRegistry, audioPlayer, audioRecorder, formEntryViewModel, printerWidgetViewModel, internalRecordingRequester, externalAppRecordingRequester, odkViewLifecycle, mediaWidgetAnswerViewModel, allReadOnly);
     }
 
     private void releaseOdkView() {
@@ -2098,7 +2101,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                                 formEntryViewModel.refreshSync();
                                 onActivityResult(task.getRequestCode(), task.getResultCode(), task.getIntent());
                             } else {
-                                formController.getAuditEventLogger().logEvent(AuditEvent.AuditEventType.HIERARCHY, true, System.currentTimeMillis());
+                                formController.getAuditEventLogger().logEvent(AuditEvent.AuditEventType.FORM_RESUME, true, System.currentTimeMillis());
                                 formControllerAvailable(formController, form, instance);
 
                                 // start smap - Handle form launcher widget return
@@ -2120,11 +2123,8 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                                     next();
                                     formController.getFormDef().getMainInstance().isInitialize = false;
                                 } else {
-                                    // end smap
-                                    Intent intent = new Intent(this, FormHierarchyFragmentHostActivity.class);
-                                    intent.putExtra(FormHierarchyFragmentHostActivity.EXTRA_SESSION_ID, sessionId);
-                                    intent.putExtra(FormHierarchyFragmentHostActivity.SHOW_NEW_EDIT_MESSAGE, formEntryViewModel.shouldShowNewEditMessage());
-                                    startActivityForResult(intent, RequestCodes.HIERARCHY_ACTIVITY);
+                                    // smap - go to first question instead of hierarchy (FieldTask4 behaviour)
+                                    formEntryViewModel.refresh();
                                 }  // smap
                             }
                         }
