@@ -95,7 +95,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
         List<Instance> instancesToUpload = uploader
                 .getInstancesFromIds(instanceIdsToUpload)
                 .stream()
-                .sorted(Comparator.comparing(Instance::getFinalizationDate))
+                .sorted(Comparator.comparing(Instance::getFinalizationDate, Comparator.nullsFirst(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
 
         String deviceId = propertyManager.getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID);
