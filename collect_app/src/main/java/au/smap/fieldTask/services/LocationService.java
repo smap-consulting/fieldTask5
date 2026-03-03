@@ -94,27 +94,9 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
         super.onStartCommand(intent, flags, startId);
         Timber.i("======================= Start Location Service");
 
-        Settings settings = DaggerUtils.getComponent(Collect.getInstance()).settingsProvider().getUnprotectedSettings();
-        isRecordingLocation = settings.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE);
-
-        // smap - Start periodic checks using Handler (replaces Timer)
-        mHandler.post(checkSettingsRunnable);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        createLocationRequest();
-        requestLocationUpdates();
-
-        // smap - Start foreground notification on API 26+, with permission check for API 34+
+        // smap - Must call startForeground() before any stopSelf() on API 26+, otherwise
+        // Android throws RemoteServiceException("did not then call Service.startForeground()")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            boolean hasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-
-            if (!hasLocation) {
-                Timber.w("Location permission not granted, stopping LocationService");
-                stopSelf();
-                return START_NOT_STICKY;
-            }
-
             Notification notification = new NotificationCompat.Builder(this, SmapNotificationChannels.LOCATION_TRACKING_CHANNEL_ID)
                     .setContentTitle(getString(org.odk.collect.strings.R.string.app_name))
                     .setContentText(getString(org.odk.collect.strings.R.string.location_tracking_active))
@@ -137,7 +119,26 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 stopSelf();
                 return START_NOT_STICKY;
             }
+
+            boolean hasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+            if (!hasLocation) {
+                Timber.w("Location permission not granted, stopping LocationService");
+                stopSelf();
+                return START_NOT_STICKY;
+            }
         }
+
+        Settings settings = DaggerUtils.getComponent(Collect.getInstance()).settingsProvider().getUnprotectedSettings();
+        isRecordingLocation = settings.getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE);
+
+        // smap - Start periodic checks using Handler (replaces Timer)
+        mHandler.post(checkSettingsRunnable);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        createLocationRequest();
+        requestLocationUpdates();
 
         return START_STICKY;
     }
