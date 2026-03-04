@@ -19,11 +19,13 @@ package au.smap.fieldTask.database;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import org.odk.collect.android.BuildConfig;
+
 /**
  * Convenience definitions for Trace database
  */
 public final class TraceProviderAPI {
-    public static final String AUTHORITY = "org.smap.smapTask.android.provider.trace";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider.trace";
 
     // This class cannot be instantiated
     private TraceProviderAPI() {}

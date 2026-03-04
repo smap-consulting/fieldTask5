@@ -291,7 +291,7 @@ the specific language governing permissions and limitations under the License.
         <!-- smap add trace provider -->
         <provider
             android:name="au.smap.fieldTask.providers.TraceProvider"
-            android:authorities="org.smap.smapTask.android.provider.trace"
+            android:authorities="${applicationId}.provider.trace"
             android:exported="true" />
 
         <!-- smap add network and location receiver -->
