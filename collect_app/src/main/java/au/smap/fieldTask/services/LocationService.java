@@ -105,23 +105,27 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                     .setPriority(NotificationCompat.PRIORITY_LOW)
                     .build();
 
+            // smap - Check location permission BEFORE calling startForeground() with FOREGROUND_SERVICE_TYPE_LOCATION.
+            // On API 33+, startForeground() throws SecurityException if location permission is not granted,
+            // but the system's 5-second watchdog timer is only cleared by a *successful* startForeground() call.
+            // A thrown exception does not clear it, causing ForegroundServiceDidNotStartInTimeException.
+            // Fix: if no location permission, use the 2-arg startForeground() (always succeeds) then stop.
+            boolean hasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
             try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && hasLocation) {
                     startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_LOCATION);
                 } else {
                     startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification);
                 }
                 Timber.i("Foreground service started for location tracking");
             } catch (Exception e) {
-                // smap - On Android 12+ (API 31+) startForeground throws ForegroundServiceStartNotAllowedException
-                // when the app is in the background. Stop gracefully rather than crash.
+                // smap - Catch any remaining startForeground() failures (e.g. ForegroundServiceStartNotAllowedException).
                 Timber.w("Cannot start foreground location service: " + e.getMessage());
                 stopSelf();
                 return START_NOT_STICKY;
             }
-
-            boolean hasLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
             if (!hasLocation) {
                 Timber.w("Location permission not granted, stopping LocationService");
