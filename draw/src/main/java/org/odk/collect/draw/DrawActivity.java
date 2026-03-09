@@ -187,7 +187,7 @@ public class DrawActivity extends LocalizedActivity {
         if (refImage != null && refImage.exists()) {
             ImageFileUtils.copyImageAndApplyExifRotation(refImage, savepointImage);
         }
-        uri = (Uri) extras.get(EXTRA_OUTPUT);
+        uri = extras != null ? (Uri) extras.get(EXTRA_OUTPUT) : null;
         if (uri != null) {
             output = new File(uri.getPath());
         } else {
