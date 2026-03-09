@@ -45,6 +45,8 @@ import au.smap.fieldTask.database.TaskResponseAssignment;
 import au.smap.fieldTask.database.TrTask;
 import au.smap.fieldTask.database.TraceUtilities;
 
+import org.odk.collect.android.backgroundwork.InstanceSubmitScheduler;
+import org.odk.collect.android.projects.ProjectsDataService;
 import org.odk.collect.android.tasks.InstanceUploaderTask;
 import org.odk.collect.android.utilities.FormsRepositoryProvider;
 import org.odk.collect.android.utilities.InstancesRepositoryProvider;
@@ -142,6 +144,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
     @Inject
     org.odk.collect.settings.SettingsProvider settingsProvider;
+
+    @Inject
+    InstanceSubmitScheduler instanceSubmitScheduler;    // smap - cancel ODK auto-send before smap upload
+
+    @Inject
+    ProjectsDataService projectsDataService;            // smap - needed to get project id for cancelSubmit
 
     private InstancesRepository instancesRepository;
     private FormsRepository formsRepository;
@@ -284,7 +292,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
      */
     @Override
     protected void onCancelled() {
-
+        // smap - notify listener so dialog is dismissed and instances data is refreshed
+        synchronized (this) {
+            if (mStateListener != null) {
+                mStateListener.taskDownloadingComplete(null);
+            }
+        }
     }
 
     @Override
@@ -569,6 +582,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             }
 
             if(toUpload.size() > 0) {
+                // smap - cancel ODK WorkManager auto-send to prevent double-upload race with this task
+                try {
+                    instanceSubmitScheduler.cancelSubmit(projectsDataService.requireCurrentProject().getUuid());
+                } catch (Exception e) {
+                    Timber.w(e, "Failed to cancel auto-send before smap upload");
+                }
                 InstanceUploaderTask instanceUploaderTask = new InstanceUploaderTask();
                 publishProgress(Collect.getInstance().getString(R.string.smap_submitting, toUpload.size()));
                 instanceUploaderTask.setUploaderListener((InstanceUploaderListener) mStateListener);

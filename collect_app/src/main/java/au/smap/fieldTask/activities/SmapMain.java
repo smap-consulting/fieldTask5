@@ -447,13 +447,44 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     }
 
     /**
-     * Show modern progress dialog with cancel support
+     * Show progress dialog with a cancel button that aborts the sync task.
+     * smap - made cancellable to prevent UI appearing hung during slow server responses
      */
     private void showProgressDialog(String message) {
-        MaterialProgressDialogFragment progressDialog = new MaterialProgressDialogFragment();
+        SyncProgressDialog progressDialog = new SyncProgressDialog();
         progressDialog.setMessage(message);
-        progressDialog.setCancelable(false);
         progressDialog.show(getSupportFragmentManager(), PROGRESS_DIALOG_TAG);
+    }
+
+    /**
+     * Cancel an in-progress manual sync. Called by SyncProgressDialog cancel button.
+     * smap
+     */
+    public void cancelSync() {
+        if (mDownloadTasks != null) {
+            mDownloadTasks.cancel(true);
+        }
+    }
+
+    /**
+     * Progress dialog subclass that adds a cancel button wired to cancelSync().
+     * smap
+     */
+    public static class SyncProgressDialog extends MaterialProgressDialogFragment {
+        @Override
+        protected String getCancelButtonText() {
+            return Collect.getInstance().getString(org.odk.collect.strings.R.string.cancel);
+        }
+
+        @Override
+        protected OnCancelCallback getOnCancelCallback() {
+            return () -> {
+                if (getActivity() instanceof SmapMain) {
+                    ((SmapMain) getActivity()).cancelSync();
+                }
+                return true;
+            };
+        }
     }
 
     /**
