@@ -1,8 +1,7 @@
 package org.odk.collect.android.application.initialization
 
 import android.content.Context
-import android.os.Handler
-import com.google.android.gms.maps.MapView
+
 import org.odk.collect.android.geo.MapConfiguratorProvider
 import org.odk.collect.osmdroid.OsmDroidInitializer
 import org.odk.collect.settings.SettingsProvider
@@ -49,12 +48,10 @@ class MapsInitializer @Inject constructor(
                     com.google.android.gms.maps.MapsInitializer.Renderer.LEGACY -> Timber.d("The legacy version of Google Maps renderer is used.")
                 }
             }
-            val handler = Handler(context.mainLooper)
-            handler.post {
-                // This has to happen on the main thread but we might call `initialize` from tests
-                MapView(context).onCreate(null)
-            }
+            // smap - removed MapView(context).onCreate(null) here: caused ANR via synchronous
+            // smap - Binder IPC on main thread. MapsInitializer.initialize() above is sufficient.
             OsmDroidInitializer.initialize(userAgentProvider.userAgent)
+            FRAMEWORKS_INITIALIZED = true // smap - was never set to true in upstream
         } catch (ignore: Exception) {
             // ignored
         } catch (ignore: Error) {
