@@ -142,7 +142,7 @@ public class SmapTaskMapFragment extends Fragment {
 
         ImageButton locationButton = rootView.findViewById(R.id.show_location);
         locationButton.setOnClickListener(v ->
-            mapFragment.zoomToCurrentLocation(mapFragment.getGpsLocation()));
+            map.zoomToCurrentLocation(map.getGpsLocation()));
 
         if (mo == null) {
             mo = new MapLocationObserver(getContext(), this);
