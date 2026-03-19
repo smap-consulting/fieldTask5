@@ -141,8 +141,14 @@ public class SmapTaskMapFragment extends Fragment {
         mapFragment.setGpsLocationEnabled(true);
 
         ImageButton locationButton = rootView.findViewById(R.id.show_location);
-        locationButton.setOnClickListener(v ->
-            map.zoomToCurrentLocation(map.getGpsLocation()));
+        locationButton.setOnClickListener(v -> {
+            MapPoint gpsLocation = map.getGpsLocation();
+            if (gpsLocation != null) {
+                map.zoomToCurrentLocation(gpsLocation);
+            } else {
+                Toast.makeText(getContext(), org.odk.collect.strings.R.string.waiting_for_location, Toast.LENGTH_SHORT).show();
+            }
+        });
 
         if (mo == null) {
             mo = new MapLocationObserver(getContext(), this);
