@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.StateFlow
 import org.odk.collect.androidshared.data.getState
 import org.odk.collect.androidshared.ui.ReturnToAppActivity
@@ -37,7 +38,7 @@ class ForegroundServiceLocationTracker(private val application: Application) : L
             }
         }
 
-        application.startService(intent)
+        ContextCompat.startForegroundService(application, intent)
     }
 
     override fun stop() {
