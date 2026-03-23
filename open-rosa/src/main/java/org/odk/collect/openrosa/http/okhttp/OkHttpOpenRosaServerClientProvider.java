@@ -43,7 +43,7 @@ import timber.log.Timber;
 public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientProvider {
 
     private static final int CONNECTION_TIMEOUT = 30000;
-    private static final int WRITE_CONNECTION_TIMEOUT = 60000; // it can take up to 27 seconds to spin up an Aggregate
+    private static final int WRITE_CONNECTION_TIMEOUT = 180000; // smap: increased to 3 minutes for large media uploads on slow connections
     private static final int READ_CONNECTION_TIMEOUT = 60000; // it can take up to 27 seconds to spin up an Aggregate
     private static final String USER_AGENT_HEADER = "User-Agent";
     private static final String OPEN_ROSA_VERSION_HEADER = OpenRosaConstants.VERSION_HEADER;
