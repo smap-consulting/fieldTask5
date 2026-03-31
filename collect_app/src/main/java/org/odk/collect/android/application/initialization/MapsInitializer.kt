@@ -17,11 +17,14 @@ class MapsInitializer @Inject constructor(
 ) {
 
     fun initialize() {
-        resetToAvailableFramework()
-
-        if (!FRAMEWORKS_INITIALIZED) {
-            initializeFrameworks()
-        }
+        // smap - entirely off main thread: initOptions calls isGooglePlayServicesAvailable (Binder IPC),
+        // smap - causing ANR on Android 15. Maps not needed until user opens a map screen.
+        Thread {
+            resetToAvailableFramework()
+            if (!FRAMEWORKS_INITIALIZED) {
+                initializeFrameworks()
+            }
+        }.start()
     }
 
     private fun resetToAvailableFramework() {

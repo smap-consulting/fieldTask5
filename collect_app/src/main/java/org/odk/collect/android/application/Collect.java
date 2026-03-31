@@ -192,8 +192,8 @@ public class Collect extends Application implements
                     CollectStrictMode.enable();
                     MlKitBarcodeScannerViewFactory.init(this);
 
-                    // smap - Initialize notification channels for Android O+
-                    au.smap.fieldTask.notifications.SmapNotificationChannels.INSTANCE.createChannels(this);
+                    // smap - Off main thread: createNotificationChannel does Binder IPC, causes ANR on Android 15
+                    new Thread(() -> au.smap.fieldTask.notifications.SmapNotificationChannels.INSTANCE.createChannels(this)).start();
                 }
         );
     }

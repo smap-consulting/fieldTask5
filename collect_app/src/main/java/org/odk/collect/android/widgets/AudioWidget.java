@@ -239,9 +239,13 @@ public class AudioWidget extends QuestionWidget implements FileWidget, WidgetDat
 
     private Integer getDurationOfFile(String uri) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(uri);
-        String durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        return durationString != null ? Integer.parseInt(durationString) : 0;
+        try {
+            retriever.setDataSource(uri);
+            String durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            return durationString != null ? Integer.parseInt(durationString) : 0;
+        } catch (Exception e) {
+            return 0;  // smap - file may not exist when called during CLEAN_UP (Android 14 crash)
+        }
     }
 
     @Override
