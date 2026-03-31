@@ -17,6 +17,10 @@ class IntersectsFunctionHandler : IFunctionHandler {
         return listOf(arrayOf(String::class.java))
     }
 
+    override fun rawArgs(): Boolean = false
+
+    override fun realTime(): Boolean = false
+
     override fun eval(args: Array<out Any>, ec: EvaluationContext): Any {
         try {
             val mapPoints = parseGeometry(args[0] as String, strict = true)
