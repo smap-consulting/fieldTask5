@@ -62,6 +62,8 @@ import org.odk.collect.forms.Form;
 import org.odk.collect.geo.DaggerGeoDependencyComponent;
 import org.odk.collect.geo.GeoDependencyComponent;
 import org.odk.collect.geo.GeoDependencyComponentProvider;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.MapsInitializer.Renderer;
 import org.odk.collect.googlemaps.DaggerGoogleMapsDependencyComponent;
 import org.odk.collect.googlemaps.GoogleMapsDependencyComponent;
 import org.odk.collect.googlemaps.GoogleMapsDependencyComponentProvider;
@@ -194,6 +196,9 @@ public class Collect extends Application implements
 
                     // smap - Off main thread: createNotificationChannel does Binder IPC, causes ANR on Android 15
                     new Thread(() -> au.smap.fieldTask.notifications.SmapNotificationChannels.INSTANCE.createChannels(this)).start();
+
+                    // smap - Pre-initialize Maps SDK off main thread to avoid Binder IPC blocking main thread (ANR on Android 11)
+                    MapsInitializer.initialize(this, Renderer.LATEST, null);
                 }
         );
     }
