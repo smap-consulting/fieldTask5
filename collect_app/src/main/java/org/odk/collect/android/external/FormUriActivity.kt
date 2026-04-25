@@ -34,6 +34,7 @@ import org.odk.collect.projects.ProjectsRepository
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.strings.R.string
 import org.odk.collect.strings.localization.LocalizedActivity
+import android.database.sqlite.SQLiteFullException
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -374,7 +375,11 @@ private class FormUriViewModel(
                 if (savepoint.instanceDbId == null) {
                     File(savepoint.instanceFilePath).parentFile?.deleteRecursively()
                 }
-                savepointsRepositoryProvider.create().delete(savepoint.formDbId, savepoint.instanceDbId)
+                try {
+                    savepointsRepositoryProvider.create().delete(savepoint.formDbId, savepoint.instanceDbId)
+                } catch (e: SQLiteFullException) {
+                    android.util.Log.w("FormUriViewModel", "Disk full, savepoint not deleted", e)
+                }
             },
             foreground = {
                 _formInspectionResult.value = FormInspectionResult.Valid

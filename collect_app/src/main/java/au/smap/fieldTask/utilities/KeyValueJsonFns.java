@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public final class KeyValueJsonFns {
 
-	public class KeyValue {
+	public static class KeyValue {
 		public String key;
 		public String value;
 	}
