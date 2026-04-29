@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.startup.AppInitializer
-import com.mapbox.common.MapboxOptions
 import com.mapbox.maps.MapView
 import com.mapbox.maps.Style
 import com.mapbox.maps.loader.MapboxMapsInitializer
@@ -70,7 +69,6 @@ class MapBoxInitializationFragment : Fragment() {
         // Auto initialization is disabled to stop x86 devices from crashing so we do this manually
         context.getState().let {
             if (!it.get(KEY_MAPBOX_INITIALIZED, false)) {
-                MapboxOptions.eventsEnabled = false
                 AppInitializer.getInstance(context)
                     .initializeComponent(MapboxMapsInitializer::class.java)
                 it.set(KEY_MAPBOX_INITIALIZED, true)
