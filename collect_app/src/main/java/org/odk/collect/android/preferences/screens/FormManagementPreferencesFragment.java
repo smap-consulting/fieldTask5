@@ -41,7 +41,10 @@ import org.odk.collect.android.backgroundwork.FormUpdateScheduler;
 import org.odk.collect.android.backgroundwork.InstanceSubmitScheduler;
 import org.odk.collect.settings.enums.AutoSend;
 import org.odk.collect.settings.enums.StringIdEnumUtils;
+import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.shared.settings.Settings;
+
+import au.smap.fieldTask.tasks.SmapChangeOrganisationTask;
 
 import javax.inject.Inject;
 
@@ -70,6 +73,7 @@ public class FormManagementPreferencesFragment extends BaseProjectPreferencesFra
         initListPref(KEY_AUTOSEND);
         initListPref(KEY_IMAGE_SIZE);
         initGuidancePrefs();
+        initOrganisationPref(); // smap
 
         updateDisabledPrefs();
     }
@@ -150,6 +154,38 @@ public class FormManagementPreferencesFragment extends BaseProjectPreferencesFra
                 // Only enable automatic form updates if periodic updates are set
                 pref.setEnabled(!formUpdateCheckPeriod.equals(getString(org.odk.collect.strings.R.string.never_value)));
             }
+        }
+    }
+
+    private void initOrganisationPref() {
+        final ListPreference orgPref = findPreference(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        if (orgPref == null) {
+            return;
+        }
+        Settings settings = settingsProvider.getUnprotectedSettings();
+        java.util.Set<String> orgs = settings.getStringSet(ProjectKeys.KEY_SMAP_ORGANISATIONS);
+        String currentOrg = settings.getString(ProjectKeys.KEY_SMAP_CURRENT_ORGANISATION);
+        if (orgs != null && !orgs.isEmpty()) {
+            String[] orgArray = orgs.toArray(new String[0]);
+            java.util.Arrays.sort(orgArray);
+            orgPref.setEntries(orgArray);
+            orgPref.setEntryValues(orgArray);
+            if (currentOrg != null) {
+                orgPref.setValue(currentOrg);
+                orgPref.setSummary(currentOrg);
+            }
+            if (orgs.size() > 1) {
+                orgPref.setOnPreferenceChangeListener((preference, newValue) -> {
+                    preference.setSummary(newValue.toString());
+                    String serverUrl = settings.getString(ProjectKeys.KEY_SERVER_URL);
+                    new SmapChangeOrganisationTask().execute(serverUrl, newValue.toString());
+                    return true;
+                });
+            } else {
+                orgPref.setEnabled(false);
+            }
+        } else {
+            orgPref.setVisible(false);
         }
     }
 

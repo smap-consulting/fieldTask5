@@ -150,6 +150,7 @@ public class ServerPreferencesFragment extends BaseProjectPreferencesFragment {
             String currentToken = authTokenPreference.getText();
             authTokenPreference.setSummary(currentToken != null ? currentToken : "");
         }
+
     }
 
     private void useTokenChanged(boolean useToken) {

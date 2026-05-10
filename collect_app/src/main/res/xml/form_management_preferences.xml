@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="@string/form_management_preferences">
 
+    <ListPreference
+        android:dialogTitle="@string/smap_organisation"
+        android:key="smap_current_organisation"
+        android:title="@string/smap_organisation"
+        app:iconSpaceReserved="false" />
+
     <PreferenceCategory
         android:key="form_update_category"
         android:title="@string/form_update_category"

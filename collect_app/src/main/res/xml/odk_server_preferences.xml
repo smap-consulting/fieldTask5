@@ -35,4 +35,5 @@
         android:title="@string/smap_auth_token"
         android:enabled="false"
         app:iconSpaceReserved="false" />
+
 </PreferenceScreen>
