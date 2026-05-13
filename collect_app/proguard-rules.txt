@@ -73,6 +73,7 @@
 -keep class au.smap.fieldTask.database.Geometry { *; }
 -keep class au.smap.fieldTask.loaders.PointEntry { *; }
 -keep class au.smap.fieldTask.loaders.TaskEntry { *; }
+-keep class au.smap.fieldTask.utilities.KeyValueJsonFns$KeyValue { *; }
 
 # Prevent R8 from leaving Data object members always null
 -keepclassmembers,allowobfuscation class * {

@@ -2,6 +2,7 @@ package au.smap.fieldTask.utilities;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -30,14 +31,18 @@ public final class KeyValueJsonFns {
 
 			boolean hasEntries = false;
 			if(kva != null && !kva.isEmpty()) {
-				for (KeyValue kv : kva) {
-					if (kv.key != null && kv.value != null) {
-						if (hasEntries) {
-							out.append(",");
+				try {
+					for (KeyValue kv : kva) {
+						if (kv.key != null && kv.value != null) {
+							if (hasEntries) {
+								out.append(",");
+							}
+							out.append(kv.value);
+							hasEntries = true;
 						}
-						out.append(kv.value);
-						hasEntries = true;
 					}
+				} catch (ClassCastException | JsonSyntaxException e) {
+					return null;
 				}
 			}
 		}
