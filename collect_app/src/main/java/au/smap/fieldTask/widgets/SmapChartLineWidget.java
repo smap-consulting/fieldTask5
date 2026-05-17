@@ -64,6 +64,7 @@ public class SmapChartLineWidget extends SmapChartWidget {
             ArrayList<ILineDataSet> dataSets = new ArrayList<ILineDataSet>();
             int idx = 0;
             for(List<Entry> ds : datasets) {
+                if(ds.isEmpty()) { idx++; continue; }  // smap - skip empty datasets; MPAndroidChart crashes on draw
                 if(dsLabels.size() > idx) {
                     label = dsLabels.get(idx);
                 }
