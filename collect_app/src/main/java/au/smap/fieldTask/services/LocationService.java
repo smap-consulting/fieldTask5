@@ -122,7 +122,10 @@ public class LocationService extends Service implements GoogleApiClient.Connecti
                 Timber.i("Foreground service started for location tracking");
             } catch (Exception e) {
                 // smap - Catch any remaining startForeground() failures (e.g. ForegroundServiceStartNotAllowedException).
+                // Must call 2-arg startForeground() to clear the watchdog before stopSelf(), otherwise
+                // Android throws RemoteServiceException("did not then call Service.startForeground()").
                 Timber.w("Cannot start foreground location service: " + e.getMessage());
+                try { startForeground(LOCATION_SERVICE_NOTIFICATION_ID, notification); } catch (Exception ignored) {}
                 stopSelf();
                 return START_NOT_STICKY;
             }
