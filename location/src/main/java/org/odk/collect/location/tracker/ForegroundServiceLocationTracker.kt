@@ -1,5 +1,6 @@
 package org.odk.collect.location.tracker
 
+import android.Manifest
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
@@ -7,6 +8,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -71,10 +74,29 @@ class LocationTrackerService : Service(), LocationClient.LocationClientListener 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         setupNotificationChannel()
-        startForeground(
-            uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER),
-            createNotification()
-        )
+
+        // smap - Check location permission before startForeground() with FOREGROUND_SERVICE_TYPE_LOCATION.
+        // On API 34+ (targetSDK 35), startForeground() with location type throws SecurityException if
+        // runtime location permission is not granted. Use 2-arg fallback then stop if permission missing.
+        val hasLocationPermission =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && hasLocationPermission) {
+                startForeground(uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER), createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+            } else {
+                startForeground(uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER), createNotification())
+            }
+        } catch (e: Exception) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        if (!hasLocationPermission) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
 
         locationClient.setRetainMockAccuracy(
             intent?.getBooleanExtra(

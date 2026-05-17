@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="GoogleAppIndexingWarning">
 
-    <!-- Location tracking is disabled for this flavor -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" tools:node="remove" />
-
     <application
         tools:replace="android:usesCleartextTraffic,android:allowBackup"
         android:usesCleartextTraffic="false"
