@@ -39,6 +39,9 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
+import org.odk.collect.android.activities.ActivityUtils
+import org.odk.collect.android.activities.CrashHandlerActivity
+import org.odk.collect.crashhandler.CrashHandler
 
 const val FORM_ENTRY_TOKEN = "form_entry_token"
 
@@ -101,6 +104,14 @@ class FormUriActivity : LocalizedActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // smap - activity can be launched directly (e.g. from notification) when app failed to init
+        val crashHandler = CrashHandler.getInstance(this)
+        if (crashHandler != null && crashHandler.hasCrashed(this)) {
+            super.onCreate(null)
+            ActivityUtils.startActivityAndCloseAllOthers(this, CrashHandlerActivity::class.java)
+            return
+        }
+
         super.onCreate(savedInstanceState)
         DaggerUtils.getComponent(this).inject(this)
         setContentView(R.layout.circular_progress_indicator)
