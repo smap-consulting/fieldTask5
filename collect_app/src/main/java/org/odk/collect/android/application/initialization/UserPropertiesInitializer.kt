@@ -58,6 +58,14 @@ class UserPropertiesInitializer(
     }
 
     private fun hasUnsentAutoSendForms(project: Project.Saved): Boolean {
+        return try {
+            hasUnsentAutoSendFormsInternal(project)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun hasUnsentAutoSendFormsInternal(project: Project.Saved): Boolean {
         val instancesRepository = instancesRepositoryProvider.create(project.uuid)
         val formsRepository = formsRepositoryProvider.create(project.uuid)
         val finalizedForms = instancesRepository.getAllByStatus(Instance.STATUS_COMPLETE)
