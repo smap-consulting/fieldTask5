@@ -44,7 +44,7 @@ class MapsInitializer @Inject constructor(
         try {
             com.google.android.gms.maps.MapsInitializer.initialize(
                 context,
-                com.google.android.gms.maps.MapsInitializer.Renderer.LATEST
+                com.google.android.gms.maps.MapsInitializer.Renderer.LEGACY
             ) { renderer: com.google.android.gms.maps.MapsInitializer.Renderer ->
                 when (renderer) {
                     com.google.android.gms.maps.MapsInitializer.Renderer.LATEST -> Timber.d("The latest version of Google Maps renderer is used.")
