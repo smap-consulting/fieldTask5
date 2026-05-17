@@ -86,7 +86,7 @@ android {
         testInstrumentationRunner('androidx.test.runner.AndroidJUnitRunner')
         vectorDrawables.useSupportLibrary = true
 
-        // smap - AWS configurationcd col   
+        // smap - AWS configuration col
         buildConfigField("String", "AMAZON_COGNITO_REGION", "\"$amazonCognitoRegion\"")
         buildConfigField("String", "AMAZON_COGNITO_IDENTITY_POOL_ID", "\"$amazonCognitoIdentityPoolId\"")
         buildConfigField("String", "AMAZON_DYNAMODB_REGION", "\"$amazonDynamodbRegion\"")
