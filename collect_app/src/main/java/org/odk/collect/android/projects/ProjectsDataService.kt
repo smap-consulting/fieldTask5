@@ -50,7 +50,10 @@ class ProjectsDataService(
         if (project != null) {
             return project
         } else {
-            throw IllegalStateException("No current project!")
+            // smap - multi-project not used; create default rather than crash
+            val defaultProject = projectsRepository.save(Project.New("Default", "D", "#3e9fcc"))
+            setCurrentProject(defaultProject.uuid)
+            return defaultProject
         }
     }
 
