@@ -14,7 +14,7 @@ class CrashHandler(private val processKiller: Runnable = Runnable { exitProcess(
 
     fun launchApp(conditionsCheck: Runnable, onSuccess: Runnable? = null) {
         if (checkConditions(conditionsCheck)) {
-            onSuccess?.run()
+            checkConditions { onSuccess?.run() }
         }
     }
 
