@@ -293,7 +293,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
         String asked = (String) GeneralSharedPreferencesSmap.getInstance().get(ProjectKeys.KEY_SMAP_REQUEST_LOCATION_DONE);
         if (asked != null && asked.equals("no")) {
             (new RequestLocationPermissionsDialogSmap()).show(this.getSupportFragmentManager(), RequestLocationPermissionsDialogSmap.TAG);
-        } else if ((hasFineLocation || hasCoarseLocation) && ("accept".equals(asked))){
+        } else if (lr.locationEnabled() && (hasFineLocation || hasCoarseLocation) && ("accept".equals(asked))){
             lr.locationStart(this, permissionsProvider);
         }
 

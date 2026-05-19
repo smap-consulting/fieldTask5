@@ -54,7 +54,7 @@ class BootReceiver : BroadcastReceiver() {
             .getString("current_project_id", null)
         val prefsName = "general_prefs" + (projectId ?: "")
         return context.getSharedPreferences(prefsName, Context.MODE_PRIVATE)
-            .getBoolean(ProjectKeys.KEY_SMAP_ENABLE_GEOFENCE, true)
+            .getBoolean(ProjectKeys.KEY_SMAP_USER_LOCATION, false)
     }
 
     private fun startLocationService(context: Context) {
