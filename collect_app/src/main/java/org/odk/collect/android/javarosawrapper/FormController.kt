@@ -309,6 +309,12 @@ interface FormController {
     fun isSubmissionEntireForm(): Boolean
 
     /**
+     * Returns true if any field in the form has pii="anonymise" — meaning the
+     * submission XML differs from the saved instance XML.
+     */
+    fun hasPiiAnonymisedFields(): Boolean = false
+
+    /**
      * Constructs the XML payload for a filled-in form instance. This payload
      * enables a filled-in form to be re-opened and edited.
      */

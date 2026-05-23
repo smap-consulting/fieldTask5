@@ -57,6 +57,9 @@ import org.odk.collect.entities.javarosa.finalization.EntitiesExtra;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1008,9 +1011,55 @@ public class JavaRosaFormController implements FormController {
 
     public ByteArrayPayload getSubmissionXml() throws IOException {
         FormInstance instance = getInstance();
+        applyPiiAnonymisation(instance.getRoot());
         XFormSerializingVisitor serializer = new XFormSerializingVisitor();
         return (ByteArrayPayload) serializer.createSerializedPayload(instance,
                 getSubmissionDataReference());
+    }
+
+    public boolean hasPiiAnonymisedFields() {
+        return checkForPiiAnonymise(getInstance().getRoot());
+    }
+
+    private boolean checkForPiiAnonymise(TreeElement element) {
+        for (int i = 0; i < element.getNumChildren(); i++) {
+            TreeElement child = element.getChildAt(i);
+            if ("anonymise".equals(child.getBindAttributeValue(null, "pii"))) {
+                return true;
+            }
+            if (checkForPiiAnonymise(child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void applyPiiAnonymisation(TreeElement element) {
+        for (int i = 0; i < element.getNumChildren(); i++) {
+            TreeElement child = element.getChildAt(i);
+            String piiAttr = child.getBindAttributeValue(null, "pii");
+            if ("anonymise".equals(piiAttr)) {
+                IAnswerData value = child.getValue();
+                if (value != null && value.getDisplayText() != null && !value.getDisplayText().isEmpty()) {
+                    child.setValue(new StringData(sha256Hex(value.getDisplayText())));
+                }
+            }
+            applyPiiAnonymisation(child);
+        }
+    }
+
+    private String sha256Hex(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(hash.length * 2);
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
+        }
     }
 
     /**

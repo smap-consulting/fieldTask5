@@ -471,7 +471,7 @@ public class SaveFormToDisk {
 
             instance = updateInstanceDatabase(false, canEditAfterCompleted, validationResult);
 
-            if (!canEditAfterCompleted) {
+            if (!canEditAfterCompleted || formController.hasPiiAnonymisedFields()) {
                 manageFilesAfterSavingEncryptedForm(instanceXml, submissionXml);
             } else {
                 // try to delete the submissionXml file, since it is
