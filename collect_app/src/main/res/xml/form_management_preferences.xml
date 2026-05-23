@@ -10,41 +10,6 @@
         app:iconSpaceReserved="false" />
 
     <PreferenceCategory
-        android:key="form_update_category"
-        android:title="@string/form_update_category"
-        app:allowDividerAbove="false"
-        app:allowDividerBelow="false"
-        app:iconSpaceReserved="false">
-
-        <ListPreference
-            android:dialogTitle="@string/form_update_mode_title"
-            android:entries="@array/form_update_mode_entries"
-            android:entryValues="@array/form_update_mode_values"
-            android:key="form_update_mode"
-            android:title="@string/form_update_mode_title"
-            app:iconSpaceReserved="false"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            android:defaultValue="@string/never_value"
-            android:dialogTitle="@string/form_update_frequency_title"
-            android:entries="@array/periodic_form_updates_check_entries"
-            android:entryValues="@array/periodic_form_updates_check_entry_values"
-            android:key="periodic_form_updates_check"
-            android:title="@string/form_update_frequency_title"
-            app:iconSpaceReserved="false" />
-        <CheckBoxPreference
-            android:key="automatic_update"
-            android:summary="@string/automatic_download_summary"
-            android:title="@string/automatic_download"
-            app:iconSpaceReserved="false" />
-        <CheckBoxPreference
-            android:key="hide_old_form_versions"
-            android:summary="@string/hide_old_form_versions_setting_summary"
-            android:title="@string/hide_old_form_versions_setting_title"
-            app:iconSpaceReserved="false" />
-    </PreferenceCategory>
-    <PreferenceCategory
         android:key="form_submission"
         android:title="@string/form_submission_category"
         app:allowDividerAbove="false"
@@ -78,6 +43,7 @@
             android:title="@string/constraint_behavior_title"
             app:iconSpaceReserved="false" />
         <CheckBoxPreference
+            android:defaultValue="false"
             android:key="high_resolution"
             android:summary="@string/high_resolution_summary"
             android:title="@string/high_resolution_title"
@@ -105,16 +71,5 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
-        android:key="form_import"
-        android:title="@string/form_import_category"
-        app:allowDividerAbove="false"
-        app:allowDividerBelow="false"
-        app:iconSpaceReserved="false">
-        <CheckBoxPreference
-            android:key="instance_sync"
-            android:summary="@string/instance_sync_summary"
-            android:title="@string/instance_sync"
-            app:iconSpaceReserved="false" />
-    </PreferenceCategory>
+
 </PreferenceScreen>
