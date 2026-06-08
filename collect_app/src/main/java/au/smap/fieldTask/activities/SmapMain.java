@@ -836,6 +836,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
                         i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_TASK, taskId);
                         i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_SURVEY_NOTES, surveyNotes);
                         i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_CAN_UPDATE, canUpdate);
+                        i.putExtra(org.odk.collect.android.activities.FormFillingActivity.KEY_READ_ONLY, entry.readOnly);  // References are read only
                         i.putExtra(ApplicationConstants.BundleKeys.FORM_MODE, ApplicationConstants.FormModes.EDIT_SAVED);
                         if (entry.formIndex != null) {
                             FormRestartDetails frd = new FormRestartDetails();

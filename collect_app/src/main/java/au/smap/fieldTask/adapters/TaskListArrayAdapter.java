@@ -21,6 +21,7 @@ package au.smap.fieldTask.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,9 +53,18 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
 
     private int mLayout;
     boolean mFormView;
+    boolean mShowReferences;        // In the task view, show read only references instead of actionable tasks
     OnTaskOptionsClickListener taskClickLisener;
     LayoutInflater mInflater;
     static String TAG = "TaskListArrayAdapter";
+
+    public void setShowReferences(boolean showReferences) {
+        mShowReferences = showReferences;
+    }
+
+    private static boolean isReference(TaskEntry item) {
+        return item.taskType != null && item.taskType.equals("reference");
+    }
 
     public TaskListArrayAdapter(Context context, boolean formView, OnTaskOptionsClickListener taskClickLisener) {
         super(context, R.layout.main_list);
@@ -83,7 +93,10 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
          * Get icon drawable
          */
         Drawable d = null;
-        if (item.type.equals("form")) {
+        boolean isReference = isReference(item);
+        if (isReference) {
+            d = ContextCompat.getDrawable(getContext(), R.drawable.form_state_readonly_circle);
+        } else if (item.type.equals("form")) {
             if (item.readOnly) {
                 d = ContextCompat.getDrawable(getContext(), R.drawable.form_state_readonly_circle);
             } else {
@@ -125,6 +138,12 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
         if (d != null) {
             ImageView icon = (ImageView) view.findViewById(R.id.icon);
             icon.setImageDrawable(d);
+            // References are shown in the reference colour (purple), matching the web console
+            if (isReference) {
+                icon.setColorFilter(Color.parseColor("#6F42C1"));
+            } else {
+                icon.clearColorFilter();
+            }
         }
 
         TextView taskNameText = view.findViewById(R.id.toptext);
@@ -160,9 +179,10 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
             }
         }
 
-        // smap: show menu button for task rows only; restore visibility on recycled views
+        // smap: show menu button for task rows only; restore visibility on recycled views.
+        // References are read only so they have no accept/reject/release actions.
         View imageButton = view.findViewById(R.id.menu_button);
-        if (item.type.equals("form")) {
+        if (item.type.equals("form") || isReference) {
             imageButton.setVisibility(View.GONE);
         } else {
             imageButton.setVisibility(View.VISIBLE);
@@ -222,12 +242,19 @@ public class TaskListArrayAdapter extends ArrayAdapter<TaskEntry> {
         int count = 0;
         if (data != null) {
             for (int i = 0; i < data.size(); i++) {
-                if (mFormView && data.get(i).type.equals("form")) {
-                    add(data.get(i));
-                    count++;
-                } else if (!mFormView && !data.get(i).type.equals("form")) {
-                    add(data.get(i));
-                    count++;
+                TaskEntry item = data.get(i);
+                boolean isForm = item.type.equals("form");
+                if (mFormView) {
+                    if (isForm) {
+                        add(item);
+                        count++;
+                    }
+                } else if (!isForm) {
+                    // Task view: show references or actionable tasks/cases depending on the toggle
+                    if (mShowReferences == isReference(item)) {
+                        add(item);
+                        count++;
+                    }
                 }
             }
         }

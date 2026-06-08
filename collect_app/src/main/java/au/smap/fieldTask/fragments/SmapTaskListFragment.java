@@ -98,6 +98,12 @@ public class SmapTaskListFragment extends ListFragment {
     private TaskListArrayAdapter mAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private com.google.android.material.button.MaterialButtonToggleGroup filterGroup;
+    private com.google.android.material.button.MaterialButton btnTasks;
+    private com.google.android.material.button.MaterialButton btnReferences;
+    private java.util.List<TaskEntry> allTasks;     // Full task list before the references filter
+    private boolean showReferences;                 // True when the References segment is selected
+
     SurveyDataViewModel model;
 
     public static SmapTaskListFragment newInstance() {
@@ -245,6 +251,19 @@ public class SmapTaskListFragment extends ListFragment {
             ((SmapMain) getActivity()).processGetTask(true);
         });
 
+        // Set up the Tasks / References toggle (only shown when references exist)
+        filterGroup = view.findViewById(R.id.task_filter_group);
+        btnTasks = view.findViewById(R.id.btn_tasks);
+        btnReferences = view.findViewById(R.id.btn_references);
+        filterGroup.check(R.id.btn_tasks);
+        filterGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (!isChecked) {
+                return;
+            }
+            showReferences = (checkedId == R.id.btn_references);
+            applyData();
+        });
+
         model = getViewMode();
         model.getSurveyData().observe(getViewLifecycleOwner(), surveyData -> {
             Timber.i("-------------------------------------- Task List Fragment got Data ");
@@ -312,22 +331,61 @@ public class SmapTaskListFragment extends ListFragment {
     }
 
     public void setData(SurveyData data) {
-        int count = 0;
-        if (mAdapter != null) {
-            if (data != null) {
-                count = mAdapter.setData(data.tasks);
-            } else {
-                mAdapter.setData(null);
+        allTasks = (data != null) ? data.tasks : null;
+        applyData();
+    }
+
+    /*
+     * Apply the current Tasks / References filter to the stored task list, update the toggle
+     * visibility / labels and set the Tasks tab count to the number of actionable items only.
+     */
+    private void applyData() {
+        if (mAdapter == null) {
+            return;
+        }
+
+        // Count actionable tasks/cases and read only references
+        int actionable = 0;
+        int references = 0;
+        if (allTasks != null) {
+            for (TaskEntry entry : allTasks) {
+                if ("form".equals(entry.type)) {
+                    continue;
+                }
+                if (entry.taskType != null && entry.taskType.equals("reference")) {
+                    references++;
+                } else {
+                    actionable++;
+                }
             }
         }
 
+        // The toggle is only useful when there are references to switch to
+        if (filterGroup != null) {
+            filterGroup.setVisibility(references > 0 ? View.VISIBLE : View.GONE);
+            if (references == 0 && showReferences) {
+                showReferences = false;
+                filterGroup.check(R.id.btn_tasks);
+            }
+            if (btnTasks != null) {
+                btnTasks.setText(getString(R.string.smap_tasks) + " (" + actionable + ")");
+            }
+            if (btnReferences != null) {
+                btnReferences.setText(getString(R.string.smap_references) + " (" + references + ")");
+            }
+        }
+
+        mAdapter.setShowReferences(showReferences);
+        mAdapter.setData(allTasks);
+
+        // The tab badge always reflects actionable work, never references
         FragmentActivity activity = (SmapMain) getActivity();
         if (activity != null) {
             TabLayout tabLayout = (TabLayout) (activity).findViewById(R.id.tabs);
             if (tabLayout != null) {
                 TabLayout.Tab tab = tabLayout.getTabAt(1);
                 if (tab != null) {
-                    tab.setText(getString(R.string.smap_tasks) + "(" + count + ")");
+                    tab.setText(getString(R.string.smap_tasks) + "(" + actionable + ")");
                 }
             }
         }

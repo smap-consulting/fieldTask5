@@ -537,6 +537,7 @@ public class Utilities {
 
                 entry.type = "task";
                 entry.taskType = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_TASK_TYPE));
+                entry.readOnly = "reference".equals(entry.taskType);    // References open read only
                 entry.name = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_TITLE));
                 entry.displayName = c.getString(c.getColumnIndexOrThrow(InstanceColumns.DISPLAY_NAME));
                 entry.taskStatus = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_TASK_STATUS));
