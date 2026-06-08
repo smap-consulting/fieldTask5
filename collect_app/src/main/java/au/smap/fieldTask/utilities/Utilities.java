@@ -892,7 +892,10 @@ public class Utilities {
 
         Uri dbUri = InstanceColumns.CONTENT_URI;
 
-        String selectClause = InstanceColumns.T_TASK_TYPE + " = 'case' and "
+        // Match cases and references (both have assignment id 0 and a unique update id).  Including
+        // 'reference' also clears any case row whose type was previously corrupted to 'reference'.
+        String selectClause = "(" + InstanceColumns.T_TASK_TYPE + " = 'case' or "
+                + InstanceColumns.T_TASK_TYPE + " = 'reference') and "
                 + InstanceColumns.T_UPDATEID + " = ? and "
                 + InstanceColumns.SOURCE + " = ?";
 
@@ -931,12 +934,21 @@ public class Utilities {
 
         Uri dbUri = InstanceColumns.CONTENT_URI;
 
-        String selectClause = InstanceColumns.T_ASS_ID + " = " + assId + " and "
-                + InstanceColumns.SOURCE + " = ?";
-
-
-        String[] selectArgs = {""};
-        selectArgs[0] = Utilities.getSource();
+        String selectClause;
+        String[] selectArgs;
+        // Cases and references have an assignment id of 0, which is not unique.  Match on the
+        // update id instead so we only update the one record - otherwise updating one case or
+        // reference would overwrite the task type (and other parameters) of every other case
+        // and reference on the phone.
+        if (assId == 0 && ta.task.update_id != null) {
+            selectClause = InstanceColumns.T_UPDATEID + " = ? and "
+                    + InstanceColumns.SOURCE + " = ?";
+            selectArgs = new String[] { ta.task.update_id, Utilities.getSource() };
+        } else {
+            selectClause = InstanceColumns.T_ASS_ID + " = " + assId + " and "
+                    + InstanceColumns.SOURCE + " = ?";
+            selectArgs = new String[] { Utilities.getSource() };
+        }
 
         ContentValues values = new ContentValues();
         if (ta.task.scheduled_at != null) {
