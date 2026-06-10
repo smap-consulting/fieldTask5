@@ -113,8 +113,9 @@ class BarcodeWidget(
         }
     }
 
-    // Remove control characters, invisible characters and unused code points.
+    // Remove control characters, invisible characters and unused code points but keep
+    // tabs/line breaks as some barcodes (eg PDF417) use them as field separators.
     private fun stripInvalidCharacters(data: String?): String? {
-        return data?.replace("\\p{C}".toRegex(), "")
+        return data?.replace("[\\p{C}&&[^\\t\\r\\n]]".toRegex(), "")
     }
 }

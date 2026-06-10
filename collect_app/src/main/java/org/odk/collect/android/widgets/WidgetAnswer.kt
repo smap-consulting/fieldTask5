@@ -36,7 +36,8 @@ fun WidgetAnswer(
                         fontSize,
                         if (summaryView) Arrangement.Start else Arrangement.Center,
                         onClick,
-                        onLongClick
+                        onLongClick,
+                        formatted = false
                     )
                     else -> TextWidgetAnswer(
                         modifier,

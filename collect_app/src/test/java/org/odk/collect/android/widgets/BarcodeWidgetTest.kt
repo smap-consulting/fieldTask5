@@ -145,6 +145,24 @@ class BarcodeWidgetTest : QuestionWidgetTest<BarcodeWidget, StringData>() {
     }
 
     @Test
+    fun `#setData preserves line break separators`() {
+        val widget = createWidget()
+        widget.setData("xxx\nxxx")
+        assertThat(
+            widget.answer!!.displayText,
+            equalTo("xxx\nxxx")
+        )
+        composeRule.onNodeWithText("xxx\nxxx").assertIsDisplayed()
+    }
+
+    @Test
+    fun `#setData displays raw answer without markdown or html formatting`() {
+        val widget = createWidget()
+        widget.setData("xxx&#10;xxx")
+        composeRule.onNodeWithText("xxx&#10;xxx").assertIsDisplayed()
+    }
+
+    @Test
     fun `#setData updates the button title`() {
         val widget = createWidget()
         widget.setData("\ud800blah\b")

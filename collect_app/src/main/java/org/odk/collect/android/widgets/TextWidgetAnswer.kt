@@ -31,10 +31,15 @@ fun TextWidgetAnswer(
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
     onClick: () -> Unit = {},
     onLongClick: () -> Unit,
-    onClickLabel: String? = null
+    onClickLabel: String? = null,
+    formatted: Boolean = true
 ) {
-    val annotatedAnswer = remember(answer) {
-        AnnotatedString.fromHtml(HtmlUtils.markdownToHtml(answer))
+    val annotatedAnswer = remember(answer, formatted) {
+        if (formatted) {
+            AnnotatedString.fromHtml(HtmlUtils.markdownToHtml(answer))
+        } else {
+            AnnotatedString(answer)
+        }
     }
     val hasFormatting = annotatedAnswer.spanStyles.isNotEmpty()
 
