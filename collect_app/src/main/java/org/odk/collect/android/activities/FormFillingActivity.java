@@ -1191,7 +1191,11 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         if (formUri != null) {
             form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri));
         }
-        boolean readOnly = form != null && "yes".equals(form.getReadOnly());
+        // Read only at form level (read_only_survey) or for this opening only (e.g. referenced
+        // records).  Questions stay editable for viewing data, but the end screen offers Exit
+        // instead of Save so nothing is persisted.
+        boolean readOnly = (form != null && "yes".equals(form.getReadOnly()))
+                || getIntent().getBooleanExtra(KEY_READ_ONLY, false);
 
         // Get smap settings for showing instance name and mark finalized checkbox (smap)
         boolean showInstanceName = (boolean) au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap.getInstance()
