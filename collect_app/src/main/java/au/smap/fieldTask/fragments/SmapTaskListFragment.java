@@ -16,6 +16,10 @@ package au.smap.fieldTask.fragments;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -26,19 +30,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.ListFragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,7 +58,7 @@ import org.odk.collect.android.activities.AboutActivity;
 import org.odk.collect.android.activities.FormDownloadListActivity;
 import au.smap.fieldTask.activities.SmapMain;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
-import au.smap.fieldTask.adapters.TaskListArrayAdapter;
+import au.smap.fieldTask.adapters.TaskRecyclerAdapter;
 import org.odk.collect.android.database.instances.DatabaseInstancesRepository;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.forms.instances.Instance;
@@ -78,7 +84,7 @@ import timber.log.Timber;
 /**
  * Responsible for displaying tasks on the main fieldTask screen
  */
-public class SmapTaskListFragment extends ListFragment {
+public class SmapTaskListFragment extends Fragment {
 
     private static final int MENU_ENTERDATA = Menu.FIRST + 2;
     private static final int MENU_GETFORMS = Menu.FIRST + 3;
@@ -95,7 +101,10 @@ public class SmapTaskListFragment extends ListFragment {
 
     private BottomSheetDialog bottomSheetDialog;
 
-    private TaskListArrayAdapter mAdapter;
+    private OnTaskOptionsClickListener taskClickListener;
+    private TaskRecyclerAdapter mAdapter;
+    private RecyclerView recyclerView;
+    private View emptyView;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private com.google.android.material.button.MaterialButtonToggleGroup filterGroup;
@@ -125,7 +134,7 @@ public class SmapTaskListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.smap_task_layout, container, false);
+        rootView = inflater.inflate(R.layout.smap_task_recycler_layout, container, false);
 
         setHasOptionsMenu(true);
         return rootView;
@@ -135,7 +144,7 @@ public class SmapTaskListFragment extends ListFragment {
     public void onActivityCreated(Bundle b) {
         super.onActivityCreated(b);
 
-        OnTaskOptionsClickListener taskClickListener = new OnTaskOptionsClickListener() {
+        taskClickListener = new OnTaskOptionsClickListener() {
             final DatabaseInstancesRepository di = new DatabaseInstancesRepository();
 
             @Override
@@ -230,9 +239,102 @@ public class SmapTaskListFragment extends ListFragment {
             }
         };
 
-        mAdapter = new TaskListArrayAdapter(getActivity(), false, taskClickListener);
-        setListAdapter(mAdapter);
+        mAdapter = new TaskRecyclerAdapter(getActivity(), taskClickListener, this::onRowClick);
 
+        recyclerView = rootView.findViewById(R.id.task_recycler);
+        emptyView = rootView.findViewById(android.R.id.empty);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(mAdapter);
+
+        new ItemTouchHelper(new TaskSwipeCallback()).attachToRecyclerView(recyclerView);
+    }
+
+    /*
+     * Swipe left or right on an actionable task/case row to reject (task) or release (case).
+     * Reuses the existing reject/release reason dialog. Form and reference rows are not swipeable.
+     */
+    private class TaskSwipeCallback extends ItemTouchHelper.SimpleCallback {
+
+        private final Paint background = new Paint();
+        private final Drawable icon;
+        private final int iconMargin;
+
+        TaskSwipeCallback() {
+            super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+            background.setColor(Color.parseColor("#D32F2F"));
+            icon = ContextCompat.getDrawable(requireContext(), R.drawable.form_state_rejected);
+            iconMargin = (int) (16 * getResources().getDisplayMetrics().density);
+        }
+
+        @Override
+        public int getMovementFlags(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh) {
+            int pos = vh.getBindingAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION || mAdapter == null || !mAdapter.isSwipeable(pos)) {
+                return 0;
+            }
+            return makeMovementFlags(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView rv, @NonNull RecyclerView.ViewHolder vh,
+                              @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder vh, int direction) {
+            int pos = vh.getBindingAdapterPosition();
+            if (pos == RecyclerView.NO_POSITION || mAdapter == null) {
+                return;
+            }
+            TaskEntry entry = mAdapter.getItem(pos);
+            // Spring the row back; the reject/release dialog confirms the action and a refresh
+            // broadcast reloads the list when it actually changes.
+            mAdapter.notifyItemChanged(pos);
+            taskClickListener.onRejectClicked(entry);
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView rv,
+                                @NonNull RecyclerView.ViewHolder vh, float dX, float dY,
+                                int actionState, boolean isCurrentlyActive) {
+            View item = vh.itemView;
+            if (dX > 0) {
+                c.drawRect(item.getLeft(), item.getTop(), item.getLeft() + dX, item.getBottom(), background);
+                if (icon != null) {
+                    int top = item.getTop() + (item.getHeight() - icon.getIntrinsicHeight()) / 2;
+                    int left = item.getLeft() + iconMargin;
+                    icon.setBounds(left, top, left + icon.getIntrinsicWidth(), top + icon.getIntrinsicHeight());
+                    icon.draw(c);
+                }
+            } else if (dX < 0) {
+                c.drawRect(item.getRight() + dX, item.getTop(), item.getRight(), item.getBottom(), background);
+                if (icon != null) {
+                    int top = item.getTop() + (item.getHeight() - icon.getIntrinsicHeight()) / 2;
+                    int right = item.getRight() - iconMargin;
+                    icon.setBounds(right - icon.getIntrinsicWidth(), top, right, top + icon.getIntrinsicHeight());
+                    icon.draw(c);
+                }
+            }
+            super.onChildDraw(c, rv, vh, dX, dY, actionState, isCurrentlyActive);
+        }
+    }
+
+    private void onRowClick(TaskEntry entry) {
+        if (MultiClickGuard.allowClick(getClass().getName())) {
+            if (entry.type.equals("task")) {
+                if (entry.locationTrigger != null && entry.locationTrigger.length() > 0) {
+                    Toast.makeText(
+                            getActivity(),
+                            getString(R.string.smap_must_start_from_nfc),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    ((SmapMain) getActivity()).completeTask(entry, false);
+                }
+            } else {
+                ((SmapMain) getActivity()).completeForm(entry, false, null);
+            }
+        }
     }
 
     @Override
@@ -378,6 +480,10 @@ public class SmapTaskListFragment extends ListFragment {
         mAdapter.setShowReferences(showReferences);
         mAdapter.setData(allTasks);
 
+        if (emptyView != null) {
+            emptyView.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        }
+
         // The tab badge always reflects actionable work, never references
         FragmentActivity activity = (SmapMain) getActivity();
         if (activity != null) {
@@ -394,28 +500,6 @@ public class SmapTaskListFragment extends ListFragment {
     public void setRefreshing(boolean refreshing) {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(refreshing);
-        }
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long rowId) {
-        if (MultiClickGuard.allowClick(getClass().getName())) {
-            super.onListItemClick(l, v, position, rowId);
-
-            TaskEntry entry = (TaskEntry) getListAdapter().getItem(position);
-
-            if (entry.type.equals("task")) {
-                if (entry.locationTrigger != null && entry.locationTrigger.length() > 0) {
-                    Toast.makeText(
-                            getActivity(),
-                            getString(R.string.smap_must_start_from_nfc),
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    ((SmapMain) getActivity()).completeTask(entry, false);
-                }
-            } else {
-                ((SmapMain) getActivity()).completeForm(entry, false, null);
-            }
         }
     }
 
