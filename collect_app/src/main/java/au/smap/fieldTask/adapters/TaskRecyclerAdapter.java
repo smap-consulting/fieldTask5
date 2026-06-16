@@ -81,20 +81,43 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         return item.taskType != null && item.taskType.equals("reference");
     }
 
+    // A dereferenced (cancelled) reference is hidden from the list - it stays in the database
+    // flagged for sync and is removed by the server on the next download.
+    private static boolean isDereferenced(TaskEntry item) {
+        return isReference(item) && Utilities.STATUS_T_CANCELLED.equals(item.taskStatus);
+    }
+
     /*
-     * Actionable rows (tasks and cases that are not references) are the only rows that can be
-     * swiped to reject/release.
+     * Task/case rows can be swiped to reject/release; reference rows can be swiped to dereference.
+     * Only form rows (never shown in the Tasks tab anyway) are not swipeable.
      */
     public boolean isSwipeable(int position) {
         if (position < 0 || position >= items.size()) {
             return false;
         }
         TaskEntry item = items.get(position);
-        return !item.type.equals("form") && !isReference(item);
+        return !item.type.equals("form");
     }
 
     public TaskEntry getItem(int position) {
         return items.get(position);
+    }
+
+    /* Remove a row (used by swipe-to-dereference, paired with restoreItem for undo). */
+    public TaskEntry removeItem(int position) {
+        if (position < 0 || position >= items.size()) {
+            return null;
+        }
+        TaskEntry removed = items.remove(position);
+        notifyItemRemoved(position);
+        return removed;
+    }
+
+    /* Put a removed row back (undo). */
+    public void restoreItem(int position, TaskEntry entry) {
+        int target = Math.min(position, items.size());
+        items.add(target, entry);
+        notifyItemInserted(target);
     }
 
     /*
@@ -105,7 +128,7 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
         items.clear();
         if (data != null) {
             for (TaskEntry item : data) {
-                if (item.type.equals("form")) {
+                if (item.type.equals("form") || isDereferenced(item)) {
                     continue;
                 }
                 if (showReferences == isReference(item)) {

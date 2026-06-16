@@ -49,6 +49,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
 import org.odk.collect.android.R;
@@ -288,10 +289,15 @@ public class SmapTaskListFragment extends Fragment {
                 return;
             }
             TaskEntry entry = mAdapter.getItem(pos);
-            // Spring the row back; the reject/release dialog confirms the action and a refresh
-            // broadcast reloads the list when it actually changes.
-            mAdapter.notifyItemChanged(pos);
-            taskClickListener.onRejectClicked(entry);
+            if (entry.taskType != null && entry.taskType.equals("reference")) {
+                // Remove the reference immediately and offer an undo; commit on dismiss.
+                dereferenceWithUndo(pos);
+            } else {
+                // Spring the row back; the reject/release dialog commits the action and a refresh
+                // broadcast reloads the list when it actually changes.
+                mAdapter.notifyItemChanged(pos);
+                taskClickListener.onRejectClicked(entry);
+            }
         }
 
         @Override
@@ -454,8 +460,12 @@ public class SmapTaskListFragment extends Fragment {
                 if ("form".equals(entry.type)) {
                     continue;
                 }
-                if (entry.taskType != null && entry.taskType.equals("reference")) {
-                    references++;
+                boolean isReference = entry.taskType != null && entry.taskType.equals("reference");
+                if (isReference) {
+                    // Dereferenced (cancelled) references are hidden, so exclude them from the count
+                    if (!Utilities.STATUS_T_CANCELLED.equals(entry.taskStatus)) {
+                        references++;
+                    }
                 } else {
                     actionable++;
                 }
@@ -480,9 +490,7 @@ public class SmapTaskListFragment extends Fragment {
         mAdapter.setShowReferences(showReferences);
         mAdapter.setData(allTasks);
 
-        if (emptyView != null) {
-            emptyView.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
-        }
+        updateEmptyView();
 
         // The tab badge always reflects actionable work, never references
         FragmentActivity activity = (SmapMain) getActivity();
@@ -689,6 +697,49 @@ public class SmapTaskListFragment extends Fragment {
     private void processManageFiles() {
         Intent i = new Intent(getContext(), org.odk.collect.android.activities.DeleteFormsActivity.class);
         startActivity(i);
+    }
+
+    /*
+     * Dereference a reference record. No reason is required. The row is removed from the list at
+     * once and a Snackbar offers an undo. If the undo is not used, the reference moves to the
+     * cancelled state and is flagged for sync; the server applies the dereference on the next
+     * refresh request. Restoring (undo) leaves the database untouched.
+     */
+    private void dereferenceWithUndo(int position) {
+        TaskEntry removed = mAdapter.removeItem(position);
+        if (removed == null) {
+            return;
+        }
+        updateEmptyView();
+
+        // Use the application context so committing in the dismiss callback is safe even if the
+        // fragment has been detached by then.
+        final android.content.Context appContext = requireContext().getApplicationContext();
+
+        Snackbar snackbar = Snackbar.make(rootView,
+                getString(R.string.smap_reference_removed), Snackbar.LENGTH_LONG);
+        snackbar.setAction(getString(R.string.smap_undo), v -> {
+            mAdapter.restoreItem(position, removed);
+            updateEmptyView();
+        });
+        snackbar.addCallback(new Snackbar.Callback() {
+            @Override
+            public void onDismissed(Snackbar transientBottomBar, int event) {
+                if (event != DISMISS_EVENT_ACTION) {     // anything other than the undo action commits
+                    Utilities.setStatusForTask(removed.id, Utilities.STATUS_T_CANCELLED, "");
+                    Intent intent = new Intent("org.smap.smapTask.refresh");   // Notify map and task list
+                    LocalBroadcastManager.getInstance(appContext).sendBroadcast(intent);
+                    Timber.i("######## send org.smap.smapTask.refresh after dereference");
+                }
+            }
+        });
+        snackbar.show();
+    }
+
+    private void updateEmptyView() {
+        if (emptyView != null && mAdapter != null) {
+            emptyView.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        }
     }
 
     private void rejectTask(String reason, TaskEntry taskEntry) {
