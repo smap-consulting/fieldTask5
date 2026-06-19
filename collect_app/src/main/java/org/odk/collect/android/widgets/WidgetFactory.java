@@ -184,23 +184,23 @@ public class WidgetFactory {
                     case Constants.DATATYPE_GEOPOINT:
                         if (hasAppearance(questionDetails.getPrompt(), PLACEMENT_MAP) || hasAppearance(questionDetails.getPrompt(), MAPS)) {
                             questionWidget = new GeoPointMapWidget(activity, questionDetails, waitingForDataRegistry,
-                                    new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
+                                    new ActivityGeoDataRequester(permissionsProvider, activity, formController), dependencies);
                         } else {
                             questionWidget = new GeoPointWidget(activity, questionDetails, waitingForDataRegistry,
-                                    new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
+                                    new ActivityGeoDataRequester(permissionsProvider, activity, formController), dependencies);
                         }
                         break;
                     case Constants.DATATYPE_GEOSHAPE:
                         questionWidget = new GeoShapeWidget(activity, questionDetails,
-                                new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
+                                new ActivityGeoDataRequester(permissionsProvider, activity, formController), dependencies);
                         break;
                     case Constants.DATATYPE_GEOTRACE:
                         questionWidget = new GeoTraceWidget(activity, questionDetails,
-                                MapConfiguratorProvider.getConfigurator(), new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
+                                MapConfiguratorProvider.getConfigurator(), new ActivityGeoDataRequester(permissionsProvider, activity, formController), dependencies);
                         break;
                     case Constants.DATATYPE_GEOCOMPOUND:    // smap custom datatype
                         questionWidget = new GeoCompoundWidget(activity, questionDetails, waitingForDataRegistry,
-                                new ActivityGeoDataRequester(permissionsProvider, activity), dependencies);
+                                new ActivityGeoDataRequester(permissionsProvider, activity, formController), dependencies);
                         break;
                     case Constants.DATATYPE_BARCODE:
                         if (appearance.contains("nfc")) {        // smap nfc reader

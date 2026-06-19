@@ -72,7 +72,7 @@ public class ActivityGeoDataRequesterTest {
         when(prompt.getQuestion()).thenReturn(questionDef);
         when(prompt.getIndex()).thenReturn(formIndex);
 
-        activityGeoDataRequester = new ActivityGeoDataRequester(permissionsProvider, testActivity);
+        activityGeoDataRequester = new ActivityGeoDataRequester(permissionsProvider, testActivity, null);
     }
 
     @Test

@@ -48,6 +48,8 @@ import org.odk.collect.settings.SettingsProvider;
 import org.odk.collect.strings.localization.LocalizedActivity;
 import org.odk.collect.webpage.WebPageService;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import timber.log.Timber;
@@ -78,7 +80,13 @@ public class GeoPointMapActivity extends LocalizedActivity {
 
     public static final String EXTRA_LOCATION = "gp";
 
+    // smap - "history-map": previously collected locations from earlier repeat instances
+    public static final String EXTRA_HISTORY_LOCATIONS = "history_locations";
+    private static final String HISTORY_MARKER_COLOR = "#808080";
+
     protected Bundle previousState;
+
+    private List<MapPoint> historyLocations;
 
     @Inject
     MapFragmentFactory mapFragmentFactory;
@@ -264,6 +272,10 @@ public class GeoPointMapActivity extends LocalizedActivity {
                 clearButton.setEnabled(false);
             }
 
+            // smap - "history-map": show previously collected locations from the repeat
+            historyLocations = intent.getParcelableArrayListExtra(EXTRA_HISTORY_LOCATIONS);
+            drawHistoryMarkers();
+
             if (intent.hasExtra(EXTRA_LOCATION)) {
                 MapPoint point = intent.getParcelableExtra(EXTRA_LOCATION);
 
@@ -280,6 +292,11 @@ public class GeoPointMapActivity extends LocalizedActivity {
                 zoomButton.setEnabled(true);
                 foundFirstLocation = true;
                 zoomToMarker(false);
+            } else if (historyLocations != null && !historyLocations.isEmpty()) {
+                // No current answer: frame the previously collected locations so they're
+                // visible and don't let the first GPS fix zoom away from them.
+                map.zoomToBoundingBox(historyLocations, 0.6, false);
+                foundFirstLocation = true;
             }
         }
 
@@ -382,8 +399,20 @@ public class GeoPointMapActivity extends LocalizedActivity {
         map.zoomToPoint(map.getMarkerPoint(featureId), animate);
     }
 
+    // smap - re-draw the "history-map" markers after the map's features are cleared
+    private void drawHistoryMarkers() {
+        if (historyLocations == null || historyLocations.isEmpty()) {
+            return;
+        }
+        for (MapPoint point : historyLocations) {
+            map.addMarker(new MarkerDescription(point, false, MapFragment.CENTER,
+                    new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point, HISTORY_MARKER_COLOR, null)));
+        }
+    }
+
     private void clear() {
         map.clearFeatures();
+        drawHistoryMarkers();
         featureId = -1;
         clearButton.setEnabled(false);
 
@@ -396,6 +425,7 @@ public class GeoPointMapActivity extends LocalizedActivity {
     /** Places the marker and enables the button to remove it. */
     private void placeMarker(@NonNull MapPoint point) {
         map.clearFeatures();
+        drawHistoryMarkers();
         featureId = map.addMarker(new MarkerDescription(point, intentDraggable && !intentReadOnly && !isPointLocked, MapFragment.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point)));
         if (!intentReadOnly) {
             clearButton.setEnabled(true);

@@ -4,15 +4,11 @@ import androidx.activity.ComponentDialog
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import org.javarosa.core.model.Constants
-import org.javarosa.core.model.condition.EvaluationContext
 import org.javarosa.core.model.data.GeoShapeData
 import org.javarosa.core.model.data.GeoTraceData
 import org.javarosa.core.model.data.IAnswerData
 import org.javarosa.form.api.FormEntryPrompt
-import org.javarosa.model.xform.XPathReference
-import org.javarosa.xpath.expr.XPathFuncExpr
 import org.odk.collect.android.javarosawrapper.FailedValidationResult
-import org.odk.collect.android.utilities.Appearances
 import org.odk.collect.android.utilities.FormEntryPromptUtils
 import org.odk.collect.android.widgets.utilities.AdditionalAttributes.INCREMENTAL
 import org.odk.collect.android.widgets.utilities.BindAttributes.ALLOW_MOCK_ACCURACY
@@ -22,7 +18,6 @@ import org.odk.collect.geo.geopoly.GeoPolyFragment
 import org.odk.collect.geo.geopoly.GeoPolyFragment.OutputMode
 import org.odk.collect.geo.geopoly.GeoPolyUtils
 import org.odk.collect.maps.MapPoint
-import timber.log.Timber
 
 class GeoPolyDialogFragment(viewModelFactory: ViewModelProvider.Factory) :
     WidgetAnswerDialogFragment<GeoPolyFragment>(
@@ -90,38 +85,9 @@ class GeoPolyDialogFragment(viewModelFactory: ViewModelProvider.Factory) :
     }
 
     private fun getPreviousPolygons(prompt: FormEntryPrompt): List<List<MapPoint>> {
-        if (!Appearances.hasAppearance(prompt, Appearances.HISTORY_MAP)) {
-            return emptyList()
-        }
-
-        try {
-            val formController = getFormController() ?: return emptyList()
-            val formDef = formController.getFormDef() ?: return emptyList()
-            val formInstance = formDef.instance
-            val questionPath = prompt.formElement.bind.reference.toString()
-
-            val pathExpr = XPathReference.getPathExpr(questionPath)
-            val ec = EvaluationContext(formDef.evaluationContext, formInstance.root.ref)
-            val nodeset = pathExpr.eval(formInstance, ec)
-
-            val count = nodeset.size()
-            if (count < 2) return emptyList()
-
-            val result = mutableListOf<List<MapPoint>>()
-            for (i in 0 until count - 1) {
-                val value = nodeset.getValAt(i)
-                val valueStr = if (value != null) XPathFuncExpr.toString(value) else continue
-                if (valueStr.isBlank()) continue
-                val points = GeoPolyUtils.parseGeometry(valueStr)
-                if (points.isNotEmpty()) {
-                    result.add(points)
-                }
-            }
-            return result
-        } catch (e: Exception) {
-            Timber.w(e, "Failed to get previous polygons for history-map")
-            return emptyList()
-        }
+        return HistoryMapUtils.getPreviousGeometryValues(getFormController(), prompt)
+            .map { GeoPolyUtils.parseGeometry(it) }
+            .filter { it.isNotEmpty() }
     }
 
     private fun onValidate(geoString: String, outputMode: OutputMode) {

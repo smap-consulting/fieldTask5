@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import org.javarosa.form.api.FormEntryPrompt
+import org.odk.collect.android.javarosawrapper.FormController
 import org.odk.collect.android.utilities.Appearances
 import org.odk.collect.android.utilities.ApplicationConstants
 import org.odk.collect.android.utilities.FormEntryPromptUtils
@@ -18,13 +19,15 @@ import org.odk.collect.geo.geocompound.GeoCompoundActivity
 import org.odk.collect.geo.geopoint.GeoPointActivity
 import org.odk.collect.geo.geopoint.GeoPointMapActivity
 import org.odk.collect.geo.geopoly.GeoPolyUtils.parseGeometry
+import org.odk.collect.maps.MapPoint
 import org.odk.collect.permissions.PermissionListener
 import org.odk.collect.permissions.PermissionsProvider
 import java.lang.Boolean.parseBoolean
 
 class ActivityGeoDataRequester(
     private val permissionsProvider: PermissionsProvider,
-    private val activity: FragmentActivity
+    private val activity: FragmentActivity,
+    private val formController: FormController?
 ) : GeoDataRequester {
 
     override fun requestGeoPoint(
@@ -69,6 +72,15 @@ class ActivityGeoDataRequester(
                         it.putBoolean(EXTRA_RETAIN_MOCK_ACCURACY, getAllowMockAccuracy(prompt))
                         it.putBoolean(EXTRA_READ_ONLY, prompt.isReadOnly)
                         it.putBoolean(EXTRA_DRAGGABLE_ONLY, hasPlacementMapAppearance(prompt))
+
+                        // smap - "history-map": show previously collected locations from the repeat
+                        val previousPoints = getPreviousPoints(prompt)
+                        if (previousPoints.isNotEmpty()) {
+                            it.putParcelableArrayList(
+                                GeoPointMapActivity.EXTRA_HISTORY_LOCATIONS,
+                                previousPoints
+                            )
+                        }
                     }
 
                     val intent = Intent(
@@ -127,6 +139,18 @@ class ActivityGeoDataRequester(
                 }
             }
         )
+    }
+
+    // smap - first point of each previous repeat instance for the "history-map" appearance
+    private fun getPreviousPoints(prompt: FormEntryPrompt): ArrayList<MapPoint> {
+        val points = ArrayList<MapPoint>()
+        for (value in HistoryMapUtils.getPreviousGeometryValues(formController, prompt)) {
+            val parsed = parseGeometry(value)
+            if (parsed.isNotEmpty()) {
+                points.add(parsed[0])
+            }
+        }
+        return points
     }
 
     private fun getAllowMockAccuracy(prompt: FormEntryPrompt): Boolean {
