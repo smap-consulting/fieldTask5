@@ -82,7 +82,7 @@ public class GeoPointMapActivity extends LocalizedActivity {
 
     // smap - "history-map": previously collected locations from earlier repeat instances
     public static final String EXTRA_HISTORY_LOCATIONS = "history_locations";
-    private static final String HISTORY_MARKER_COLOR = "#808080";
+    private static final String HISTORY_MARKER_COLOR = "#2962FF";
 
     protected Bundle previousState;
 

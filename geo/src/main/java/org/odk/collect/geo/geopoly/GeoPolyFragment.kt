@@ -232,7 +232,8 @@ class GeoPolyFragment @JvmOverloads constructor(
             map!!.addPolyLine(
                 LineDescription(
                     points = prevPoints,
-                    strokeColor = Color.parseColor("#80808080"),
+                    // Vivid blue keeps high contrast over both satellite imagery and street maps
+                    strokeColor = Color.parseColor("#CC2962FF"),
                     draggable = false
                 )
             )
