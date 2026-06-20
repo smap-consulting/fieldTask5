@@ -63,6 +63,7 @@ class FormEntryMenuProviderTest {
         backgroundLocationViewModel,
         backgroundAudioViewModel,
         settingsProvider,
+        { false },
         formEntryMenuClickListener
     )
 

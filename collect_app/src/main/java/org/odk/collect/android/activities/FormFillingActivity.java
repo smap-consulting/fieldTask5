@@ -404,6 +404,10 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             if (audioRecorder.isRecording() && !backgroundAudioViewModel.isBackgroundRecording()) {
                 // We want the user to stop recording before changing screens
                 DialogFragmentUtils.showIfNotShowing(RecordingWarningDialogFragment.class, getSupportFragmentManager());
+            } else if (isReadOnly()) {
+                // smap - Read only (e.g. referenced records). Back just closes the view without
+                // offering to save, so no editable case is created.
+                finishAndRemoveTask();
             } else {
                 QuitFormDialog.show(FormFillingActivity.this, formSaveViewModel, formEntryViewModel, settingsProvider, () -> {
                     saveForm(true, InstancesDaoHelper.isInstanceComplete(getFormController()), null, true);
@@ -500,6 +504,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 backgroundLocationViewModel,
                 backgroundAudioViewModel,
                 settingsProvider,
+                this::isReadOnly, // smap - hide Save in read only mode
                 new FormEntryMenuProvider.FormEntryMenuClickListener() {
                     @Override
                     public void changeLanguage() {
@@ -749,6 +754,23 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         Toolbar toolbar = findViewById(org.odk.collect.androidshared.R.id.toolbar);
         setSupportActionBar(toolbar);
         setTitle(getString(org.odk.collect.strings.R.string.loading_form));
+    }
+
+    /**
+     * smap - True when the form is opened read only, either at form level (read_only_survey)
+     * or for this opening only (e.g. referenced records). In this mode nothing is persisted,
+     * so exiting must not offer to save a draft.
+     */
+    private boolean isReadOnly() {
+        if (getIntent().getBooleanExtra(KEY_READ_ONLY, false)) {
+            return true;
+        }
+        Uri formUri = getIntent().getData();
+        if (formUri != null) {
+            Form form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri));
+            return form != null && "yes".equals(form.getReadOnly());
+        }
+        return false;
     }
 
     /**
@@ -1185,17 +1207,10 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             updateNavigationButtonVisibility();
         }
 
-        // Get form to check if it's read-only (smap)
-        Form form = null;
-        Uri formUri = getIntent().getData();
-        if (formUri != null) {
-            form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri));
-        }
         // Read only at form level (read_only_survey) or for this opening only (e.g. referenced
         // records).  Questions stay editable for viewing data, but the end screen offers Exit
         // instead of Save so nothing is persisted.
-        boolean readOnly = (form != null && "yes".equals(form.getReadOnly()))
-                || getIntent().getBooleanExtra(KEY_READ_ONLY, false);
+        boolean readOnly = isReadOnly();
 
         // Get smap settings for showing instance name and mark finalized checkbox (smap)
         boolean showInstanceName = (boolean) au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap.getInstance()

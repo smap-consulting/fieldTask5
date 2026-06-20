@@ -34,6 +34,7 @@ class FormEntryMenuProvider(
     private val backgroundLocationViewModel: BackgroundLocationViewModel,
     private val backgroundAudioViewModel: BackgroundAudioViewModel,
     private val settingsProvider: SettingsProvider,
+    private val isReadOnly: () -> Boolean, // smap - hide Save in read only mode
     private val formEntryMenuClickListener: FormEntryMenuClickListener
 ) : MenuProvider {
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -44,7 +45,7 @@ class FormEntryMenuProvider(
     override fun onPrepareMenu(menu: Menu) {
         val formController = formEntryViewModel.formController
 
-        var useability: Boolean = settingsProvider.getProtectedSettings().getBoolean(ProtectedProjectKeys.KEY_SAVE_MID)
+        var useability: Boolean = settingsProvider.getProtectedSettings().getBoolean(ProtectedProjectKeys.KEY_SAVE_MID) && !isReadOnly() // smap - no Save when read only
         menu.findItem(R.id.menu_save).isVisible = useability
 
         useability = settingsProvider.getProtectedSettings().getBoolean(ProtectedProjectKeys.KEY_JUMP_TO)
