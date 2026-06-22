@@ -49,4 +49,5 @@ object DatabaseInstanceColumns : BaseColumns {
     const val T_HIDE = "tHide" // Set true if task is to be hidden from view
     const val PHONE = "phone" // Phone number of task
     const val T_TASK_SRV_ID = "tTaskSrvId" // Server task ID from myassignments response
+    const val T_ASSIGNEE = "tAssignee" // User ident the underlying record is assigned to (references)
 }

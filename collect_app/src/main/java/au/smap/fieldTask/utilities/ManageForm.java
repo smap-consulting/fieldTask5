@@ -342,6 +342,7 @@ public class ManageForm {
         values.put(InstanceColumns.T_ADDRESS, ta.task.address);
         values.put(InstanceColumns.T_IS_SYNC, Utilities.STATUS_SYNC_YES);
         values.put(InstanceColumns.T_TASK_TYPE, ta.task.type);
+        values.put(InstanceColumns.T_ASSIGNEE, ta.task.assignee);
 
         // Add target location
         if (ta.location != null && ta.location.geometry != null && ta.location.geometry.coordinates != null && ta.location.geometry.coordinates.length >= 1) {

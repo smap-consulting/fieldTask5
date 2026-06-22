@@ -214,7 +214,14 @@ public class TaskRecyclerAdapter extends RecyclerView.Adapter<TaskRecyclerAdapte
 
         TextView taskStartText = view.findViewById(R.id.middletext);
         if (taskStartText != null) {
-            if (item.taskType != null && item.taskType.equals("case")) {
+            if (isReference) {
+                // References are read only - show who the underlying record is assigned to, if anyone
+                if (item.assignee != null && item.assignee.trim().length() > 0) {
+                    taskStartText.setText(context.getString(R.string.smap_reference_assigned_to, item.assignee));
+                } else {
+                    taskStartText.setText(context.getString(R.string.smap_reference_unassigned));
+                }
+            } else if (item.taskType != null && item.taskType.equals("case")) {
                 taskStartText.setText(item.displayName);
             } else {
                 String line2 = Utilities.getTaskTime(item.taskStatus, item.actFinish, item.taskStart);

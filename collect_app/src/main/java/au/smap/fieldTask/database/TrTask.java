@@ -16,6 +16,7 @@ public class TrTask {
     public Date scheduled_finish;
 	public String location_trigger;
 	public boolean repeat;			// Task can be completed multiple times
+	public String assignee;			// User ident the underlying record is assigned to (null if unassigned)
 	public String address;			// Key value pairs representing an unstructured address
 	public String status;
 	public int show_dist;

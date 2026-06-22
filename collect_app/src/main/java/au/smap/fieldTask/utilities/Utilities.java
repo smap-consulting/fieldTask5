@@ -475,7 +475,8 @@ public class Utilities {
                 InstanceColumns.SOURCE,
                 InstanceColumns.T_LOCATION_TRIGGER,
                 InstanceColumns.T_UPDATEID,
-                InstanceColumns.T_TASK_SRV_ID
+                InstanceColumns.T_TASK_SRV_ID,
+                InstanceColumns.T_ASSIGNEE
         };
 
         String selectClause;
@@ -564,6 +565,7 @@ public class Utilities {
                 entry.locationTrigger = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_LOCATION_TRIGGER));
                 entry.updateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
                 entry.taskId = c.getInt(c.getColumnIndexOrThrow(InstanceColumns.T_TASK_SRV_ID));
+                entry.assignee = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_ASSIGNEE));
                 entry.formDeleted = !activeFormIds.contains(entry.jrFormId);
 
                 // smap - delete orphan tasks that were downloaded from server but never opened
@@ -966,6 +968,7 @@ public class Utilities {
         values.put(InstanceColumns.T_ADDRESS, ta.task.address);
         values.put(InstanceColumns.T_LOCATION_TRIGGER, ta.task.location_trigger);
         values.put(InstanceColumns.T_TASK_TYPE, ta.task.type);   // smap ensure task type is updated for existing tasks
+        values.put(InstanceColumns.T_ASSIGNEE, ta.task.assignee);   // smap keep reference assignee fresh
 
         // Add task geofence values
         values.put(InstanceColumns.T_SHOW_DIST, ta.task.show_dist);
