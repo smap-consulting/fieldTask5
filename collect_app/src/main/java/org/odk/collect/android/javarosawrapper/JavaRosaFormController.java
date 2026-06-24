@@ -774,9 +774,13 @@ public class JavaRosaFormController implements FormController {
             List<FormEntryPrompt> questionList = new ArrayList<>();
             for (FormIndex indexInGroup : getIndicesForGroup(gd)) {
                 if (getEvent(indexInGroup) != FormEntryController.EVENT_QUESTION) {
+                    // getReference() can be null for some index types; guard so we throw the
+                    // intended RepeatsInFieldListException (handled by callers) rather than an NPE.
+                    TreeReference reference = indexInGroup.getReference();
                     throw new RepeatsInFieldListException("Repeats in 'field-list' groups " +
                             "are not supported. Please update the form design to remove the " +
-                            "following repeat from a field list: " + indexInGroup.getReference().toString(false));
+                            "following repeat from a field list: "
+                            + (reference != null ? reference.toString(false) : indexInGroup.toString()));
                 }
 
                 // we only display relevant questions
