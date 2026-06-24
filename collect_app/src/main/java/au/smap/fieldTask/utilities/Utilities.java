@@ -718,45 +718,53 @@ public class Utilities {
     }
 
     /*
-     * Delete any cases no longer assigned to this user
+     * Delete any cases and references no longer assigned to this user.
+     * Both are removed the same way: when a survey becomes inaccessible the server stops
+     * sending its cases and references, so any held on the phone that are not in the
+     * assignment list are cancelled (which hides them and closes them on the next refresh).
+     * The status is not flagged for sync, so the record is left untouched on the server -
+     * the change can be temporary (e.g. the user changed organisation).
      */
     public static void deleteUnassignedCases(List<TaskResponseAssignment> assignmentsToKeep) {
+        cancelUnassignedRecords(assignmentsToKeep, "case");
+        cancelUnassignedRecords(assignmentsToKeep, "reference");
+    }
 
-        List<TaskResponseAssignment> casesToKeep = new ArrayList<>();
+    private static void cancelUnassignedRecords(List<TaskResponseAssignment> assignmentsToKeep, String taskType) {
+
+        List<TaskResponseAssignment> toKeep = new ArrayList<>();
 
         if (assignmentsToKeep != null && !assignmentsToKeep.isEmpty()) {
             for (TaskResponseAssignment ta : assignmentsToKeep) {
-                if (ta.task.type != null && ta.task.type.equals("case")) {
-                    casesToKeep.add(ta);
+                if (ta.task.type != null && ta.task.type.equals(taskType)) {
+                    toKeep.add(ta);
                 }
             }
         }
 
         Uri dbUri = InstanceColumns.CONTENT_URI;
 
-        StringBuilder where = new StringBuilder(InstanceColumns.T_TASK_TYPE + " = 'case' and "
+        StringBuilder where = new StringBuilder(InstanceColumns.T_TASK_TYPE + " = ? and "
                 + InstanceColumns.SOURCE + " = ?");
         where.append(" and " + InstanceColumns.DELETED_DATE + " is null");
         where.append(" and " + T_TASK_STATUS + " != ?");
 
-        String[] whereArgs = new String[casesToKeep.size() + 2];
+        String[] whereArgs = new String[toKeep.size() + 3];
         int idx = 0;
+        whereArgs[idx++] = taskType;
         whereArgs[idx++] = Utilities.getSource();
         whereArgs[idx++] = Utilities.STATUS_T_CLOSED;
-        if (casesToKeep.size() > 0) {
+        if (toKeep.size() > 0) {
             where.append(" and " + InstanceColumns.T_UPDATEID + " not in (");
-            for (int i = 0; i < casesToKeep.size(); i++) {
+            for (int i = 0; i < toKeep.size(); i++) {
                 if (i > 0) {
                     where.append(",");
                 }
                 where.append("?");
-                whereArgs[idx++] = casesToKeep.get(i).task.update_id;
+                whereArgs[idx++] = toKeep.get(i).task.update_id;
             }
             where.append(")");
         }
-
-
-        InstanceProvider ip = new InstanceProvider();
 
         String obsoleteUpdateId;
         Cursor c = null;
@@ -766,7 +774,7 @@ public class Utilities {
                 c.moveToFirst();
                 do {
                     obsoleteUpdateId = c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
-                    markOldCaseCancelled(obsoleteUpdateId);
+                    markOldRecordCancelled(obsoleteUpdateId, taskType);
                 } while (c.moveToNext());
             }
         } finally {
@@ -865,18 +873,20 @@ public class Utilities {
     }
 
     /*
-     * Delete the previous copy of a case that has been replaced
+     * Mark a case or reference cancelled. The status is not flagged for sync so the record
+     * is hidden/closed locally but left in place on the server.
      */
-    public static void markOldCaseCancelled(String updateId) {
+    public static void markOldRecordCancelled(String updateId, String taskType) {
 
         Uri dbUri = InstanceColumns.CONTENT_URI;
 
-        String selectClause = InstanceColumns.T_TASK_TYPE + " = 'case' and "
+        String selectClause = InstanceColumns.T_TASK_TYPE + " = ? and "
                 + InstanceColumns.DELETED_DATE + " is null and "
                 + InstanceColumns.T_UPDATEID + " = ? and "
                 + InstanceColumns.SOURCE + " = ?";
 
         ArrayList<String> selectArgsList = new ArrayList<>();
+        selectArgsList.add(taskType);
         selectArgsList.add(updateId);
         selectArgsList.add(Utilities.getSource());
         String[] selectArgs = new String[selectArgsList.size()];
