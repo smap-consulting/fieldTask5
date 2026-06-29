@@ -761,16 +761,21 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
      * or for this opening only (e.g. referenced records). In this mode nothing is persisted,
      * so exiting must not offer to save a draft.
      */
+    private Boolean readOnly; // smap - cached, computed once (DB lookup) since used on every swipe
+
     private boolean isReadOnly() {
-        if (getIntent().getBooleanExtra(KEY_READ_ONLY, false)) {
-            return true;
+        if (readOnly == null) {
+            if (getIntent().getBooleanExtra(KEY_READ_ONLY, false)) {
+                readOnly = true;
+            } else {
+                Uri formUri = getIntent().getData();
+                Form form = formUri != null
+                        ? new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri))
+                        : null;
+                readOnly = form != null && "yes".equals(form.getReadOnly());
+            }
         }
-        Uri formUri = getIntent().getData();
-        if (formUri != null) {
-            Form form = new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri));
-            return form != null && "yes".equals(form.getReadOnly());
-        }
-        return false;
+        return readOnly;
     }
 
     /**
@@ -780,6 +785,11 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
      * see previous questions.
      */
     private void nonblockingCreateSavePointData() {
+        // smap - Read only views (e.g. referenced records) never persist, so don't create
+        // savepoints. Otherwise a leftover savepoint makes the app offer recovery next open.
+        if (isReadOnly()) {
+            return;
+        }
         try {
             Long formDbId = formSessionRepository.get(sessionId).getValue().getForm().getDbId();
             Long instanceDbId = null;
