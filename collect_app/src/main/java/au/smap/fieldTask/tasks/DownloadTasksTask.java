@@ -824,10 +824,17 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                             results.put(ta.task.title, Collect.getInstance().getString(R.string.smap_created));
                             publishProgress(ta.task.title, Integer.valueOf(count).toString(), Integer.valueOf(tr.taskAssignments.size())
                                     .toString());
-                        } else {
+                        } else if(ts == null) {
+                            // A record the phone does not yet have failed to download - report it
                             publishProgress(ta.task.title + " : Failed", Integer.valueOf(count).toString(), Integer.valueOf(tr.taskAssignments.size())
                                     .toString());
                             results.put(ta.task.title, "Creation failed: " + mfr.statusMsg );
+                        } else {
+                            // Re-download of an already-present case/reference failed (usually a
+                            // transient network error). The existing copy is preserved, so keep
+                            // it quietly and retry on the next refresh instead of alarming the user.
+                            Timber.w("Will retry next refresh - failed to update existing record %s: %s",
+                                    ta.task.title, mfr.statusMsg);
                         }
 
                     }
