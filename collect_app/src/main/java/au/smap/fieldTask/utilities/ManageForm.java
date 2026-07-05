@@ -258,52 +258,83 @@ public class ManageForm {
         ManageFormResponse mfResponse = new ManageFormResponse();
     	ManageFormDetails fd = getFormDetails(ta.task.form_id, null, source);    // Get the form details
 
-    	if(fd.exists) {
-
-			// If this is a case delete the existing case first
-			if(ta.task.type != null && ta.task.type.equals("case")) {
-				Utilities.deleteOldCase(ta.task.update_id);
-			}
-
-	  		 // Get the instance path
-	         instancePath = getInstancePath(fd.formPath, assignmentId, ta.task.update_id);
-	         if(instancePath != null && initialDataURL != null) {
-	        	 File f = new File(instancePath);
-                 try {
-                     Utilities smapUtilities = new Utilities();
-                     smapUtilities.downloadInstanceFile(f, initialDataURL, serverUrl, ta.task.form_id, version);
-                 } catch (Exception e) {
-                     e.printStackTrace();
-                     mfResponse.isError = true;
-                     mfResponse.statusMsg = getLocalizedString(Collect.getInstance(), R.string.smap_media_download, initialDataURL, instancePath)
-                             + " " + e.getMessage();
-                     return mfResponse;
-                 }
-
-	         }
-
-            if(ta.task.title == null) {
-                ta.task.title = "local: " + STFileUtils.getName(fd.formPath);
-            }
-
-	         // Write the new instance entry into the instance content provider
-	         try {
-	        	 mfResponse.mUri = writeInstanceDatabase(ta.task.form_id, fd.version, fd.formName, fd.submissionUri,
-                         instancePath, ta, fd.formPath);
-	         } catch (Throwable e) {
-	        	 e.printStackTrace();
-	       		 mfResponse.isError = true;
-	    		 mfResponse.statusMsg = "Unable to insert instance " + ta.task.form_id + " into instance database.";
-	        	 return mfResponse;
-	         }
-    	} else {
+    	if(!fd.exists) {
             mfResponse.isError = true;
-    	}
+            mfResponse.statusMsg = "Form not found on device: " + ta.task.form_id;
+            return mfResponse;
+        }
 
-         mfResponse.isError = false;
-         mfResponse.formPath = fd.formPath;
-         mfResponse.instancePath = instancePath;
-         return mfResponse;
+        boolean isCaseOrReference = ta.task.type != null
+                && (ta.task.type.equals("case") || ta.task.type.equals("reference"));
+
+        // Get the instance path - a new, timestamped folder
+        instancePath = getInstancePath(fd.formPath, assignmentId, ta.task.update_id);
+
+        // Download the instance data to the NEW path first.  Only once it succeeds do we
+        // delete any existing case / reference for this record, so a failed download on a
+        // slow link never destroys the copy already on the phone.
+        if(instancePath != null && initialDataURL != null) {
+            File f = new File(instancePath);
+            try {
+                Utilities smapUtilities = new Utilities();
+                smapUtilities.downloadInstanceFile(f, initialDataURL, serverUrl, ta.task.form_id, version);
+            } catch (Exception e) {
+                e.printStackTrace();
+                deleteInstanceFolder(instancePath);     // remove the partial download; leave the existing record intact
+                mfResponse.isError = true;
+                mfResponse.statusMsg = getLocalizedString(Collect.getInstance(), R.string.smap_media_download, initialDataURL, instancePath)
+                        + " " + e.getMessage();
+                return mfResponse;
+            }
+        }
+
+        // Download succeeded (or none required) - replace any existing case / reference for
+        // this record.  deleteOldCase matches on update_id so it removes just the old version.
+        if(isCaseOrReference) {
+            Utilities.deleteOldCase(ta.task.update_id);
+        }
+
+        if(ta.task.title == null) {
+            ta.task.title = "local: " + STFileUtils.getName(fd.formPath);
+        }
+
+        // Write the new instance entry into the instance content provider
+        try {
+            mfResponse.mUri = writeInstanceDatabase(ta.task.form_id, fd.version, fd.formName, fd.submissionUri,
+                    instancePath, ta, fd.formPath);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            mfResponse.isError = true;
+            mfResponse.statusMsg = "Unable to insert instance " + ta.task.form_id + " into instance database.";
+            return mfResponse;
+        }
+
+        mfResponse.isError = false;
+        mfResponse.formPath = fd.formPath;
+        mfResponse.instancePath = instancePath;
+        return mfResponse;
+    }
+
+    /*
+     * Best-effort removal of a partially-downloaded instance folder so a failed download
+     * does not leave orphan files behind. The folder is newly created for this download and
+     * not yet referenced by the instances database.
+     */
+    private void deleteInstanceFolder(String instancePath) {
+        try {
+            File dir = new File(instancePath).getParentFile();
+            if (dir != null && dir.exists()) {
+                File[] files = dir.listFiles();
+                if (files != null) {
+                    for (File child : files) {
+                        child.delete();
+                    }
+                }
+                dir.delete();
+            }
+        } catch (Exception e) {
+            Timber.e("Failed to clean up partial instance download: %s", e.getMessage());
+        }
     }
 
     private Uri writeInstanceDatabase(String jrformid, String jrVersion, String formName,
