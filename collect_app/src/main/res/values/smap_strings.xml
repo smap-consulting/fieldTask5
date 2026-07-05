@@ -75,6 +75,7 @@
     <string name="smap_add_comment">Add Comment</string>
     <string name="smap_clear_remote_cache">Clear remote cache</string>
     <string name="smap_new_forms">Look for new forms and tasks</string>
+    <string name="smap_retrying">Connection problem, retrying (%1$d/%2$d)…</string>
     <string name="smap_no_forms">No forms to download</string>
     <string name="smap_downloading">Downloading %1$d forms</string>
     <string name="smap_submitting">"Submitting %1$d finalised surveys"</string>

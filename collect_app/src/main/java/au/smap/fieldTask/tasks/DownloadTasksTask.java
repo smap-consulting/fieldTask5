@@ -55,6 +55,7 @@ import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 import org.odk.collect.metadata.PropertyManager;
 import org.odk.collect.android.notifications.NotificationManagerNotifier;
+import org.odk.collect.openrosa.http.HttpCredentialsInterface;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
 import org.odk.collect.openrosa.forms.OpenRosaXmlFetcher;
 import org.odk.collect.settings.keys.ProtectedProjectKeys;
@@ -85,6 +86,7 @@ import au.smap.fieldTask.utilities.Utilities;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -126,6 +128,10 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     String source = null;                           // Server name
     String taskURL = null;                          // Url to get tasks
     int count;                                      // Record number of deletes
+
+    // smap - retry transient network failures on slow/flaky connections
+    private static final int MAX_REFRESH_RETRIES = 3;           // total attempts
+    private static final long INITIAL_RETRY_BACKOFF_MS = 2000;  // doubled each retry
 
     @Inject
     OpenRosaHttpInterface httpInterface;
@@ -394,7 +400,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 headers.put("Cache-Control", "no-cache");
 
                 URI uri = URI.create(taskURL);
-                String resp = httpInterface.getRequest(uri, "application/json", webCredentialsUtils.getCredentials(uri), headers);
+                String resp = getTasksWithRetry(uri, headers);
                 GsonBuilder gb = new GsonBuilder().registerTypeAdapter(Date.class, new DateDeserializer());
                 gson = gb.create();
 
@@ -490,6 +496,42 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 	        	results.put(Collect.getInstance().getString(R.string.smap_error) + ":", msg );
 
 	        }
+        }
+    }
+
+    /**
+     * smap - Fetch tasks from the server, retrying transient network failures with
+     * exponential back-off. On slow/flaky connections the socket can be aborted
+     * mid-transfer (e.g. "Software caused connection abort"); such IOExceptions are
+     * retried. Non-network errors fail fast. Honours cancellation between attempts.
+     */
+    private String getTasksWithRetry(URI uri, HashMap<String, String> headers) throws Exception {
+        HttpCredentialsInterface credentials = webCredentialsUtils.getCredentials(uri);
+        long backoff = INITIAL_RETRY_BACKOFF_MS;
+        int attempt = 0;
+        while (true) {
+            try {
+                return httpInterface.getRequest(uri, "application/json", credentials, headers);
+            } catch (IOException e) {
+                attempt++;
+                if (attempt >= MAX_REFRESH_RETRIES || isCancelled()) {
+                    throw e;
+                }
+                Timber.w("Refresh network error (attempt %d/%d): %s - retrying in %dms",
+                        attempt, MAX_REFRESH_RETRIES, e.getMessage(), backoff);
+                publishProgress(Collect.getInstance().getString(
+                        R.string.smap_retrying, attempt, MAX_REFRESH_RETRIES));
+                try {
+                    Thread.sleep(backoff);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw e;
+                }
+                if (isCancelled()) {
+                    throw new CancelException("cancelled");
+                }
+                backoff *= 2;
+            }
         }
     }
 
