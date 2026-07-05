@@ -43,6 +43,7 @@ public class TaskEntry {
     public Boolean readOnly = false;
     public boolean formDeleted = false;  // True if the parent form has been soft-deleted
     public String assignee;  // User ident the underlying record is assigned to (references)
+    public long uploadTime;  // Server _upload_time (epoch ms) of the record last downloaded
     //public String geometryXPath;  // Disable
 
 

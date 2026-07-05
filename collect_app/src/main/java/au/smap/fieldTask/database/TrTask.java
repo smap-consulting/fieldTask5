@@ -21,6 +21,7 @@ public class TrTask {
 	public String status;
 	public int show_dist;
 	public String phone;
+	public long update_time;		// Server _upload_time (epoch ms) of the latest record; re-download cases/references only when this increases
 
 	// Backward compatability
 	public String type;

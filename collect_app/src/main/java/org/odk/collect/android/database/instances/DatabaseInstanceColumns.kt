@@ -50,4 +50,5 @@ object DatabaseInstanceColumns : BaseColumns {
     const val PHONE = "phone" // Phone number of task
     const val T_TASK_SRV_ID = "tTaskSrvId" // Server task ID from myassignments response
     const val T_ASSIGNEE = "tAssignee" // User ident the underlying record is assigned to (references)
+    const val T_UPLOAD_TIME = "tUploadTime" // Server _upload_time (epoch ms) of the record last downloaded; used to skip unchanged cases/references
 }

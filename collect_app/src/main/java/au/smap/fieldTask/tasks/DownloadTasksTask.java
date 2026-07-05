@@ -166,10 +166,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         public long tid;
         public String status;
         public boolean keep;
+        public long uploadTime;     // smap - server _upload_time of the record last downloaded
 
-        public TaskStatus(long tid, String status) {
+        public TaskStatus(long tid, String status, long uploadTime) {
             this.tid = tid;
             this.status = status;
+            this.uploadTime = uploadTime;
             keep = false;
         }
     }
@@ -367,7 +369,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                  */
                 Utilities.getTasks(tasks, false, ApplicationConstants.SortingOrder.BY_NAME_ASC, "", true, false, true);
                 for(TaskEntry t : tasks) {
-                    taskMap.put(getTaskCaseString(t.taskType, t.assId, t.updateId), new TaskStatus(t.id, t.taskStatus));
+                    taskMap.put(getTaskCaseString(t.taskType, t.assId, t.updateId), new TaskStatus(t.id, t.taskStatus, t.uploadTime));
                 }
 
                 /*
@@ -781,12 +783,17 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 // Find out if this task is already on the phone
                 TaskStatus ts = getExistingTaskStatus(ta.task.type, assignment.assignment_id, ta.task.update_id);
                 /*
-                 * If this is a new task or a case that has not been rejected then get it from the server
+                 * Download from the server when this is a new task, or when it is a case /
+                 * reference (not rejected) whose record has changed on the server. Change is
+                 * detected via the server's _upload_time (update_time); an unchanged case /
+                 * reference is left untouched to avoid needless re-downloads on slow links.
                  */
+                boolean isCaseOrReference = ta.task.type != null
+                        && (ta.task.type.equals("case") || ta.task.type.equals("reference"));
+                boolean serverRecordIsNewer = ts != null && ta.task.update_time > ts.uploadTime;
                 if(ts == null ||
-                        (ta.task.type != null && ta.task.type.equals("case")) && !ts.status.equals(Utilities.STATUS_T_REJECTED)) {
-                    Timber.i("New task: %s", assignment.assignment_id);
-                    // New task
+                        (isCaseOrReference && !ts.status.equals(Utilities.STATUS_T_REJECTED) && serverRecordIsNewer)) {
+                    Timber.i("New or updated task/case: %s", assignment.assignment_id);
                     if(assignment.assignment_status.equals(Utilities.STATUS_T_ACCEPTED) ||
                             assignment.assignment_status.equals(Utilities.STATUS_T_NEW)) {
 
