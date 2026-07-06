@@ -52,6 +52,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import org.odk.collect.material.MaterialProgressDialogFragment;
 
 import org.odk.collect.android.R;
+import au.smap.fieldTask.viewmodels.RefreshViewModel;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModel;
 import au.smap.fieldTask.viewmodels.SurveyDataViewModelFactory;
 import au.smap.fieldTask.adapters.ViewPagerAdapter;
@@ -62,11 +63,9 @@ import au.smap.fieldTask.fragments.SmapTaskMapFragment;
 import au.smap.fieldTask.fragments.dialogs.RequestLocationPermissionsDialogSmap;
 import org.odk.collect.android.formmanagement.FormFillingIntentFactory;
 import org.odk.collect.android.injection.DaggerUtils;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
 import org.odk.collect.android.projects.ProjectsDataService;
 
 import au.smap.fieldTask.listeners.NFCListener;
-import au.smap.fieldTask.listeners.TaskDownloaderListener;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.permissions.PermissionsProvider;
@@ -78,15 +77,12 @@ import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
 import au.smap.fieldTask.services.LocationService;
-import au.smap.fieldTask.formmanagement.ServerFormDetailsSmap;
-import au.smap.fieldTask.listeners.DownloadFormsTaskListenerSmap;
 import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import au.smap.fieldTask.models.FormLaunchDetail;
 import au.smap.fieldTask.models.FormRestartDetails;
 import au.smap.fieldTask.models.NfcTrigger;
-import au.smap.fieldTask.tasks.DownloadTasksTask;
 import au.smap.fieldTask.tasks.NdefReaderTask;
 import au.smap.fieldTask.utilities.ManageForm;
 import org.odk.collect.androidshared.ui.multiclicksafe.MultiClickGuard;
@@ -95,7 +91,6 @@ import au.smap.fieldTask.utilities.Utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -112,15 +107,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.odk.collect.android.databinding.SmapMainLayoutBinding;
 import timber.log.Timber;
 
-public class SmapMain extends CollectAbstractActivity implements TaskDownloaderListener,
-        NFCListener,
-        InstanceUploaderListener,
-        DownloadFormsTaskListenerSmap {
+public class SmapMain extends CollectAbstractActivity implements NFCListener {
 
     private static final String PROGRESS_DIALOG_TAG = "progressDialog";
     private static final int COMPLETE_FORM = 4;
 
-    private String mAlertMsg;
     private boolean mPaused = false;
 
     public static final String EXTRA_REFRESH = "refresh";
@@ -136,8 +127,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     public NdefReaderTask mReadNFC;
     public ArrayList<NfcTrigger> nfcTriggersList;   // nfcTriggers (geofence should have separate list)
 
-    private String mProgressMsg;
-    public DownloadTasksTask mDownloadTasks;
+    private RefreshViewModel refreshViewModel;
 
     SurveyDataViewModel model;
     private MainTaskListener listener = null;
@@ -239,11 +229,15 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         stateChanged();
 
-        // smap - After the activity is recreated (e.g. the screen was locked during or after a
-        // refresh) the FragmentManager restores the sync progress dialog with its last message.
-        // If no refresh is actually running the dialog is orphaned - the task completed against
-        // the previous activity instance and can no longer dismiss it - so clear it here.
-        if (savedInstanceState != null && !Collect.getInstance().isDownloading()) {
+        // smap - The refresh is owned by a ViewModel so it survives activity recreation
+        // (rotation / screen lock). Observe its state and re-attach the progress dialog / result.
+        refreshViewModel = new ViewModelProvider(this).get(RefreshViewModel.class);
+        observeRefresh();
+
+        // If the activity was recreated after the refresh already finished, dismiss the sync
+        // progress dialog the FragmentManager restored (belt-and-braces; also covers the case
+        // where the ViewModel itself was cleared, e.g. "Don't keep activities").
+        if (savedInstanceState != null && !refreshViewModel.isRunning()) {
             dismissProgressDialog();
         }
 
@@ -431,17 +425,12 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
     // Get tasks and forms from the server
     public void processGetTask(boolean manual) {
-
-      if(manual || autoSendSettingsProvider.isAutoSendEnabledInSettings(null)) {
-            mDownloadTasks = new DownloadTasksTask();
-            if(manual) {
-                mProgressMsg = getString(R.string.smap_synchronising);
-                if (!this.isFinishing()) {
-                    showProgressDialog(mProgressMsg);
-                }
-                mDownloadTasks.setDownloaderListener(this, this);
-            }
-            mDownloadTasks.execute();
+        if (manual || autoSendSettingsProvider.isAutoSendEnabledInSettings(null)) {
+            // A manual refresh shows progress and a result alert; an auto-send refresh runs silently.
+            // The ViewModel owns the task so it survives recreation; the progress dialog is driven
+            // by the observers below.
+            String initialMessage = manual ? getString(R.string.smap_synchronising) : null;
+            refreshViewModel.startRefresh(manual, initialMessage);
         }
     }
 
@@ -469,9 +458,7 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
      * smap
      */
     public void cancelSync() {
-        if (mDownloadTasks != null) {
-            mDownloadTasks.cancel(true);
-        }
+        refreshViewModel.cancel();
     }
 
     /**
@@ -551,50 +538,42 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
     }
 
     /*
-     * Forms Downloading Overrides
+     * Refresh (task download) UI - driven by RefreshViewModel so it survives activity recreation.
+     * Because the ViewModel is the task's listener, these observers just re-attach on recreation.
      */
-    @Override
-    public void formsDownloadingComplete(Map<ServerFormDetailsSmap, String> result) {
-        // Ignore formsDownloading is called synchronously from taskDownloader
+    private void observeRefresh() {
+        // Progress messages - shown only for a manual refresh, and only while it is running.
+        refreshViewModel.getProgress().observe(this, message -> {
+            if (message != null && refreshViewModel.isManualRefresh() && refreshViewModel.isRunning()) {
+                showOrUpdateProgressDialog(message);
+            }
+        });
+
+        // Completion or cancellation - dismiss the dialog and, for a manual refresh, show the result.
+        refreshViewModel.getResult().observe(this, event -> {
+            if (event == null || event.isConsumed()) {
+                return;
+            }
+            onRefreshComplete(event.consume());
+        });
     }
 
-    @Override
-    public void progressUpdate(String currentFile, int progress, int total) {
-        mProgressMsg = getString(R.string.smap_checking_file, currentFile, String.valueOf(progress), String.valueOf(total));
-        if (!isFinishing() && !isDestroyed()) {
-            MaterialProgressDialogFragment dialog =
+    private void showOrUpdateProgressDialog(String message) {
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+        MaterialProgressDialogFragment dialog =
                 (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
-            if (dialog != null) {
-                dialog.setMessage(mProgressMsg);
-            }
+        if (dialog == null) {
+            showProgressDialog(message);
+        } else {
+            dialog.setMessage(message);
         }
     }
 
-    @Override
-    public void formsDownloadingCancelled() {
-       // ignore
-    }
+    private void onRefreshComplete(HashMap<String, String> result) {
 
-    /*
-     * Task Download overrides
-     */
-    @Override
-    // Download tasks progress update
-    public void progressUpdate(String progress) {
-        if(mProgressMsg != null && !isFinishing() && !isDestroyed()) {
-            mProgressMsg = progress;
-            MaterialProgressDialogFragment dialog =
-                (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
-            if (dialog != null) {
-                dialog.setMessage(mProgressMsg);
-            }
-        }
-    }
-
-    @Override
-    public void taskDownloadingComplete(HashMap<String, String> result) {
-
-        Timber.i("Complete - Send intent");
+        Timber.i("Refresh complete");
 
         // Refresh instances data after sync (forms may have been soft-deleted)
         java.util.concurrent.Executors.newSingleThreadExecutor().execute(() ->
@@ -608,68 +587,41 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
             Timber.w(e, "Unexpected error dismissing dialog");
         }
 
-        if (result != null) {
-            StringBuilder message = new StringBuilder();
-            Set<String> keys = result.keySet();
-            Iterator<String> it = keys.iterator();
-
-            while (it.hasNext()) {
-                String key = it.next();
-                String m = result.get(key);
-                if (key.equals("err_not_enabled")) {
-                    message.append(this.getString(R.string.smap_tasks_not_enabled));
-                } else if (key.equals("err_no_tasks")) {
-                    // No tasks is fine, in fact its the most common state
-                } else if (key.equals("Error:") && m != null && m.startsWith("403")) {
-                    message.append(this.getString(R.string.smap_unauth));
-                } else {
-                    message.append(key).append(" - ").append(m).append("\n\n");
-                }
-            }
-
-            mAlertMsg = message.toString().trim();
-            if (mAlertMsg.length() > 0) {
-                try {
-                    if (!isFinishing() && !isDestroyed()) {
-                        new MaterialAlertDialogBuilder(SmapMain.this)
-                                .setTitle(R.string.smap_get_tasks)
-                                .setMessage(mAlertMsg)
-                                .setCancelable(true)
-                                .setNeutralButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> dialog.dismiss())
-                                .show();
-                    }
-                } catch (Exception e) {
-                    Timber.e(e);
-                    // Tried to show a dialog but the activity may have been closed
-                }
-            }
-
+        // Only a manual refresh reports its outcome to the user
+        if (!refreshViewModel.isManualRefresh() || result == null) {
+            return;
         }
-    }
 
-    /*
-     * Uploading overrides
-     */
-    @Override
-    public void uploadingComplete(HashMap<String, String> result) {
-        // Upload complete - no action needed here
-    }
-
-    @Override
-    public void progressUpdate(int progress, int total) {
-        mAlertMsg = getString(org.odk.collect.strings.R.string.sending_items, String.valueOf(progress), String.valueOf(total));
-        if (!isFinishing() && !isDestroyed()) {
-            MaterialProgressDialogFragment dialog =
-                (MaterialProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(PROGRESS_DIALOG_TAG);
-            if (dialog != null) {
-                dialog.setMessage(mAlertMsg);
+        StringBuilder message = new StringBuilder();
+        for (String key : result.keySet()) {
+            String m = result.get(key);
+            if (key.equals("err_not_enabled")) {
+                message.append(this.getString(R.string.smap_tasks_not_enabled));
+            } else if (key.equals("err_no_tasks")) {
+                // No tasks is fine, in fact its the most common state
+            } else if (key.equals("Error:") && m != null && m.startsWith("403")) {
+                message.append(this.getString(R.string.smap_unauth));
+            } else {
+                message.append(key).append(" - ").append(m).append("\n\n");
             }
         }
-    }
 
-    @Override
-    public void authRequest(Uri url, HashMap<String, String> doneSoFar) {
-        // Auth request - handled by parent class
+        String alertMsg = message.toString().trim();
+        if (alertMsg.length() > 0) {
+            try {
+                if (!isFinishing() && !isDestroyed()) {
+                    new MaterialAlertDialogBuilder(SmapMain.this)
+                            .setTitle(R.string.smap_get_tasks)
+                            .setMessage(alertMsg)
+                            .setCancelable(true)
+                            .setNeutralButton(org.odk.collect.strings.R.string.ok, (dialog, which) -> dialog.dismiss())
+                            .show();
+                }
+            } catch (Exception e) {
+                Timber.e(e);
+                // Tried to show a dialog but the activity may have been closed
+            }
+        }
     }
 
     /*
