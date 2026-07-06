@@ -239,6 +239,14 @@ public class SmapMain extends CollectAbstractActivity implements TaskDownloaderL
 
         stateChanged();
 
+        // smap - After the activity is recreated (e.g. the screen was locked during or after a
+        // refresh) the FragmentManager restores the sync progress dialog with its last message.
+        // If no refresh is actually running the dialog is orphaned - the task completed against
+        // the previous activity instance and can no longer dismiss it - so clear it here.
+        if (savedInstanceState != null && !Collect.getInstance().isDownloading()) {
+            dismissProgressDialog();
+        }
+
         // Show login status if it was set
         String login_status = getIntent().getStringExtra(LOGIN_STATUS);
         if(login_status != null) {
