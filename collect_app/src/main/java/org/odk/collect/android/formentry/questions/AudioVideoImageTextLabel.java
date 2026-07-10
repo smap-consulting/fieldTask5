@@ -159,7 +159,9 @@ public class AudioVideoImageTextLabel extends RelativeLayout implements View.OnC
     }
 
     public void playVideo() {
-        mediaUtils.openFile(getContext(), videoFile, "video/*");
+        if (videoFile != null) {  // smap: guard against autoplay="video" with no video file
+            mediaUtils.openFile(getContext(), videoFile, "video/*");
+        }
     }
 
     public TextView getLabelTextView() {
