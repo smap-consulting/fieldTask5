@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
 import org.odk.collect.analytics.Analytics
 import org.odk.collect.android.R
+import org.odk.collect.android.activities.ActivityUtils
+import org.odk.collect.android.activities.CrashHandlerActivity
 import org.odk.collect.android.activities.FormEntryViewModelFactory
 import org.odk.collect.android.application.CollectComposeThemeProvider
 import org.odk.collect.android.entities.EntitiesRepositoryProvider
@@ -22,6 +24,7 @@ import org.odk.collect.android.utilities.SavepointsRepositoryProvider
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
 import org.odk.collect.async.Scheduler
 import org.odk.collect.audiorecorder.recording.AudioRecorder
+import org.odk.collect.crashhandler.CrashHandler
 import org.odk.collect.location.LocationClient
 import org.odk.collect.permissions.PermissionsChecker
 import org.odk.collect.permissions.PermissionsProvider
@@ -111,6 +114,15 @@ class FormHierarchyFragmentHostActivity : LocalizedActivity(), CollectComposeThe
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // smap - activity can be recreated after process death before the app has
+        // initialized (e.g. failed init/crash), leaving the Dagger component null
+        val crashHandler = CrashHandler.getInstance(this)
+        if (crashHandler != null && crashHandler.hasCrashed(this)) {
+            super.onCreate(null)
+            ActivityUtils.startActivityAndCloseAllOthers(this, CrashHandlerActivity::class.java)
+            return
+        }
+
         DaggerUtils.getComponent(this).inject(this)
 
         val viewOnly = intent.getBooleanExtra(EXTRA_VIEW_ONLY, false)
