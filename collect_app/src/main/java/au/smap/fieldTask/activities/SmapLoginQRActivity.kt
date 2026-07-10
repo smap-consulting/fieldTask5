@@ -40,8 +40,10 @@ class SmapLoginQRActivity : LocalizedActivity(), CollectComposeThemeProvider {
     }
 
     private fun showScannerFragment() {
+        // smap: permission result can arrive after onSaveInstanceState (e.g. activity
+        // backgrounded during the grant); commit() would then crash, so allow state loss.
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, SmapLoginQRScannerFragment())
-            .commit()
+            .commitAllowingStateLoss()
     }
 }
