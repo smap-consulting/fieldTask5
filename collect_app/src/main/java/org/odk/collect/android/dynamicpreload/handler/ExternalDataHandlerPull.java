@@ -133,19 +133,22 @@ public class ExternalDataHandlerPull extends ExternalDataHandlerBase {
             }
         }
 
+        boolean noValidRecord = false; // smap - true when a numeric record index is out of range (e.g. unbound position())
         if (multiSelect) {
             try {
                 // Support legacy function values
                 if (fn.equals("-1")) { // legacy
                     fn = FN_COUNT;
-                } else if (fn.equals("0")) { // legacy
-                    fn = FN_LIST;
                 }
 
                 /*
                  * If the function is a number greater than 0 then set the function to "index",
-                 * if less than 0 set it to "count" otherwise if equal to 0 then it should be "list"
-                 * if it is not a number then it will not be changed
+                 * if less than 0 set it to "count".  A numeric value of 0 is not a valid record
+                 * index - this occurs when position() is evaluated against an unbound repeat
+                 * reference (JavaRosa returns 0).  There is no record to return in that case, so
+                 * flag it and return "" below rather than falling back to "list", which would
+                 * concatenate every matching value (and break date() casts).  Explicit list mode
+                 * is unaffected because it uses the 'list' token, not a numeric value.
                  */
                 try {
                     index = Integer.parseInt(fn);
@@ -154,16 +157,19 @@ public class ExternalDataHandlerPull extends ExternalDataHandlerBase {
                     } else if (index < 0) {
                         fn = FN_COUNT;
                     } else {
-                        fn = FN_LIST;
+                        noValidRecord = true; // smap - numeric 0 -> no record (unbound / out of range)
                     }
                 } catch (Exception e) {
-                    // Not a number, keep fn as is
+                    // Not a number, keep fn as is (list, count, index, sum, ...)
                 }
             } catch (Exception e) {
                 fn = FN_LIST; // default
             }
         }
         // smap
+        if (noValidRecord) { // smap - return empty rather than listing all matches
+            return "";
+        }
 
         // SCTO-545
         dataSetName = normalize(dataSetName);
