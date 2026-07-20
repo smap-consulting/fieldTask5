@@ -358,6 +358,12 @@ public class SmapTaskListFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             ((SmapMain) getActivity()).processGetTask(true);
         });
+        // smap - the RecyclerView is wrapped in a FrameLayout (to hold the empty view), and that
+        // FrameLayout is what SwipeRefreshLayout picks as its scroll target. A plain FrameLayout
+        // never reports that it can scroll, so without this every downward drag would be taken as
+        // a refresh instead of scrolling the list back up. Ask the real scrolling view instead.
+        swipeRefreshLayout.setOnChildScrollUpCallback((parent, child) ->
+                recyclerView != null && recyclerView.canScrollVertically(-1));
 
         // Set up the Tasks / References toggle (only shown when references exist)
         filterGroup = view.findViewById(R.id.task_filter_group);

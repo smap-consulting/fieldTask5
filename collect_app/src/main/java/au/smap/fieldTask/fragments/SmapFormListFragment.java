@@ -156,6 +156,13 @@ public class SmapFormListFragment extends ListFragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             ((SmapMain) getActivity()).processGetTask(true);
         });
+        // smap - the ListView is wrapped in a FrameLayout (to hold the empty view), and that
+        // FrameLayout is what SwipeRefreshLayout picks as its scroll target. A plain FrameLayout
+        // never reports that it can scroll, so without this every downward drag would be taken as
+        // a refresh instead of scrolling the list back up. Ask the real scrolling view instead.
+        final ListView listView = view.findViewById(android.R.id.list);
+        swipeRefreshLayout.setOnChildScrollUpCallback((parent, child) ->
+                listView != null && listView.canScrollVertically(-1));
 
         model = getViewMode();
         model.getSurveyData().observe(getViewLifecycleOwner(), surveyData -> {
