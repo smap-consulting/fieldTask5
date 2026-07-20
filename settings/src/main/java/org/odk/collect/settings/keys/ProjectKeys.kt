@@ -114,4 +114,5 @@ object ProjectKeys {
     const val KEY_SMAP_IM_RI = "smap_im_ri"
     const val KEY_SMAP_IM_ACC = "smap_im_acc"
     const val KEY_SMAP_REQUEST_LOCATION_DONE = "smap_request_location_done"
+    const val KEY_SMAP_SUBMISSION_AUTH_FAILED_AT = "smap_submission_auth_failed_at" // System time in milli seconds that the server last rejected our credentials on submission
 }

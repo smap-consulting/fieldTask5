@@ -49,11 +49,17 @@ import timber.log.Timber;
 
 public class InstanceServerUploader extends InstanceUploader {
     private static final String URL_PATH_SEP = "/";
+    private static final long DEFAULT_CONTENT_LENGTH = 10000000L;
 
     private final OpenRosaHttpInterface httpInterface;
     private final WebCredentialsUtils webCredentialsUtils;
     private final Settings generalSettings;
     private final Map<Uri, Uri> uriRemap = new HashMap<>();
+
+    // smap - content length accepted by the server, learned from the HEAD response. Held across
+    // the batch so instances that skip their own HEAD (because the URL is already resolved)
+    // still use the server's value rather than the default.
+    private long acceptContentLength = DEFAULT_CONTENT_LENGTH;
 
     public InstanceServerUploader(OpenRosaHttpInterface httpInterface,
                                   WebCredentialsUtils webCredentialsUtils,
@@ -62,6 +68,117 @@ public class InstanceServerUploader extends InstanceUploader {
         this.httpInterface = httpInterface;
         this.webCredentialsUtils = webCredentialsUtils;
         this.generalSettings = generalSettings;
+    }
+
+    /**
+     * smap - Confirms the server will accept our credentials before a batch is uploaded.
+     * <p>
+     * Costs a single HEAD request. Throws {@link FormUploadAuthRequestedException} if the
+     * server rejects the credentials, letting the caller abandon the whole batch instead of
+     * discovering the same rejection once per instance. On success the resolved URL and the
+     * accepted content length are cached, so instances submitting to this URL skip their own
+     * HEAD request.
+     */
+    public void checkSubmissionAuth(String urlString) throws FormUploadException {
+        resolveSubmissionUri(urlString);
+    }
+
+    /**
+     * Issues the OpenRosa HEAD request for a submission URL to confirm the endpoint, learn the
+     * accepted content length and resolve any redirect. The result is cached in
+     * {@link #uriRemap} so it is issued at most once per URL per batch.
+     * <p>
+     * smap - extracted from uploadOneSubmission so it can also be used as a pre-batch
+     * authentication probe. No instance file is read before this succeeds.
+     */
+    private Uri resolveSubmissionUri(String urlString) throws FormUploadException {
+        Uri submissionUri = Uri.parse(urlString);
+
+        // We already issued a head request and got a response, so we know it was an
+        // OpenRosa-compliant server. We also know the proper URL to send the submission to and
+        // the proper scheme.
+        if (uriRemap.containsKey(submissionUri)) {
+            Uri remapped = uriRemap.get(submissionUri);
+            Timber.i("Using Uri remap for submission. Now: %s", remapped.toString());
+            return remapped;
+        }
+
+        if (submissionUri.getHost() == null) {
+            throw new FormUploadException(FAIL + "Host name may not be null");
+        }
+
+        URI uri;
+        try {
+            uri = URI.create(submissionUri.toString());
+        } catch (IllegalArgumentException e) {
+            Timber.d(e.getMessage() != null ? e.getMessage() : e.toString());
+            throw new FormUploadException(getLocalizedString(Collect.getInstance(), org.odk.collect.strings.R.string.url_error));
+        }
+
+        HttpHeadResult headResult;
+        CaseInsensitiveHeaders responseHeaders;
+        try {
+            headResult = httpInterface.executeHeadRequest(uri, webCredentialsUtils.getCredentials(uri));
+            responseHeaders = headResult.getHeaders();
+
+            if (responseHeaders.containsHeader(OpenRosaConstants.ACCEPT_CONTENT_LENGTH_HEADER)) {
+                String contentLengthString = responseHeaders.getAnyValue(OpenRosaConstants.ACCEPT_CONTENT_LENGTH_HEADER);
+                try {
+                    acceptContentLength = Long.parseLong(contentLengthString);
+                } catch (Exception e) {
+                    Timber.e(e, "Exception thrown parsing contentLength %s", contentLengthString);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new FormUploadException(FAIL
+                    + (e.getMessage() != null ? e.getMessage() : e.toString()));
+        }
+
+        // Only 401 means our credentials are no good for the server as a whole. A 403 applies to
+        // this instance's survey alone, so it must not abort the batch or trip the auth gate - it
+        // falls through and is reported against the individual instance.
+        if (headResult.getStatusCode() == HttpsURLConnection.HTTP_UNAUTHORIZED) {
+            throw new FormUploadAuthRequestedException(getLocalizedString(Collect.getInstance(), org.odk.collect.strings.R.string.server_auth_credentials, submissionUri.getHost()),
+                    submissionUri);
+        } else if (headResult.getStatusCode() == HttpsURLConnection.HTTP_NO_CONTENT) {
+            // Redirect header received
+            if (responseHeaders.containsHeader("Location")) {
+                try {
+                    Uri newURI = Uri.parse(URLDecoder.decode(responseHeaders.getAnyValue("Location"), "utf-8"));
+                    // Allow redirects within same host. This could be redirecting to HTTPS.
+                    if (submissionUri.getHost().equalsIgnoreCase(newURI.getHost())) {
+                        // Re-add params if server didn't respond with params
+                        if (newURI.getQuery() == null) {
+                            newURI = newURI.buildUpon()
+                                    .encodedQuery(submissionUri.getEncodedQuery())
+                                    .build();
+                        }
+                        uriRemap.put(submissionUri, newURI);
+                        submissionUri = newURI;
+                    } else {
+                        // Don't follow a redirection attempt to a different host.
+                        // We can't tell if this is a spoof or not.
+                        throw new FormUploadException(FAIL
+                                + "Unexpected redirection attempt to a different host: "
+                                + newURI.toString());
+                    }
+                } catch (FormUploadException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new FormUploadException(FAIL + urlString + " " + e.toString());
+                }
+            }
+        } else {
+            if (headResult.getStatusCode() >= HttpsURLConnection.HTTP_OK
+                    && headResult.getStatusCode() < HttpsURLConnection.HTTP_MULT_CHOICE) {
+                throw new FormUploadException("Failed to send to " + uri + ". Is this an OpenRosa " +
+                        "submission endpoint? If you have a web proxy you may need to log in to " +
+                        "your network.\n\nHEAD request result status code: " + headResult.getStatusCode());
+            }
+        }
+
+        return submissionUri;
     }
 
     /**
@@ -74,88 +191,8 @@ public class InstanceServerUploader extends InstanceUploader {
     public String uploadOneSubmission(Instance instance, String urlString) throws FormUploadException {
         markSubmissionFailed(instance);
 
-        Uri submissionUri = Uri.parse(urlString);
-
-        long contentLength = 10000000L;
-
-        // We already issued a head request and got a response, so we know it was an
-        // OpenRosa-compliant server. We also know the proper URL to send the submission to and
-        // the proper scheme.
-        if (uriRemap.containsKey(submissionUri)) {
-            submissionUri = uriRemap.get(submissionUri);
-            Timber.i("Using Uri remap for submission %s. Now: %s", instance.getDbId(),
-                    submissionUri.toString());
-        } else {
-            if (submissionUri.getHost() == null) {
-                throw new FormUploadException(FAIL + "Host name may not be null");
-            }
-
-            URI uri;
-            try {
-                uri = URI.create(submissionUri.toString());
-            } catch (IllegalArgumentException e) {
-                Timber.d(e.getMessage() != null ? e.getMessage() : e.toString());
-                throw new FormUploadException(getLocalizedString(Collect.getInstance(), org.odk.collect.strings.R.string.url_error));
-            }
-
-            HttpHeadResult headResult;
-            CaseInsensitiveHeaders responseHeaders;
-            try {
-                headResult = httpInterface.executeHeadRequest(uri, webCredentialsUtils.getCredentials(uri));
-                responseHeaders = headResult.getHeaders();
-
-                if (responseHeaders.containsHeader(OpenRosaConstants.ACCEPT_CONTENT_LENGTH_HEADER)) {
-                    String contentLengthString = responseHeaders.getAnyValue(OpenRosaConstants.ACCEPT_CONTENT_LENGTH_HEADER);
-                    try {
-                        contentLength = Long.parseLong(contentLengthString);
-                    } catch (Exception e) {
-                        Timber.e(e, "Exception thrown parsing contentLength %s", contentLengthString);
-                    }
-                }
-
-            } catch (Exception e) {
-                throw new FormUploadException(FAIL
-                        + (e.getMessage() != null ? e.getMessage() : e.toString()));
-            }
-
-            if (headResult.getStatusCode() == HttpsURLConnection.HTTP_UNAUTHORIZED) {
-                throw new FormUploadAuthRequestedException(getLocalizedString(Collect.getInstance(), org.odk.collect.strings.R.string.server_auth_credentials, submissionUri.getHost()),
-                        submissionUri);
-            } else if (headResult.getStatusCode() == HttpsURLConnection.HTTP_NO_CONTENT) {
-                // Redirect header received
-                if (responseHeaders.containsHeader("Location")) {
-                    try {
-                        Uri newURI = Uri.parse(URLDecoder.decode(responseHeaders.getAnyValue("Location"), "utf-8"));
-                        // Allow redirects within same host. This could be redirecting to HTTPS.
-                        if (submissionUri.getHost().equalsIgnoreCase(newURI.getHost())) {
-                            // Re-add params if server didn't respond with params
-                            if (newURI.getQuery() == null) {
-                                newURI = newURI.buildUpon()
-                                        .encodedQuery(submissionUri.getEncodedQuery())
-                                        .build();
-                            }
-                            uriRemap.put(submissionUri, newURI);
-                            submissionUri = newURI;
-                        } else {
-                            // Don't follow a redirection attempt to a different host.
-                            // We can't tell if this is a spoof or not.
-                            throw new FormUploadException(FAIL
-                                    + "Unexpected redirection attempt to a different host: "
-                                    + newURI.toString());
-                        }
-                    } catch (Exception e) {
-                        throw new FormUploadException(FAIL + urlString + " " + e.toString());
-                    }
-                }
-            } else {
-                if (headResult.getStatusCode() >= HttpsURLConnection.HTTP_OK
-                        && headResult.getStatusCode() < HttpsURLConnection.HTTP_MULT_CHOICE) {
-                    throw new FormUploadException("Failed to send to " + uri + ". Is this an OpenRosa " +
-                            "submission endpoint? If you have a web proxy you may need to log in to " +
-                            "your network.\n\nHEAD request result status code: " + headResult.getStatusCode());
-                }
-            }
-        }
+        Uri submissionUri = resolveSubmissionUri(urlString);
+        long contentLength = acceptContentLength;
 
         // When encrypting submissions, there is a failure window that may mark the submission as
         // complete but leave the file-to-be-uploaded with the name "submission.xml" and the plaintext

@@ -37,6 +37,7 @@ import au.smap.fieldTask.listeners.SmapLoginListener;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.tasks.SmapLoginTask;
 import au.smap.fieldTask.utilities.KeyValueString;
+import au.smap.fieldTask.utilities.SubmissionAuthGate;
 import org.odk.collect.androidshared.ui.SnackbarUtils;
 import org.odk.collect.androidshared.utils.Validator;
 
@@ -200,6 +201,9 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
 
         // Save the login time in case the password policy is set to periodic
         settings.save(ProjectKeys.KEY_SMAP_LAST_LOGIN, String.valueOf(System.currentTimeMillis()));
+
+        // smap - fresh credentials, so stop suppressing auto send
+        new SubmissionAuthGate(settings).clear();
 
         // Start Main Activity and initiate a refresh
         Intent i = new Intent(SmapLoginActivity.this, SmapMain.class);

@@ -65,6 +65,7 @@ public class RefreshViewModel extends ViewModel
         running.setValue(true);
         progress.setValue(initialMessage);
         downloadTask = new DownloadTasksTask();
+        downloadTask.setManual(manual);     // smap - a manual refresh bypasses the submission auth gate
         downloadTask.setDownloaderListener(this, Collect.getInstance());
         downloadTask.execute();
     }

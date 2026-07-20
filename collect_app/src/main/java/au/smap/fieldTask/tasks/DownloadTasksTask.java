@@ -82,6 +82,7 @@ import org.odk.collect.android.utilities.ApplicationConstants;
 import au.smap.fieldTask.utilities.ManageForm;
 import au.smap.fieldTask.utilities.ManageForm.ManageFormDetails;
 import au.smap.fieldTask.utilities.ManageFormResponse;
+import au.smap.fieldTask.utilities.SubmissionAuthGate;
 import au.smap.fieldTask.utilities.Utilities;
 import org.odk.collect.android.utilities.WebCredentialsUtils;
 
@@ -156,6 +157,8 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
     @Inject
     ProjectsDataService projectsDataService;            // smap - needed to get project id for cancelSubmit
+
+    private boolean manual;     // smap - user initiated refresh, bypasses the submission auth gate
 
     private InstancesRepository instancesRepository;
     private FormsRepository formsRepository;
@@ -322,6 +325,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         synchronized (this) {
             mStateListener = sl;
         }
+    }
+
+    /**
+     * smap - mark this refresh as user initiated so it bypasses the submission auth gate.
+     */
+    public void setManual(boolean manual) {
+        this.manual = manual;
     }
 
 
@@ -585,6 +595,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
     }
 
     private InstanceUploaderTask.Outcome submitCompletedForms() {
+
+        // smap - skip automatic submission while the server is rejecting our credentials. A manual
+        // refresh always tries, so the user is never stuck waiting for the window to expire.
+        if (!manual && new SubmissionAuthGate(settingsProvider.getUnprotectedSettings()).isBlocked()) {
+            Timber.i("Skipping submission of completed forms - credentials rejected recently");
+            return null;
+        }
 
         String selection = InstanceProviderAPI.InstanceColumns.SOURCE + "=? and (" + InstanceProviderAPI.InstanceColumns.STATUS + "=? or " +
         		InstanceProviderAPI.InstanceColumns.STATUS + "=?)" +

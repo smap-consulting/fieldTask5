@@ -20,6 +20,8 @@ import static org.odk.collect.strings.localization.LocalizedApplicationKt.getLoc
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import au.smap.fieldTask.utilities.SubmissionAuthGate;
+
 import org.odk.collect.analytics.Analytics;
 import org.odk.collect.android.analytics.AnalyticsEvents;
 import org.odk.collect.android.application.Collect;
@@ -49,6 +51,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 /**
  * Background task for uploading completed forms.
@@ -99,6 +103,25 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                 .collect(Collectors.toList());
 
         String deviceId = propertyManager.getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID);
+
+        // smap - probe authentication once for the batch. Without this a rejected password costs
+        // a HEAD request per instance, every sync, which is a lot of data for a device holding
+        // many completed surveys. Trips the circuit breaker so auto send backs off too.
+        SubmissionAuthGate authGate = new SubmissionAuthGate(settingsProvider.getUnprotectedSettings());
+        if (!instancesToUpload.isEmpty()) {
+            try {
+                uploader.checkSubmissionAuth(uploader.getUrlToSubmitTo(instancesToUpload.get(0), deviceId, completeDestinationUrl, null));
+                authGate.clear();
+            } catch (FormUploadAuthRequestedException e) {
+                authGate.recordAuthFailure();
+                outcome.authRequestingServer = e.getAuthRequestingServer();
+                return outcome;     // Nothing attempted, so nothing to report per instance
+            } catch (FormUploadException e) {
+                // Not an auth problem (server down, no network). Fall through and let each
+                // instance report its own failure as before.
+                Timber.d(e);
+            }
+        }
 
         for (int i = 0; i < instancesToUpload.size(); i++) {
             if (isCancelled()) {

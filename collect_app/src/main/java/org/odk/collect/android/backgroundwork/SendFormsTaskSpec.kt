@@ -15,16 +15,21 @@ package org.odk.collect.android.backgroundwork
 
 import android.content.Context
 import androidx.work.BackoffPolicy
+import au.smap.fieldTask.utilities.SubmissionAuthGate
 import org.odk.collect.analytics.Analytics
 import org.odk.collect.android.injection.DaggerUtils
 import org.odk.collect.android.instancemanagement.InstancesDataService
 import org.odk.collect.async.TaskSpec
+import org.odk.collect.settings.SettingsProvider
 import java.util.function.Supplier
 import javax.inject.Inject
 
 class SendFormsTaskSpec : TaskSpec {
     @Inject
     lateinit var instancesDataService: InstancesDataService
+
+    @Inject
+    lateinit var settingsProvider: SettingsProvider
 
     override val maxRetries: Int = 13 // Stop trying when backoff is > 5 days
     override val backoffPolicy = BackoffPolicy.EXPONENTIAL
@@ -40,7 +45,12 @@ class SendFormsTaskSpec : TaskSpec {
         return Supplier {
             val projectId = inputData[TaskData.DATA_PROJECT_ID]
             val formAutoSend = inputData[TaskData.DATA_FORM_AUTO_SEND] != null
-            if (projectId != null) {
+            if (SubmissionAuthGate(settingsProvider.getUnprotectedSettings()).isBlocked()) {
+                // smap - the server rejected our credentials recently. Retrying every finalized
+                // instance would burn data to no effect, so report success and let the gate
+                // expire; a manual refresh or a fresh login clears it sooner.
+                true
+            } else if (projectId != null) {
                 if (formAutoSend) {
                     instancesDataService.sendInstances(projectId, formAutoSend = true)
                 } else {

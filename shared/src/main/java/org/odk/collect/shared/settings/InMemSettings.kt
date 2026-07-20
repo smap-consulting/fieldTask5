@@ -45,7 +45,7 @@ class InMemSettings : Settings {
     }
 
     override fun getLong(key: String): Long {
-        TODO("Not yet implemented")
+        return map[key] as Long? ?: 0L
     }
 
     override fun getInt(key: String): Int {

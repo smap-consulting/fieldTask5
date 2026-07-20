@@ -1,11 +1,12 @@
 package org.odk.collect.android.instancemanagement
 
+import au.smap.fieldTask.utilities.SubmissionAuthGate
 import org.odk.collect.analytics.Analytics
 import org.odk.collect.android.analytics.AnalyticsEvents
 import org.odk.collect.android.application.Collect
+import org.odk.collect.android.upload.FormUploadAuthRequestedException
 import org.odk.collect.android.upload.FormUploadException
 import org.odk.collect.android.upload.InstanceServerUploader
-import org.odk.collect.android.upload.InstanceUploader
 import org.odk.collect.android.utilities.FormsRepositoryProvider
 import org.odk.collect.android.utilities.InstanceAutoDeleteChecker
 import org.odk.collect.android.utilities.InstancesRepositoryProvider
@@ -33,8 +34,28 @@ class InstanceSubmitter(
         val deviceId = propertyManager.getSingularProperty(PROPMGR_DEVICE_ID)
 
         val uploader = setUpODKUploader()
+        val ordered = toUpload.sortedBy { it.finalizationDate }
 
-        for (instance in toUpload.sortedBy { it.finalizationDate }) {
+        // smap - probe authentication once for the batch rather than discovering the same
+        // rejection once per instance, and trip the circuit breaker so later runs back off.
+        if (ordered.isNotEmpty()) {
+            val authGate = SubmissionAuthGate(generalSettings)
+            try {
+                uploader.checkSubmissionAuth(uploader.getUrlToSubmitTo(ordered.first(), deviceId, null, null))
+                authGate.clear()
+            } catch (e: FormUploadAuthRequestedException) {
+                authGate.recordAuthFailure()
+                // Report the failure for each instance without touching the network or the
+                // database - nothing was attempted, so nothing is marked as failed.
+                ordered.forEach { result[it] = e }
+                return result
+            } catch (e: FormUploadException) {
+                // Not an auth problem. Fall through and let each instance report its own failure.
+                Timber.d(e)
+            }
+        }
+
+        for (instance in ordered) {
             try {
                 val destinationUrl = uploader.getUrlToSubmitTo(instance, deviceId, null, null)
                 uploader.uploadOneSubmission(instance, destinationUrl)
@@ -50,7 +71,7 @@ class InstanceSubmitter(
         return result
     }
 
-    private fun setUpODKUploader(): InstanceUploader {
+    private fun setUpODKUploader(): InstanceServerUploader {
         return InstanceServerUploader(
             httpInterface,
             WebCredentialsUtils(generalSettings),
