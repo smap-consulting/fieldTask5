@@ -121,8 +121,17 @@ public class AuditEventLogger {
     }
 
     private void addNewValueToQuestionAuditEvent(AuditEvent aev, FormController formController) {
-        IAnswerData answerData = formController.getQuestionPrompt(aev.getFormIndex()).getAnswerValue();
-        aev.recordValueChange(answerData != null ? answerData.getDisplayText() : null);
+        // smap - reading the answer evaluates form expressions, so a broken form can throw here.
+        // A select whose itemset names a secondary instance that is missing throws XPathException
+        // from ItemsetBinding.getChoices. Audit logging is bookkeeping that runs on every
+        // navigation, so it must never take down form entry - drop the value and carry on.
+        try {
+            IAnswerData answerData = formController.getQuestionPrompt(aev.getFormIndex()).getAnswerValue();
+            aev.recordValueChange(answerData != null ? answerData.getDisplayText() : null);
+        } catch (RuntimeException e) {
+            Timber.w(e, "Could not read answer for audit event at index %s", aev.getFormIndex());
+            aev.recordValueChange(null);
+        }
     }
 
     // If location provider are enabled/disabled it sometimes fires the BroadcastReceiver multiple

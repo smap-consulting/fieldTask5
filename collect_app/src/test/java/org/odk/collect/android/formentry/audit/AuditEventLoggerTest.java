@@ -19,6 +19,7 @@ package org.odk.collect.android.formentry.audit;
 import android.location.Location;
 
 import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.xpath.XPathException;
 import org.junit.Before;
 import org.junit.Test;
 import org.odk.collect.android.javarosawrapper.FormController;
@@ -234,6 +235,22 @@ public class AuditEventLoggerTest {
 
         auditEventLogger.flush(); // Triggers event writing
         assertEquals(21, testWriter.auditEvents.size());
+    }
+
+    @Test
+    public void whenReadingAnswerThrows_stillWritesEvents() {
+        // A select whose itemset names a missing secondary instance throws from getAnswerValue.
+        // Audit logging must not take form entry down with it.
+        when(formController.getQuestionPrompt(any()))
+                .thenThrow(new XPathException("Instance yes_no not found"));
+
+        AuditEventLogger auditEventLogger = new AuditEventLogger(testAuditConfig, testWriter, formController);
+
+        auditEventLogger.logEvent(QUESTION, false, 0);
+        auditEventLogger.flush(); // Triggers event writing
+
+        assertEquals(1, testWriter.auditEvents.size());
+        assertEquals(QUESTION, testWriter.auditEvents.get(0).getAuditEventType());
     }
 
     private static class TestWriter implements AuditEventLogger.AuditEventWriter {
