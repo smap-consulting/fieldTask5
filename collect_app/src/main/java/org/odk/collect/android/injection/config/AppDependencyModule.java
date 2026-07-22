@@ -145,6 +145,7 @@ import org.odk.collect.webpage.CustomTabsWebPageService;
 import org.odk.collect.webpage.WebPageService;
 
 import java.io.File;
+import java.util.Locale;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -223,8 +224,12 @@ public class AppDependencyModule {
 
 
     @Provides
-    public InstallIDProvider providesInstallIDProvider(SettingsProvider settingsProvider) {
-        return new SettingsInstallIDProvider(settingsProvider.getMetaSettings(), KEY_INSTALL_ID);
+    public InstallIDProvider providesInstallIDProvider(Context context, SettingsProvider settingsProvider) {
+        // smap: use the flavor's app name as the device id prefix instead of "collect"
+        String prefix = context.getString(R.string.app_name)
+                .replaceAll("[^A-Za-z0-9]", "")
+                .toLowerCase(Locale.ROOT);
+        return new SettingsInstallIDProvider(settingsProvider.getMetaSettings(), KEY_INSTALL_ID, prefix);
     }
 
     @Provides

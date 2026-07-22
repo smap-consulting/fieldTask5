@@ -27,6 +27,13 @@ class SettingsInstallIDProviderTest {
     }
 
     @Test
+    fun returnsValueWithCustomPrefix() {
+        val prefixed = SettingsInstallIDProvider(InMemSettings(), "blah", "fieldtask")
+
+        assertThat(prefixed.installID, startsWith("fieldtask:"))
+    }
+
+    @Test
     fun returns24CharacterValue() {
         assertThat(provider.installID.length, equalTo(24))
     }
