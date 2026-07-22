@@ -13,10 +13,10 @@
 
 <resources>
     <!-- strings that should not be translated -->
-    <string translatable="false" name="action_name">SLOS Field App</string>
-    <string translatable="false" name="app_name">SLOS Field App</string>
-	<string translatable="false" name="default_server_url">https://slos.gov.pg/</string>
+    <string translatable="false" name="action_name">LJSS Field App</string>
+    <string translatable="false" name="app_name">LJSS Field App</string>
+	<string translatable="false" name="default_server_url">https://ljss.smap.au/</string>
 	<string translatable="false" name="default_username"></string>
 	<string translatable="false" name="default_password"></string>
-	<string translatable="false" name="app_url">https://slos.gov.pg</string>
+	<string translatable="false" name="app_url">https://ljss.smap.au/</string>
 </resources>

@@ -9,7 +9,8 @@ interface InstallIDProvider {
 
 class SettingsInstallIDProvider(
     private val metaPreferences: Settings,
-    private val preferencesKey: String
+    private val preferencesKey: String,
+    private val prefix: String = "collect" // smap: allow flavor specific prefix
 ) : InstallIDProvider {
 
     override val installID: String
@@ -22,7 +23,7 @@ class SettingsInstallIDProvider(
         }
 
     private fun generateAndStoreInstallID(): String {
-        val installID = "collect:" + RandomString.randomString(16)
+        val installID = "$prefix:" + RandomString.randomString(16)
         metaPreferences.save(preferencesKey, installID)
         return installID
     }
