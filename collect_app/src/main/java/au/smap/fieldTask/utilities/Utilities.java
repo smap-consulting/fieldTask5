@@ -122,6 +122,38 @@ public class Utilities {
         return source;
     }
 
+    // smap TEMPORARY HACK: the ljss variant server moved from slos.gov.pg to ljss.smap.au.
+    // Forms and instances downloaded against the old host keep source=slos.gov.pg and no
+    // longer match the current source, so they are hidden and never submitted. Rewrite them
+    // to the new source. Safe to run in any flavour as the old source only exists on ljss.
+    // TODO remove once existing ljss devices have migrated.
+    public static void migrateSource(String oldSource, String newSource) {
+        Collect collectInstance = Collect.getInstance();
+        if (collectInstance == null) {
+            return;
+        }
+        try {
+            ContentValues values = new ContentValues();
+            values.put(InstanceColumns.SOURCE, newSource);
+            int instances = collectInstance.getContentResolver().update(
+                    InstanceColumns.CONTENT_URI, values,
+                    InstanceColumns.SOURCE + " = ?", new String[]{oldSource});
+
+            values = new ContentValues();
+            values.put(FormsProviderAPI.FormsColumns.SOURCE, newSource);
+            int forms = collectInstance.getContentResolver().update(
+                    FormsProviderAPI.FormsColumns.CONTENT_URI, values,
+                    FormsProviderAPI.FormsColumns.SOURCE + " = ?", new String[]{oldSource});
+
+            if (instances > 0 || forms > 0) {
+                Timber.i("Migrated source %s -> %s (%d instances, %d forms)",
+                        oldSource, newSource, instances, forms);
+            }
+        } catch (Exception e) {
+            Timber.e(e, "Failed to migrate source %s -> %s", oldSource, newSource);
+        }
+    }
+
     public static String getOrgMediaPath() {
         // Handle unit test case where Collect.getInstance() returns null
         Collect collectInstance = Collect.getInstance();

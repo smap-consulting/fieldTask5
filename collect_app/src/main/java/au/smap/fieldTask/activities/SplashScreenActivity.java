@@ -68,6 +68,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         // Ensure a default project exists before checking login
         ensureDefaultProject();
 
+        // smap TEMPORARY HACK: rewrite forms/instances from the old ljss host (slos.gov.pg)
+        // to the new one (ljss.smap.au) so they match the current source and get submitted.
+        // TODO remove once existing ljss devices have migrated.
+        new Thread(() -> au.smap.fieldTask.utilities.Utilities.migrateSource(
+                "slos.gov.pg", "ljss.smap.au")).start();
+
         // Check if login is required
         if (checkLoginRequired()) {
             Timber.i("Login required - launching SmapLoginActivity");
