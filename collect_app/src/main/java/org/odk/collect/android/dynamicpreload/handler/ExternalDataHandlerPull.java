@@ -27,6 +27,7 @@ import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.odk.collect.android.dynamicpreload.ExternalDataManager;
 import org.odk.collect.android.dynamicpreload.ExternalDataUtil;
 import org.odk.collect.android.dynamicpreload.ExternalSQLiteOpenHelper;
+import org.odk.collect.android.smap.utilities.LocationRegister;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,6 +150,9 @@ public class ExternalDataHandlerPull extends ExternalDataHandlerBase {
                  * flag it and return "" below rather than falling back to "list", which would
                  * concatenate every matching value (and break date() casts).  Explicit list mode
                  * is unaffected because it uses the 'list' token, not a numeric value.
+                 *
+                 * Variants whose forms rely on the legacy meaning of 0 opt back in to "list" via
+                 * LocationRegister.pulldataZeroIsList().
                  */
                 try {
                     index = Integer.parseInt(fn);
@@ -156,6 +160,8 @@ public class ExternalDataHandlerPull extends ExternalDataHandlerBase {
                         fn = FN_INDEX;
                     } else if (index < 0) {
                         fn = FN_COUNT;
+                    } else if (LocationRegister.pulldataZeroIsList()) {
+                        fn = FN_LIST; // smap - legacy 0 == list, enabled per variant
                     } else {
                         noValidRecord = true; // smap - numeric 0 -> no record (unbound / out of range)
                     }

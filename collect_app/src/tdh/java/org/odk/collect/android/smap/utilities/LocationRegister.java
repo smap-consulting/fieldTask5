@@ -37,4 +37,10 @@ public class LocationRegister {
     // Check that the installation is good
     public void isValidInstallation(Context context) {
     }
+
+    // Return true if a numeric pulldata record index of 0 should list all matching
+    // values.  Legacy behaviour, retained only for variants whose forms rely on it.
+    public static boolean pulldataZeroIsList() {
+        return false;
+    }
 }
