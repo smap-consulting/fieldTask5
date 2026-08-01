@@ -68,13 +68,7 @@ class ProjectPreferencesFragment(private val inFormEntry: Boolean) :
         findPreference<Preference>(UNLOCK_PROTECTED_SETTINGS_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
         findPreference<Preference>(CHANGE_ADMIN_PASSWORD_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
         findPreference<Preference>(ACCESS_CONTROL_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
-        findPreference<Preference>(PROJECT_MANAGEMENT_PREFERENCE_KEY)?.also {  // smap - optional
-            it.onPreferenceClickListener = this
-            if (inFormEntry) {
-                it.isEnabled = false
-                it.setSummary(org.odk.collect.strings.R.string.setting_not_available_during_form_entry)
-            }
-        }
+        findPreference<Preference>(PROJECT_MANAGEMENT_PREFERENCE_KEY)?.onPreferenceClickListener = this  // smap - optional
     }
 
     override fun onPreferenceClick(preference: Preference): Boolean {

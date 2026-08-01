@@ -138,7 +138,7 @@
   <string name="smap_emulator">No se permite ejecutar la aplicación en un emulador: la aplicación se cerrará</string>
   <!--Override upstream strings for Smap-->
   <string name="project_settings">Ajustes</string>
-  <string name="general_preferences">Ajustes generales</string>
+  <string name="general_preferences">Ajustes</string>
   <string name="admin_preferences">Preferencias de administración</string>
   <!--Geocompound widget button labels-->
   <string name="get_geocompound">Iniciar mapa compuesto</string>

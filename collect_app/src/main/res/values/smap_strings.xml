@@ -161,7 +161,7 @@
 
     <!-- Override upstream strings for Smap -->
     <string name="project_settings">Settings</string>
-    <string name="general_preferences">General Settings</string>
+    <string name="general_preferences">Settings</string>
     <string name="admin_preferences">Admin Preferences</string>
 
     <!-- Geocompound widget button labels -->
