@@ -184,6 +184,11 @@ class OfflineMapLayersPickerBottomSheetDialogFragment(
     }
 
     override fun onDeleteLayer(layerItem: CheckableReferenceLayer) {
+        // smap - a layer supplied by the server would just be downloaded again on the next
+        // refresh, so it can only be removed by unassigning it on the server
+        if (ServerLayers.isServerLayer(layerItem.id)) {
+            return
+        }
         MaterialAlertDialogBuilder(requireActivity())
             .setMessage(
                 requireActivity().getLocalizedString(

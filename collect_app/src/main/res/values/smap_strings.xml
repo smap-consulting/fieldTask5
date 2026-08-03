@@ -74,6 +74,15 @@
     <string name="no_review">This task is finalised and cannot be reviewed</string>
     <string name="smap_add_comment">Add Comment</string>
     <string name="smap_clear_remote_cache">Clear remote cache</string>
+    <!-- Offline map layers supplied by the server -->
+    <string name="smap_server_layers">Layers from the server</string>
+    <string name="smap_server_layers_none">No layers have been assigned to you</string>
+    <string name="smap_server_layers_status">%s1 of %s2 downloaded</string>
+    <string name="smap_server_layers_complete">All layers downloaded</string>
+    <string name="smap_server_layers_wifi">The remaining layers will download when the device has wifi. Download now using mobile data?</string>
+    <string name="smap_server_layers_downloading">Downloading layers</string>
+    <string name="smap_server_layers_done">Layers downloaded</string>
+    <string name="smap_server_layers_failed">Some layers could not be downloaded. They will be retried.</string>
     <string name="smap_new_forms">Look for new forms and tasks</string>
     <string name="smap_retrying">Connection problem, retrying (%1$d/%2$d)…</string>
     <string name="smap_no_forms">No forms to download</string>

@@ -18,7 +18,11 @@ import android.os.Bundle
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
+import au.smap.fieldTask.models.OfflineLayer
+import au.smap.fieldTask.tasks.OfflineLayerDownloader
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.odk.collect.android.R
+import org.odk.collect.androidshared.ui.ToastUtils
 import org.odk.collect.android.geo.MapConfiguratorProvider
 import org.odk.collect.android.injection.DaggerUtils
 import org.odk.collect.androidshared.ui.DialogFragmentUtils
@@ -123,6 +127,83 @@ class MapsPreferencesFragment : BaseProjectPreferencesFragment(), Preference.OnP
             onPreferenceClickListener = this@MapsPreferencesFragment
             summary = getLayerName()
         }
+        initServerLayersPref()
+    }
+
+    /**
+     * smap - Shows how many of the layers assigned by the server are on the device.  Layers
+     * download on their own when the device has wifi, this lets the user start a download over
+     * mobile data if they need the maps sooner.
+     */
+    private fun initServerLayersPref() {
+        val pref = findPreference<Preference>(SMAP_SERVER_LAYERS_KEY) ?: return
+
+        if (!settingsProvider.getUnprotectedSettings().getBoolean(ProjectKeys.KEY_SMAP_OFFLINE_MAPS)) {
+            pref.isVisible = false
+            return
+        }
+
+        pref.isVisible = true
+        updateServerLayersSummary(pref)
+
+        pref.setOnPreferenceClickListener {
+            val layers = OfflineLayerDownloader.getManifest(settingsProvider)
+            val downloader = OfflineLayerDownloader.create()
+            val outstanding = layers.filter { !downloader.isDownloaded(it) }
+
+            if (outstanding.isEmpty()) {
+                updateServerLayersSummary(pref)
+            } else {
+                MaterialAlertDialogBuilder(requireActivity())
+                    .setMessage(org.odk.collect.android.R.string.smap_server_layers_wifi)
+                    .setPositiveButton(org.odk.collect.strings.R.string.ok) { _, _ ->
+                        downloadServerLayers(pref, layers)
+                    }
+                    .setNegativeButton(org.odk.collect.strings.R.string.cancel, null)
+                    .show()
+            }
+            true
+        }
+    }
+
+    private fun downloadServerLayers(pref: Preference, layers: List<OfflineLayer>) {
+        pref.summary = getString(org.odk.collect.android.R.string.smap_server_layers_downloading)
+        pref.isEnabled = false
+
+        scheduler.immediate(
+            background = {
+                OfflineLayerDownloader.create().downloadAll(layers, null)
+            },
+            foreground = { allDone ->
+                pref.isEnabled = true
+                if (allDone) {
+                    ToastUtils.showLongToast(org.odk.collect.android.R.string.smap_server_layers_done)
+                } else {
+                    ToastUtils.showLongToast(org.odk.collect.android.R.string.smap_server_layers_failed)
+                }
+                updateServerLayersSummary(pref)
+                // A newly downloaded layer can now be chosen
+                findPreference<Preference>(ProjectKeys.KEY_REFERENCE_LAYER)?.summary = getLayerName()
+            }
+        )
+    }
+
+    private fun updateServerLayersSummary(pref: Preference) {
+        val layers = OfflineLayerDownloader.getManifest(settingsProvider)
+        if (layers.isEmpty()) {
+            pref.summary = getString(org.odk.collect.android.R.string.smap_server_layers_none)
+            return
+        }
+
+        val downloader = OfflineLayerDownloader.create()
+        val have = layers.count { downloader.isDownloaded(it) }
+        pref.summary = if (have == layers.size) {
+            getString(org.odk.collect.android.R.string.smap_server_layers_complete)
+        } else {
+            getString(org.odk.collect.android.R.string.smap_server_layers_status)
+                .replace("%s1", have.toString())
+                .replace("%s2", layers.size.toString())
+        }
     }
 
     private fun getLayerName(): String {
@@ -153,5 +234,10 @@ class MapsPreferencesFragment : BaseProjectPreferencesFragment(), Preference.OnP
                 settingsProvider.getUnprotectedSettings().save(ProjectKeys.KEY_REFERENCE_LAYER, null)
             }
         }
+    }
+
+    companion object {
+        // smap - preference showing the download state of the layers supplied by the server
+        private const val SMAP_SERVER_LAYERS_KEY = "smap_server_layers"
     }
 }

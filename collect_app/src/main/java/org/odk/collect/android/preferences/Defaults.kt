@@ -61,6 +61,8 @@ object Defaults {
             hashMap[ProjectKeys.KEY_SMAP_AUTH_TOKEN] = ""
             hashMap[ProjectKeys.KEY_SMAP_REVIEW_FINAL] = true
             hashMap[ProjectKeys.KEY_SMAP_FORCE_TOKEN] = false
+            hashMap[ProjectKeys.KEY_SMAP_OFFLINE_MAPS] = false
+            hashMap[ProjectKeys.KEY_SMAP_OFFLINE_LAYERS] = ""
             hashMap[ProjectKeys.KEY_SMAP_USER_LOCATION] = false
             hashMap[ProjectKeys.KEY_SMAP_LOCATION_TRIGGER] = true
             hashMap[ProjectKeys.KEY_SMAP_ODK_STYLE_MENUS] = true

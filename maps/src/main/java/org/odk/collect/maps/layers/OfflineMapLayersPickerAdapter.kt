@@ -48,7 +48,9 @@ class OfflineMapLayersPickerAdapter(
         if (layer.isExpanded) {
             holder.binding.arrow.setImageDrawable(ContextCompat.getDrawable(holder.binding.root.context, org.odk.collect.icons.R.drawable.ic_baseline_collapse_24))
             holder.binding.path.visibility = View.VISIBLE
-            holder.binding.deleteLayer.visibility = View.VISIBLE
+            // smap - a layer supplied by the server is removed by unassigning it there, not here
+            holder.binding.deleteLayer.visibility =
+                if (ServerLayers.isServerLayer(layer.id)) View.GONE else View.VISIBLE
         } else {
             holder.binding.arrow.setImageDrawable(ContextCompat.getDrawable(holder.binding.root.context, org.odk.collect.icons.R.drawable.ic_baseline_expand_24))
             holder.binding.path.visibility = View.GONE

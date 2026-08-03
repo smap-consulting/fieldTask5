@@ -74,6 +74,8 @@ import org.odk.collect.android.utilities.FormsRepositoryProvider
 import org.odk.collect.android.utilities.InstancesRepositoryProvider
 import org.odk.collect.android.utilities.SavepointsRepositoryProvider
 import org.odk.collect.android.utilities.ThemeUtils
+import org.odk.collect.android.utilities.WebCredentialsUtils
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface
 import org.odk.collect.android.widgets.QuestionWidget
 import org.odk.collect.android.widgets.items.SelectOneFromMapDialogFragment
 import org.odk.collect.androidshared.utils.UniqueIdGenerator
@@ -326,6 +328,11 @@ interface AppDependencyComponent {
     fun permissionsChecker(): PermissionsChecker
 
     fun referenceLayerRepository(): ReferenceLayerRepository
+
+    // smap - used by the offline map layer downloader
+    fun openRosaHttpInterface(): OpenRosaHttpInterface
+
+    fun webCredentialsUtils(): WebCredentialsUtils
 
     fun networkStateProvider(): NetworkStateProvider
 

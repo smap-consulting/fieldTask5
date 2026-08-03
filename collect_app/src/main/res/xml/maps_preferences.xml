@@ -20,5 +20,11 @@
             android:negativeButtonText="@string/cancel"
             android:positiveButtonText="@string/ok"
             app:iconSpaceReserved="false" />
+        <!-- smap - download layers supplied by the server, hidden unless the server manages them -->
+        <Preference
+            android:key="smap_server_layers"
+            android:title="@string/smap_server_layers"
+            android:visible="false"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 </PreferenceScreen>

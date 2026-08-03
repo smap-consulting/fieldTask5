@@ -83,6 +83,8 @@ object ProjectKeys {
     const val KEY_SMAP_AUTH_TOKEN = "auth_token" // Authentication Token
     const val KEY_SMAP_REVIEW_FINAL = "review_final" // Allow review of Form after finalising
     const val KEY_SMAP_FORCE_TOKEN = "force_token" // Require the use of tokens for authentication
+    const val KEY_SMAP_OFFLINE_MAPS = "offline_maps" // Offline map layers are managed on the server
+    const val KEY_SMAP_OFFLINE_LAYERS = "offline_layers" // Json list of the layers assigned to this user
     const val KEY_SMAP_USER_LOCATION = "smap_gps_trail" // Record a user trail
     const val KEY_SMAP_USER_SAVE_LOCATION = "smap_gps_trail" // Backup of decision to record the user trail
     const val KEY_SMAP_LOCATION_TRIGGER = "location_trigger" // Enable triggering of forms by location

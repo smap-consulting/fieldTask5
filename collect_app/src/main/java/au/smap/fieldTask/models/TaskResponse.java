@@ -38,4 +38,6 @@ public class TaskResponse {
     public String current_org;
     public Set<String> orgs;
     public List<ReferenceSurvey> refSurveys;
+    public List<OfflineLayer> offlineLayers;    // Offline map layers assigned to this user
+    public List<Integer> offlineLayersHeld;     // Layer ids this device has downloaded, sent to the server
 }

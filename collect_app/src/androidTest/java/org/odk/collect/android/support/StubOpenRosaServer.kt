@@ -189,6 +189,14 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
         return "success"
     }
 
+    override fun executeGetRequest(
+        uri: URI,
+        credentials: HttpCredentialsInterface?,
+        headers: HashMap<String, String>?
+    ): HttpGetResult {
+        return executeGetRequest(uri, null, credentials)
+    }
+
     fun setCredentials(username: String?, password: String?) {
         this.username = username
         this.password = password

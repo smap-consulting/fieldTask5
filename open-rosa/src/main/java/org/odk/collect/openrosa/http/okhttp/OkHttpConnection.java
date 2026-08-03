@@ -122,6 +122,49 @@ public class OkHttpConnection implements OpenRosaHttpInterface {
         return new HttpGetResult(downloadStream, responseHeaders, hash, statusCode);
     }
 
+    /*
+     * smap - Get a file allowing extra request headers, used to resume a download with a Range
+     * header.  Unlike executeGetRequest above this accepts a 206 partial content response.
+     */
+    @NonNull
+    @Override
+    public HttpGetResult executeGetRequest(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials,
+                                           @Nullable HashMap<String, String> headers) throws Exception {
+        URI physicalUri = getPhysicalUri(uri, credentials);
+        OpenRosaServerClient httpClient = clientFactory.get(physicalUri.getScheme(), userAgent, credentials);
+
+        Request.Builder requestBuilder = new Request.Builder()
+                .url(physicalUri.toURL())
+                .get();
+        if (headers != null) {
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                requestBuilder.addHeader(header.getKey(), header.getValue());
+            }
+        }
+
+        Response response = httpClient.makeRequest(requestBuilder.build(), new Date());
+        int statusCode = response.code();
+
+        if (statusCode != HttpURLConnection.HTTP_OK && statusCode != HttpURLConnection.HTTP_PARTIAL) {
+            discardEntityBytes(response);
+            Timber.i("Error: %s (%s at %s", response.message(), String.valueOf(statusCode), physicalUri.toString());
+            throw new Exception(response.message() + " : " + statusCode + " : " + physicalUri.toString());
+        }
+
+        ResponseBody body = response.body();
+        if (body == null) {
+            throw new Exception("No entity body returned from: " + physicalUri.toString());
+        }
+
+        Map<String, String> responseHeaders = new HashMap<>();
+        Headers respHeaders = response.headers();
+        for (int i = 0; i < respHeaders.size(); i++) {
+            responseHeaders.put(respHeaders.name(i), respHeaders.value(i));
+        }
+
+        return new HttpGetResult(body.byteStream(), responseHeaders, "", statusCode);
+    }
+
     @NonNull
     @Override
     public HttpHeadResult executeHeadRequest(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials) throws Exception {

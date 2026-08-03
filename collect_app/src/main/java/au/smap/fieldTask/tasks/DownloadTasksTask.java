@@ -76,6 +76,7 @@ import org.odk.collect.android.smap.utilities.LocationRegister;
 import org.odk.collect.android.storage.StoragePathProvider;
 import org.odk.collect.android.storage.StorageSubdirectory;
 import au.smap.fieldTask.models.FormLocator;
+import au.smap.fieldTask.models.OfflineLayer;
 import au.smap.fieldTask.models.TaskCompletionInfo;
 import au.smap.fieldTask.models.TaskResponse;
 import org.odk.collect.android.utilities.ApplicationConstants;
@@ -157,6 +158,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
     @Inject
     ProjectsDataService projectsDataService;            // smap - needed to get project id for cancelSubmit
+
+    @Inject
+    org.odk.collect.async.Scheduler scheduler;          // smap - schedules the offline layer download
+
+    @Inject
+    org.odk.collect.android.storage.StoragePathProvider storagePathProvider;    // smap - offline layers
 
     private boolean manual;     // smap - user initiated refresh, bypasses the submission auth gate
 
@@ -456,6 +463,13 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 addAndUpdateEntries();
                 getInitialDataForTask();
 
+                /*
+                 * Record the offline map layers assigned to this user and ask for them to be
+                 * downloaded.  The files are large so this is deferred until the device has wifi,
+                 * the user can start a download on mobile data from the layer picker.
+                 */
+                updateOfflineLayers();
+
             	/*
             	 * Notify the server of the phone state
             	 *  (1) Update on the server all tasks that have a status of "accepted", "rejected" or "submitted" or "cancelled" or "completed"
@@ -747,9 +761,16 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
         Collect.getInstance().setSavedLocation(null);
 
+        /*
+         * Tell the server which offline map layers this device holds so an administrator can
+         * see how a layer is rolling out
+         */
+        updateResponse.offlineLayersHeld = getHeldOfflineLayers();
+
         if(updateResponse.taskAssignments.size() > 0 ||
                 (updateResponse.taskCompletionInfo != null && updateResponse.taskCompletionInfo.size() > 0) ||
-                (updateResponse.userTrail != null && updateResponse.userTrail.size() > 0)) {
+                (updateResponse.userTrail != null && updateResponse.userTrail.size() > 0) ||
+                (updateResponse.offlineLayersHeld != null && updateResponse.offlineLayersHeld.size() > 0)) {
 
             publishProgress(Collect.getInstance().getString(R.string.smap_update_task_status));
 
@@ -1047,6 +1068,54 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         }
     }
 
+    /*
+     * The offline map layers that are fully downloaded on this device
+     */
+    private List<Integer> getHeldOfflineLayers() {
+
+        ArrayList<Integer> held = new ArrayList<>();
+        try {
+            OfflineLayerDownloader downloader = new OfflineLayerDownloader(httpInterface,
+                    webCredentialsUtils, storagePathProvider, settingsProvider);
+            for (OfflineLayer layer : OfflineLayerDownloader.getManifest(settingsProvider)) {
+                if (downloader.isDownloaded(layer)) {
+                    held.add(layer.id);
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e, "Failed to check downloaded offline layers");
+        }
+        return held;
+    }
+
+    /*
+     * Save the offline map layers that the server has assigned to this user and schedule the
+     * download.  If the organisation does not manage offline maps, or the user has no layers,
+     * any layer files previously supplied by the server are removed.
+     */
+    private void updateOfflineLayers() {
+
+        try {
+            boolean enabled = tr.settings != null && tr.settings.ft_offline_maps;
+            List<OfflineLayer> layers = enabled ? tr.offlineLayers : null;
+
+            OfflineLayerDownloader.saveManifest(settingsProvider, layers);
+
+            OfflineLayerDownloader downloader = new OfflineLayerDownloader(httpInterface,
+                    webCredentialsUtils, storagePathProvider, settingsProvider);
+
+            if (layers == null || layers.isEmpty()) {
+                // Removes any files the server no longer supplies
+                downloader.downloadAll(layers, null);
+                OfflineLayerTaskSpec.cancel(scheduler);
+            } else {
+                OfflineLayerTaskSpec.schedule(scheduler);
+            }
+        } catch (Exception e) {
+            Timber.e(e, "Failed to update offline layers");
+        }
+    }
+
     private void updateSettings () {
         if(tr.settings != null) {
             org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
@@ -1064,6 +1133,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             settings.save(ProjectKeys.KEY_SMAP_BG_STOP_MENU, tr.settings.ft_bg_stop_menu);
             settings.save(ProjectKeys.KEY_SMAP_REVIEW_FINAL, tr.settings.ft_review_final);
             settings.save(ProjectKeys.KEY_SMAP_FORCE_TOKEN, tr.settings.ft_force_token);
+            settings.save(ProjectKeys.KEY_SMAP_OFFLINE_MAPS, tr.settings.ft_offline_maps);
 
             /*
              * Override the user trail setting if this is set from the server

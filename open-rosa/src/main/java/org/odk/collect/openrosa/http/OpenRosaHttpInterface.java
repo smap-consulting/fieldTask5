@@ -139,6 +139,21 @@ public interface OpenRosaHttpInterface {
     @NonNull
     String loginRequest(@NonNull URI uri, @Nullable String contentType, @Nullable HttpCredentialsInterface credentials) throws Exception;
 
+    /**
+     * smap - Get a file allowing extra request headers to be set.  Used to send a Range header
+     * so that a large download interrupted by a poor connection can be resumed.  A 206 response
+     * is accepted as well as a 200.
+     *
+     * @param uri of the file to get
+     * @param credentials to authenticate with, may be null
+     * @param headers extra request headers
+     * @return HttpGetResult containing the stream and the response status
+     * @throws Exception if the request fails
+     */
+    @NonNull
+    HttpGetResult executeGetRequest(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials,
+                                    @Nullable HashMap<String, String> headers) throws Exception;
+
     interface FileToContentTypeMapper {
 
         @NonNull
