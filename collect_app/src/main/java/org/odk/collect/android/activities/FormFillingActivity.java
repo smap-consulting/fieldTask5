@@ -539,6 +539,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             mediaLoadingFragment = (MediaLoadingFragment) getSupportFragmentManager().findFragmentByTag(TAG_MEDIA_LOADING_FRAGMENT);
         }
 
+        resolveReadOnly();  // smap - needed by the menu, so start it before the form loads
         setupFields(savedInstanceState);
         loadForm();
 
@@ -761,21 +762,46 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
      * or for this opening only (e.g. referenced records). In this mode nothing is persisted,
      * so exiting must not offer to save a draft.
      */
-    private Boolean readOnly; // smap - cached, computed once (DB lookup) since used on every swipe
+    private Boolean readOnly; // smap - cached, resolved once off the main thread
+
+    /**
+     * smap - Work out whether the form itself is read only.  The menu is prepared before the form
+     * has loaded, so this has to be ready early, and reading the form from the database on the
+     * main thread trips the strict mode policy.  Until the lookup returns, the intent decides.
+     */
+    private void resolveReadOnly() {
+        if (getIntent().getBooleanExtra(KEY_READ_ONLY, false)) {
+            readOnly = true;
+            return;
+        }
+
+        Uri formUri = getIntent().getData();
+        if (formUri == null) {
+            readOnly = false;
+            return;
+        }
+
+        long formId = ContentUriHelper.getIdFromUri(formUri);
+        scheduler.immediate(
+                () -> {
+                    Form form = formsRepositoryProvider.create().get(formId);
+                    return form != null && "yes".equals(form.getReadOnly());
+                },
+                isReadOnly -> {
+                    readOnly = isReadOnly;
+                    if (isReadOnly) {
+                        // The menu was prepared before we knew, hide Save now
+                        invalidateOptionsMenu();
+                    }
+                }
+        );
+    }
 
     private boolean isReadOnly() {
-        if (readOnly == null) {
-            if (getIntent().getBooleanExtra(KEY_READ_ONLY, false)) {
-                readOnly = true;
-            } else {
-                Uri formUri = getIntent().getData();
-                Form form = formUri != null
-                        ? new FormsRepositoryProvider(Collect.getInstance()).create().get(ContentUriHelper.getIdFromUri(formUri))
-                        : null;
-                readOnly = form != null && "yes".equals(form.getReadOnly());
-            }
-        }
-        return readOnly;
+        // Not resolved yet, fall back to what the intent asked for
+        return readOnly != null
+                ? readOnly
+                : getIntent().getBooleanExtra(KEY_READ_ONLY, false);
     }
 
     /**
