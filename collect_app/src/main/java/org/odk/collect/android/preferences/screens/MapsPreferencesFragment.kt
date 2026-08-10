@@ -148,20 +148,29 @@ class MapsPreferencesFragment : BaseProjectPreferencesFragment(), Preference.OnP
 
         pref.setOnPreferenceClickListener {
             val layers = OfflineLayerDownloader.getManifest(settingsProvider)
-            val downloader = OfflineLayerDownloader.create()
-            val outstanding = layers.filter { !downloader.isDownloaded(it) }
 
-            if (outstanding.isEmpty()) {
-                updateServerLayersSummary(pref)
-            } else {
-                MaterialAlertDialogBuilder(requireActivity())
-                    .setMessage(org.odk.collect.android.R.string.smap_server_layers_wifi)
-                    .setPositiveButton(org.odk.collect.strings.R.string.ok) { _, _ ->
-                        downloadServerLayers(pref, layers)
+            // Checking a layer hashes the whole file, too slow to do on the main thread
+            scheduler.immediate(
+                background = {
+                    val downloader = OfflineLayerDownloader.create()
+                    layers.count { !downloader.isDownloaded(it) }
+                },
+                foreground = { outstanding ->
+                    if (!isAdded) {
+                        // The screen has gone, nothing to update
+                    } else if (outstanding == 0) {
+                        updateServerLayersSummary(pref)
+                    } else {
+                        MaterialAlertDialogBuilder(requireActivity())
+                            .setMessage(org.odk.collect.android.R.string.smap_server_layers_wifi)
+                            .setPositiveButton(org.odk.collect.strings.R.string.ok) { _, _ ->
+                                downloadServerLayers(pref, layers)
+                            }
+                            .setNegativeButton(org.odk.collect.strings.R.string.cancel, null)
+                            .show()
                     }
-                    .setNegativeButton(org.odk.collect.strings.R.string.cancel, null)
-                    .show()
-            }
+                }
+            )
             true
         }
     }
@@ -188,6 +197,10 @@ class MapsPreferencesFragment : BaseProjectPreferencesFragment(), Preference.OnP
         )
     }
 
+    /**
+     * smap - Names each layer the server has assigned and says whether it is on the device, so
+     * the user can tell which maps they are carrying rather than only how many.
+     */
     private fun updateServerLayersSummary(pref: Preference) {
         val layers = OfflineLayerDownloader.getManifest(settingsProvider)
         if (layers.isEmpty()) {
@@ -195,14 +208,39 @@ class MapsPreferencesFragment : BaseProjectPreferencesFragment(), Preference.OnP
             return
         }
 
-        val downloader = OfflineLayerDownloader.create()
-        val have = layers.count { downloader.isDownloaded(it) }
-        pref.summary = if (have == layers.size) {
+        // Checking a layer hashes the whole file, too slow to do on the main thread
+        pref.summary = getString(org.odk.collect.android.R.string.smap_server_layers_checking)
+        scheduler.immediate(
+            background = {
+                val downloader = OfflineLayerDownloader.create()
+                layers.map { Pair(it.name, downloader.isDownloaded(it)) }
+            },
+            foreground = { states ->
+                if (isAdded) {
+                    pref.summary = serverLayersSummary(states)
+                }
+            }
+        )
+    }
+
+    private fun serverLayersSummary(states: List<Pair<String, Boolean>>): String {
+        val have = states.count { it.second }
+        val headline = if (have == states.size) {
             getString(org.odk.collect.android.R.string.smap_server_layers_complete)
         } else {
             getString(org.odk.collect.android.R.string.smap_server_layers_status)
                 .replace("%s1", have.toString())
-                .replace("%s2", layers.size.toString())
+                .replace("%s2", states.size.toString())
+        }
+
+        return states.joinToString("\n", prefix = headline + "\n") { (name, downloaded) ->
+            getString(
+                if (downloaded) {
+                    org.odk.collect.android.R.string.smap_server_layers_item_have
+                } else {
+                    org.odk.collect.android.R.string.smap_server_layers_item_pending
+                }
+            ).replace("%s1", name)
         }
     }
 
