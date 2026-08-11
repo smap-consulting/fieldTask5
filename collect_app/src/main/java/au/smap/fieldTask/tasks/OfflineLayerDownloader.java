@@ -184,7 +184,11 @@ public class OfflineLayerDownloader {
 
         if (target.exists()) {
             if (matches(target, layer.md5)) {
-                return true;            // Already have this version
+                // Already have this version.  Still check the selection: the layer can be on the
+                // device with nothing selected to show it, for example after it was unassigned
+                // and reassigned, so this cannot only happen on the run that fetches the bytes.
+                selectIfNoneSelected(layer);
+                return true;
             }
             // The layer has been replaced on the server, start again
             target.delete();
