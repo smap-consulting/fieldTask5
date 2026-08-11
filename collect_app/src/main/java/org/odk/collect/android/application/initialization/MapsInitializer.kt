@@ -17,14 +17,17 @@ class MapsInitializer @Inject constructor(
 ) {
 
     fun initialize() {
-        // smap - entirely off main thread: initOptions calls isGooglePlayServicesAvailable (Binder IPC),
-        // smap - causing ANR on Android 15. Maps not needed until user opens a map screen.
-        Thread {
-            resetToAvailableFramework()
-            if (!FRAMEWORKS_INITIALIZED) {
-                initializeFrameworks()
-            }
-        }.start()
+        // smap - This has to stay on the main thread.  Building the map configurators loads the
+        // Mapbox native libraries and touches Mapbox classes, and Mapbox binds its schedulers to
+        // the thread that does so.  Doing it on a bare Thread with no Looper leaves the SDK
+        // unusable afterwards - "scheduler is not available for thread", telemetry fails to
+        // start, and a worker later aborts the process on an uncaught std::range_error.
+        // It was moved off the main thread to avoid an ANR from the Binder IPC in
+        // isGooglePlayServicesAvailable; if that returns, defer this call rather than rethread it.
+        resetToAvailableFramework()
+        if (!FRAMEWORKS_INITIALIZED) {
+            initializeFrameworks()
+        }
     }
 
     private fun resetToAvailableFramework() {
