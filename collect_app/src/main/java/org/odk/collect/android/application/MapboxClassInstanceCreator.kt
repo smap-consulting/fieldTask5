@@ -3,6 +3,7 @@ package org.odk.collect.android.application
 import androidx.fragment.app.Fragment
 import org.odk.collect.maps.MapConfigurator
 import org.odk.collect.maps.MapFragment
+import timber.log.Timber
 
 object MapboxClassInstanceCreator {
 
@@ -13,8 +14,13 @@ object MapboxClassInstanceCreator {
         return try {
             getClass(MAP_FRAGMENT)
             System.loadLibrary("mapbox-common")
+            // The build omits the Mapbox libraries for architectures it does not support, so this
+            // has to check the one that actually creates the map.  Checking only mapbox-common
+            // lets the app offer Mapbox and then die in Map.initialize, which lives in here.
+            System.loadLibrary("mapbox-maps")
             true
         } catch (e: Throwable) {
+            Timber.i(e, "Mapbox is not available on this device")
             false
         }
     }

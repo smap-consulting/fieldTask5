@@ -161,7 +161,7 @@ class MapboxMapFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        mapView = MapView(inflater.context).apply {
+        mapView = MapView(requireContext()).apply {
             compass.position = Gravity.TOP or Gravity.START
             compass.marginTop = 36f
             compass.marginBottom = 36f

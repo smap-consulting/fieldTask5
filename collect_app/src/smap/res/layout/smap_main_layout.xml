@@ -17,7 +17,12 @@
         android:orientation="vertical">
 
         <!-- SMAP BUILD - Material Banner -->
-        <!-- SMAP BUILD - MapBox initialisation fragment -->
+        <!--
+            SMAP BUILD - No MapBox initialisation fragment here.  ODK uses one on its main menu to
+            build a throwaway map at startup, but fieldTask already carries a real Mapbox map on
+            the map tab of this activity, and a second live native map makes the tab's map fail
+            to initialise.
+        -->
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
