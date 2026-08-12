@@ -23,6 +23,7 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.style.layers.Layer
 import com.mapbox.maps.extension.style.layers.addLayerAbove
+import com.mapbox.maps.extension.style.layers.addLayerBelow
 import com.mapbox.maps.extension.style.layers.generated.LineLayer
 import com.mapbox.maps.extension.style.layers.generated.RasterLayer
 import com.mapbox.maps.extension.style.sources.Source
@@ -35,6 +36,7 @@ import com.mapbox.maps.loader.MapboxMapsInitializer
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions.Companion.mapAnimationOptions
 import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.annotation.AnnotationConfig
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
@@ -80,6 +82,16 @@ import org.odk.collect.shared.injection.ObjectProviderHost
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
+
+private const val POLYLINE_ANNOTATION_LAYER_ID = "polyline_annotation_layer"
+private const val POLYGON_ANNOTATION_LAYER_ID = "polygon_annotation_layer"
+private const val POINT_ANNOTATION_LAYER_ID = "point_annotation_layer"
+
+private val ANNOTATION_LAYER_IDS = setOf(
+    POLYLINE_ANNOTATION_LAYER_ID,
+    POLYGON_ANNOTATION_LAYER_ID,
+    POINT_ANNOTATION_LAYER_ID
+)
 
 class MapboxMapFragment :
     MapViewModelMapFragment(),
@@ -195,17 +207,19 @@ class MapboxMapFragment :
                 })
             }
 
+        // Naming the annotation layers lets addOverlayLayer find them and slot reference
+        // layers underneath, so an offline layer never covers the features on the map
         polylineAnnotationManager = mapView
             .annotations
-            .createPolylineAnnotationManager()
+            .createPolylineAnnotationManager(AnnotationConfig(layerId = POLYLINE_ANNOTATION_LAYER_ID))
 
         polygonAnnotationManager = mapView
             .annotations
-            .createPolygonAnnotationManager()
+            .createPolygonAnnotationManager(AnnotationConfig(layerId = POLYGON_ANNOTATION_LAYER_ID))
 
         pointAnnotationManager = mapView
             .annotations
-            .createPointAnnotationManager()
+            .createPointAnnotationManager(AnnotationConfig(layerId = POINT_ANNOTATION_LAYER_ID))
 
         initLocationComponent()
         moveOrAnimateCamera(MapFragment.INITIAL_CENTER, false, MapFragment.INITIAL_ZOOM.toDouble())
@@ -664,8 +678,18 @@ class MapboxMapFragment :
     }
 
     private fun addOverlayLayer(layer: Layer) {
-        topStyleLayerId?.let {
-            mapboxMap.getStyle()?.addLayerAbove(layer, topStyleLayerId)
+        val style = mapboxMap.getStyle() ?: return
+
+        // styleLayers runs bottom (index 0) to top.  Put the reference overlay below the lowest
+        // annotation layer so it sits under every feature whatever order the managers were
+        // created in.  Before those layers exist there is nothing to go under, so fall back to
+        // sitting just above the basemap.
+        val lowestAnnotationLayer = style.styleLayers.firstOrNull { it.id in ANNOTATION_LAYER_IDS }?.id
+
+        if (lowestAnnotationLayer != null) {
+            style.addLayerBelow(layer, lowestAnnotationLayer)
+        } else {
+            topStyleLayerId?.let { style.addLayerAbove(layer, it) }
         }
     }
 
