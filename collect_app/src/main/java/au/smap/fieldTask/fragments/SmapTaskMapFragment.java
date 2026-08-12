@@ -17,6 +17,7 @@ package au.smap.fieldTask.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -73,6 +74,12 @@ import timber.log.Timber;
  * Responsible for displaying tasks on the main fieldTask screen
  */
 public class SmapTaskMapFragment extends Fragment {
+
+    // Roughly a fingertip. Used to decide whether a long press landed on a task
+    private static final double PRESS_TOLERANCE_PIXELS = 48;
+
+    // Width of the world in metres per pixel at zoom 0 on the equator, for 256 pixel tiles
+    private static final double EQUATOR_METRES_PER_PIXEL_AT_ZOOM_0 = 156543.03392;
 
     View rootView;
 
@@ -352,33 +359,49 @@ public class SmapTaskMapFragment extends Fragment {
     }
 
     private void onMapLongPress(MapPoint point) {
-        double minDistance = 1000;
         TaskEntry nearest = null;
+        double nearestMetres = Double.MAX_VALUE;
         for (Map.Entry<Integer, TaskEntry> entry : markerTaskMap.entrySet()) {
             TaskEntry t = entry.getValue();
             MapPoint tp = getTaskMapPoint(t);
             if (tp != null) {
-                double d = Math.sqrt(
-                    Math.pow(tp.latitude - point.latitude, 2) +
-                    Math.pow(tp.longitude - point.longitude, 2)
-                );
-                if (d < minDistance) {
-                    minDistance = d;
+                float[] result = new float[1];
+                Location.distanceBetween(point.latitude, point.longitude,
+                        tp.latitude, tp.longitude, result);
+                if (result[0] < nearestMetres) {
+                    nearestMetres = result[0];
                     nearest = t;
                 }
             }
         }
-        if (nearest != null) {
-            Toast.makeText(getActivity(), "marker selected: " + nearest.name, Toast.LENGTH_LONG).show();
-            if (nearest.locationTrigger != null) {
-                Toast.makeText(
-                    getActivity(),
-                    getString(R.string.smap_must_start_from_nfc),
-                    Toast.LENGTH_LONG).show();
-            } else {
-                ((SmapMain) getActivity()).completeTask(nearest, false);
-            }
+
+        if (nearest == null || nearestMetres > getPressToleranceMetres(point.latitude)) {
+            return;         // Not pressed on a task, so there is nothing to start
         }
+
+        Toast.makeText(getActivity(), "marker selected: " + nearest.name, Toast.LENGTH_LONG).show();
+        if (nearest.locationTrigger != null) {
+            Toast.makeText(
+                getActivity(),
+                getString(R.string.smap_must_start_from_nfc),
+                Toast.LENGTH_LONG).show();
+        } else {
+            ((SmapMain) getActivity()).completeTask(nearest, false);
+        }
+    }
+
+    /*
+     * How far from a task a long press can land and still count as pressing it.
+     *
+     * A fixed distance on the ground will not do: zoomed out, a marker that is plainly visible
+     * is kilometres away, and zoomed in a few metres covers the whole screen.  Work back from a
+     * fingertip sized radius on screen instead, so the map behaves the same at any zoom.
+     */
+    private double getPressToleranceMetres(double latitude) {
+        double metresPerPixel = EQUATOR_METRES_PER_PIXEL_AT_ZOOM_0
+                * Math.cos(Math.toRadians(latitude))
+                / Math.pow(2, mapFragment.getZoom());
+        return PRESS_TOLERANCE_PIXELS * metresPerPixel;
     }
 
     private void onFeatureClick(int featureId) {
