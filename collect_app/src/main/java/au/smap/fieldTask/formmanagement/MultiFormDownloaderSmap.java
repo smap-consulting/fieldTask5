@@ -387,9 +387,15 @@ public class MultiFormDownloaderSmap {
                 os.flush();
 
         } catch (Exception e) {
+            // Report the download failure to the caller.  Swallowing it here meant execution
+            // carried on to the copy below with the temporary file already deleted, so the real
+            // cause, usually a lost connection, surfaced as a confusing file copy error and the
+            // file being replaced had already been removed.
             Timber.e(e.toString());
 
             FileUtils.deleteAndReport(tempFile);
+
+            throw e;
 
         } finally {
             if (os != null) {
@@ -559,18 +565,20 @@ public class MultiFormDownloaderSmap {
                                 String.valueOf(count), String.valueOf(total));
                     }
 
-                    // Delete existing
-                    if (finalMediaFile.exists()) {
-                        FileUtils.deleteAndReport(finalMediaFile);
-                    }
-
-                    // Download
+                    // Download into the temporary directory.  The copy already on the device is left
+                    // alone until this has worked, so a download that fails on a poor connection
+                    // leaves the previous version in place rather than nothing at all.  These files
+                    // can be large lookup lists, and a form with a stale list is far better than a
+                    // form with no list.
                     InputStream mediaFile = formListApi.fetchMediaFile(toDownload.getDownloadUrl(), true);  // smap add credentials file
                     writeFile(tempMediaFile, stateListener, mediaFile);
 
                     deleteOldFile(tempMediaFile.getName(), finalMediaDir);
                     if (toDownload.getDownloadUrl().endsWith("organisation")) {
                         org.apache.commons.io.FileUtils.copyFileToDirectory(tempMediaFile, finalMediaDir, false);
+                        if (finalMediaFile.exists()) {      // smap the shared copy is replaced only now that the download has succeeded
+                            FileUtils.deleteAndReport(finalMediaFile);
+                        }
                         org.apache.commons.io.FileUtils.moveFileToDirectory(tempMediaFile, orgMediaDir, true);  // Save copy in org directory
                     } else {
                         org.apache.commons.io.FileUtils.moveFileToDirectory(tempMediaFile, finalMediaDir, true);
