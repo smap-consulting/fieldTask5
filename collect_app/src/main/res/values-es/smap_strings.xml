@@ -23,6 +23,10 @@
   <string name="smap_pending">: pendiente. </string>
   <string name="smap_reject_task">Rechazar Tarea</string>
   <string name="smap_release_case">Liberar caso</string>
+  <string name="smap_reference_removed">Referencia removida</string>
+  <string name="smap_reference_assigned_to">Asignada a: %s</string>
+  <string name="smap_reference_unassigned">Sin asignar</string>
+  <string name="smap_undo">Deshacer</string>
   <string name="smap_restore_task">Restablecer Tarea</string>
   <string name="smap_route_finding_inprogress">Encontrando ruta para la tarea</string>
   <string name="smap_routing_network_error">Fallo al buscar una ruta debido a error en la red</string>
@@ -32,6 +36,7 @@
   <string name="smap_tasks_not_enabled">Tareas no habilitadas - Habilite en la pantalla de ajustes</string>
   <string name="smap_forms">Formularios</string>
   <string name="smap_tasks">Tareas</string>
+  <string name="smap_references">Referencias</string>
   <string name="smap_map">Mapa</string>
   <string name="smap_taskList">TAREAS</string>
   <string name="smap_taskMap">MAPA</string>
@@ -53,7 +58,20 @@
   <string name="no_review">Esta tarea está finalizada y no puede ser revisada</string>
   <string name="smap_add_comment">Agregar Comentario</string>
   <string name="smap_clear_remote_cache">Borrar caché de datos remotos</string>
+  <!--Offline map layers supplied by the server-->
+  <string name="smap_server_layers">Capas del servidor</string>
+  <string name="smap_server_layers_none">Ninguna capa ha sido asignada a su usuario</string>
+  <string name="smap_server_layers_status">%s1 de %s2 descargadas</string>
+  <string name="smap_server_layers_complete">Todas las capas se han descargado</string>
+  <string name="smap_server_layers_item_have">%s1: descargada</string>
+  <string name="smap_server_layers_item_pending">%s1: no descargadas</string>
+  <string name="smap_server_layers_checking">Comprobando capas…</string>
+  <string name="smap_server_layers_wifi">Las capas restantes se descargarán cuando el dispositivo tenga conexión wifi. ¿Descargar ahora usando datos móviles?</string>
+  <string name="smap_server_layers_downloading">Descargando capas</string>
+  <string name="smap_server_layers_done">Capas descargadas</string>
+  <string name="smap_server_layers_failed">No se pudieron descargar algunas capas. Se volverá a intentar.</string>
   <string name="smap_new_forms">Buscando nuevos formularios y tareas</string>
+  <string name="smap_retrying">Problemas de conexión, reintentando (%1$d/%2$d)…</string>
   <string name="smap_no_forms">No hay formularios para descargar</string>
   <string name="smap_downloading">Descargando %1$d formularios</string>
   <string name="smap_submitting">Enviando al servidor %1$d formularios finalizados</string>
@@ -112,9 +130,9 @@
   <string name="smap_sort_by_project_desc">Descendente por Proyecto, Z-A</string>
   <string name="smap_no_label">No se ha especificado una etiqueta en Opciones</string>
   <string name="smap_survey_blocked">El formulario \"%1$s\" está desactivado en el servidor.  Póngase en contacto con su administrador para desbloquearlo y poder enviar sus resultados. </string>
-  <string name="smap_survey_deleted">El formulario \"%1$s\" ha sido eliminador en el servidor.  Póngase en contacto con su administrador  si usted necesita que se recupere el formulario y poder enviar sus datos.</string>
+  <string name="smap_survey_deleted">El formulario \"%1$s\" ha sido eliminado del servidor. Si necesita recuperarlo para que se puedan enviar sus datos, póngase en contacto con su administrador.</string>
   <string name="smap_csv_column_nf">La columna %1$s no fué encontrada en el archivo csv %2$s</string>
-  <string name="smap_self_select">Esta es una tarea que puede autoasignarse. Para hacerlo haga click sostenido en la tarea antes de ser realizada.</string>
+  <string name="smap_self_select">Esta es una tarea autoasignada. Debes aceptarla tocando el menú que aparece junto al nombre de la tarea.</string>
   <string name="smap_android_version">Versión Android %1s</string>
   <string name="smap_eval_required">%1$s no es un tipo válido para la función lookup_choices que tiene 3 parámetros. Sólo eval se puede usar.</string>
   <string name="smap_other">Otros</string>
