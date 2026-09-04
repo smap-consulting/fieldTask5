@@ -29,7 +29,7 @@ class SmapRegisterForMessagingTask @Inject constructor(
      */
     fun execute(token: String, server: String, username: String) {
         Timber.i("================================================== Notifying server of messaging update")
-        Timber.i("    token: %s", token)
+        Timber.i("    token: %s...", token.take(10))
         Timber.i("    server: %s", server)
         Timber.i("    user: %s", username)
 
@@ -59,7 +59,7 @@ class SmapRegisterForMessagingTask @Inject constructor(
      */
     suspend fun registerDevice(token: String, server: String, username: String): Result<Unit> {
         Timber.i("================================================== Notifying server of messaging update (suspend)")
-        Timber.i("    token: %s", token)
+        Timber.i("    token: %s...", token.take(10))
         Timber.i("    server: %s", server)
         Timber.i("    user: %s", username)
 

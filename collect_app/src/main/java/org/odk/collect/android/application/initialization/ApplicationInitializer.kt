@@ -70,10 +70,19 @@ class ApplicationInitializer(
     }
 
     private fun initializeLogging() {
-        if (BuildConfig.BUILD_TYPE == "odkCollectRelease") {
-            Timber.plant(CrashReportingTree(analytics))
-        } else {
+        // smap - was gated on BUILD_TYPE == "odkCollectRelease", which is upstream ODK's
+        // release type.  Smap ships assembleStandardRelease, so every shipped build took
+        // the debug branch and left debug logging on for users.  Crashes were still
+        // reported throughout: Crashlytics installs its own uncaught exception handler and
+        // does not need this tree.  What was missing is what the tree adds, namely
+        // non-fatals from Timber.e and breadcrumbs from Timber.w, so handled errors such
+        // as a failed device registration were invisible.
+        // Only the debug build type sets debuggable, so BuildConfig.DEBUG covers release,
+        // odkCollectRelease, selfSignedRelease and anything added later.
+        if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(CrashReportingTree(analytics))
         }
     }
 }
