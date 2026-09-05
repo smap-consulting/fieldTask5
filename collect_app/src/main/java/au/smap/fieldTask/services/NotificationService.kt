@@ -66,6 +66,29 @@ class NotificationService : FirebaseMessagingService() {
         Timber.i("========================================")
         Timber.i("FCM message received, beginning refresh")
 
+        /*
+         * Ignore a refresh meant for a server this device is no longer pointed at.
+         *
+         * A device registers against one server at a time, but a server looks up every host
+         * name it answers to, and there is a window between the user switching server and
+         * the new registration reaching DynamoDB.  Either can produce a refresh from the
+         * server this device has left.
+         *
+         * Only reject when the message says which server it came from and that server is
+         * not this one.  A server that does not send the name yet must keep working.
+         */
+        val messageServer = message.data["server"]
+        if (!messageServer.isNullOrEmpty()) {
+            val currentServer = Utilities.getSource()
+            if (!messageServer.equals(currentServer, ignoreCase = true)) {
+                Timber.w(
+                    "Ignoring refresh for %s, this device is registered to %s",
+                    messageServer, currentServer
+                )
+                return
+            }
+        }
+
         // Make sure SD card is ready, if not don't try to send
         if (Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED) {
             Timber.w("External storage not mounted, skipping notification handling")
