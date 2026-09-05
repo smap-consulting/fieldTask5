@@ -1320,6 +1320,40 @@ public class Utilities {
     }
 
     /*
+     * True while the app is still on the user name and server it shipped with, so nobody has
+     * configured it or logged in yet.
+     *
+     * Both have to match.  Someone who has pointed the app at their own server, or logged in
+     * under a name of their own, has configured it even if the other half is coincidentally
+     * still the default.
+     */
+    private static boolean isUnconfigured(String username, String server) {
+
+        Collect collect = Collect.getInstance();
+        if (collect == null) {
+            return false;   // Cannot tell, so do not block a registration on it
+        }
+
+        String defaultUsername = collect.getString(R.string.default_username);
+        String defaultServer = STFileUtils.getSource(collect.getString(R.string.default_server_url));
+
+        return isUnconfigured(username, server, defaultUsername, defaultServer);
+    }
+
+    /*
+     * Split out from the defaults so it can be tested.  Getting this wrong stops a real device
+     * registering, and nothing would report that.
+     */
+    static boolean isUnconfigured(String username, String server, String defaultUsername, String defaultServer) {
+
+        if (defaultUsername == null || defaultUsername.trim().length() == 0) {
+            return false;   // This flavour ships no default user name, so there is nothing to detect
+        }
+
+        return defaultUsername.equals(username) && defaultServer != null && defaultServer.equals(server);
+    }
+
+    /*
      * How long a successful device registration is trusted before it is asserted again
      */
     private static final long REGISTRATION_REASSERT_MS = 7L * 24 * 60 * 60 * 1000;
@@ -1345,7 +1379,15 @@ public class Utilities {
                 Timber.i("Registration check - username: %s, server: %s, token: %s",
                         username, server, token != null ? "present" : "null");
 
-                if (username != null && server != null && token != null && username.trim().length() != 0 && server.trim().length() != 0) {
+                if (isUnconfigured(username, server)) {
+                    /*
+                     * A fresh install carries a default user name and server, and registering
+                     * those put every download of the app into the device table under the same
+                     * shared name.  Those registrations can never be acted on, as nobody has
+                     * logged in yet, and they accumulate for as long as the app is published.
+                     */
+                    Timber.i("Not registering, the app is still on its shipped defaults");
+                } else if (username != null && server != null && token != null && username.trim().length() != 0 && server.trim().length() != 0) {
 
                     String registeredServer = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER);
                     String registeredUser = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_USER);
