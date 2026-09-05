@@ -85,6 +85,7 @@ object Defaults {
             hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_ID] = ""
             hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_SERVER] = ""
             hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_USER] = ""
+            hashMap[ProjectKeys.KEY_SMAP_REGISTRATION_TIME] = 0L
             hashMap[ProjectKeys.KEY_SMAP_LAST_LOGIN] = "0"
             hashMap[ProjectKeys.KEY_SMAP_PASSWORD_POLICY] = "-1"
             hashMap[ProjectKeys.KEY_SMAP_INPUT_METHOD] = "not set"

@@ -1319,6 +1319,11 @@ public class Utilities {
         return message;
     }
 
+    /*
+     * How long a successful device registration is trusted before it is asserted again
+     */
+    private static final long REGISTRATION_REASSERT_MS = 7L * 24 * 60 * 60 * 1000;
+
     public static void updateServerRegistration(boolean newToken) {
 
         Timber.i("================================================== Update Server registration");
@@ -1344,21 +1349,40 @@ public class Utilities {
 
                     String registeredServer = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER);
                     String registeredUser = settings.getString(ProjectKeys.KEY_SMAP_REGISTRATION_USER);
+                    long registeredAt = settings.getLong(ProjectKeys.KEY_SMAP_REGISTRATION_TIME);
+
+                    /*
+                     * Re-assert the registration periodically as well as when something changes.
+                     *
+                     * It heals a device whose registration was recorded before this was fixed and
+                     * never actually reached DynamoDB, and one whose row the server deleted after
+                     * FCM disabled its endpoint.  Neither has any other way back.
+                     */
+                    boolean stale = System.currentTimeMillis() - registeredAt > REGISTRATION_REASSERT_MS;
 
                     // Update the server if the token is new or the server or usernames have changed
                     if (newToken || registeredServer == null || registeredUser == null ||
-                            !username.equals(registeredUser) || !server.equals(registeredServer)) {
+                            !username.equals(registeredUser) || !server.equals(registeredServer) || stale) {
 
-                        Timber.i("Registering with server - user: %s, server: %s", username, server);
+                        Timber.i("Registering with server - user: %s, server: %s, stale: %s", username, server, stale);
+
+                        final String registeringServer = server;
+                        final String registeringUser = username;
 
                         // smap - Use Dagger to get SmapRegisterForMessagingTask with injected dependencies
                         SmapRegisterForMessagingTask task = new SmapRegisterForMessagingTask(
                             org.odk.collect.android.injection.DaggerUtils.getComponent(Collect.getInstance()).provideDeviceRegistrationService()
                         );
-                        task.execute(token, server, username);
-
-                        settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, server);
-                        settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_USER, username);
+                        /*
+                         * Record the registration only once it has reached DynamoDB.  Saving it up
+                         * front made a failed registration look successful, and the check above
+                         * then blocked every retry for the life of the install.
+                         */
+                        task.execute(token, registeringServer, registeringUser, () -> {
+                            settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_SERVER, registeringServer);
+                            settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_USER, registeringUser);
+                            settings.save(ProjectKeys.KEY_SMAP_REGISTRATION_TIME, System.currentTimeMillis());
+                        });
                     } else {
                         Timber.i("================================================== Notification not required");
                     }

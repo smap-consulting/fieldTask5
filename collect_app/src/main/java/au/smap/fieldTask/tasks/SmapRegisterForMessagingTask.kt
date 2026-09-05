@@ -17,7 +17,11 @@ import javax.inject.Inject
 class SmapRegisterForMessagingTask @Inject constructor(
     private val deviceRegistrationService: DeviceRegistrationService
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    /*
+     * Overridable so a test can run the registration on a dispatcher it controls, and
+     * assert what does and does not happen once it finishes
+     */
+    internal var scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /**
      * Register device FCM token with DynamoDB.
@@ -26,8 +30,11 @@ class SmapRegisterForMessagingTask @Inject constructor(
      * @param token Firebase Cloud Messaging registration token
      * @param server Smap server URL
      * @param username User identifier
+     * @param onSuccess run only if the registration reached DynamoDB.  The caller must not
+     *        record the device as registered until then, or a failure is never retried.
      */
-    fun execute(token: String, server: String, username: String) {
+    @JvmOverloads
+    fun execute(token: String, server: String, username: String, onSuccess: Runnable? = null) {
         Timber.i("================================================== Notifying server of messaging update")
         Timber.i("    token: %s...", token.take(10))
         Timber.i("    server: %s", server)
@@ -39,6 +46,7 @@ class SmapRegisterForMessagingTask @Inject constructor(
 
                 result.onSuccess {
                     Timber.i("================================================== Notifying server of messaging update done")
+                    onSuccess?.run()
                 }.onFailure { error ->
                     Timber.e(error, "Failed to register device for messaging")
                 }

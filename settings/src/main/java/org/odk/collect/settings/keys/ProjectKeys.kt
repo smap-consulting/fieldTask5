@@ -108,6 +108,7 @@ object ProjectKeys {
     const val KEY_SMAP_REGISTRATION_ID = "registration_id" // Android notifications id
     const val KEY_SMAP_REGISTRATION_SERVER = "registration_server" // Server name that has been registered
     const val KEY_SMAP_REGISTRATION_USER = "registration_user" // User name that has been registered
+    const val KEY_SMAP_REGISTRATION_TIME = "registration_time" // System time in milli seconds of the last successful registration
     const val KEY_SMAP_LAST_LOGIN = "last_login" // System time in milli seconds that the user last logged in
     const val KEY_SMAP_PASSWORD_POLICY = "pw_policy"
     const val KEY_SMAP_CURRENT_ORGANISATION = "smap_current_organisation"
