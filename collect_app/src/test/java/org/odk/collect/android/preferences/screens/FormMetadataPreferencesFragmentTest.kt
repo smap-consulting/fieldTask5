@@ -1,5 +1,6 @@
 package org.odk.collect.android.preferences.screens
 
+import android.content.Context
 import androidx.preference.Preference
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -31,7 +32,10 @@ class FormMetadataPreferencesFragmentTest {
     @Before
     fun setup() {
         CollectHelpers.overrideAppDependencyModule(object : AppDependencyModule() {
-            override fun providesInstallIDProvider(settingsProvider: SettingsProvider): InstallIDProvider {
+            override fun providesInstallIDProvider(
+                context: Context,
+                settingsProvider: SettingsProvider
+            ): InstallIDProvider {
                 return installIDProvider
             }
         })

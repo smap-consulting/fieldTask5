@@ -6,6 +6,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
@@ -103,7 +104,7 @@ class InstancesDataServiceTest {
         val instancesRepository = projectDependencyModule.instancesRepository
         instancesRepository.save(InstanceFixtures.instance(form = form, status = STATUS_COMPLETE))
 
-        whenever(httpInterface.executeGetRequest(any(), any(), any()))
+        whenever(httpInterface.executeGetRequest(any(), anyOrNull<String>(), anyOrNull()))
             .doReturn(
                 HttpGetResult(
                     null,
