@@ -53,7 +53,8 @@ class DeviceRegistrationService @Inject constructor(
         val device = DevicesDO(
             registrationId = token,
             smapServer = server,
-            userIdent = username
+            userIdent = username,
+            registeredTime = System.currentTimeMillis()
         )
 
         val result = deviceRepository.saveDevice(device)

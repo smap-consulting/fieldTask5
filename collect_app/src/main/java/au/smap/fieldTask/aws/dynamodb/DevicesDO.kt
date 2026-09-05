@@ -31,7 +31,20 @@ data class DevicesDO(
      * User identifier (username)
      */
     @get:DynamoDBAttribute(attributeName = "userIdent")
-    var userIdent: String = ""
+    var userIdent: String = "",
+
+    /**
+     * When this registration was last written, milliseconds since the epoch.
+     *
+     * The rows carried nothing to date them, so a registration from years ago looked exactly
+     * like one from today and dead ones could not be told from live.  Utilities re-asserts a
+     * registration weekly, so a live device restamps itself within a week.
+     *
+     * Absent on rows written by fieldTask 4 and by versions before this, so absence means
+     * unknown, not dead.
+     */
+    @get:DynamoDBAttribute(attributeName = "registeredTime")
+    var registeredTime: Long = 0
 ) {
     companion object {
         /**
