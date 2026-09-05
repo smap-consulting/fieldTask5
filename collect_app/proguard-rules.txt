@@ -14,6 +14,11 @@
 -keep class org.mp4parser.boxes.** { *; }
 -keep class * extends androidx.fragment.app.Fragment{}
 
+# smap - TaskSpecWorker instantiates these by name with Class.forName, so every scheduled
+# task in the app breaks at runtime, silently, if one is shrunk away or renamed.  Currently
+# safe only because -dontobfuscate is set below, which is easily removed by accident.
+-keep class * implements org.odk.collect.async.TaskSpec { <init>(); }
+
 -keep class * implements org.javarosa.core.util.externalizable.Externalizable{}
 -keep class org.javarosa.core.model.instance.geojson.GeojsonFeature { *; }
 -keep class org.javarosa.core.model.instance.geojson.GeojsonGeometry { *; }

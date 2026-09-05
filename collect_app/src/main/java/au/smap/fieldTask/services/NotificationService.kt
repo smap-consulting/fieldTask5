@@ -18,10 +18,9 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Environment
 import androidx.core.app.NotificationCompat
 import au.smap.fieldTask.activities.NotificationActivity
-import au.smap.fieldTask.tasks.DownloadTasksTask
+import au.smap.fieldTask.tasks.RefreshTaskSpec
 import au.smap.fieldTask.utilities.Utilities
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -43,6 +42,9 @@ class NotificationService : FirebaseMessagingService() {
 
     @Inject
     lateinit var settingsProvider: org.odk.collect.settings.SettingsProvider
+
+    @Inject
+    lateinit var scheduler: org.odk.collect.async.Scheduler
 
     override fun onCreate() {
         super.onCreate()
@@ -80,19 +82,23 @@ class NotificationService : FirebaseMessagingService() {
         val messageServer = message.data["server"]
         if (!messageServer.isNullOrEmpty()) {
             val currentServer = Utilities.getSource()
-            if (!messageServer.equals(currentServer, ignoreCase = true)) {
+            /*
+             * Only reject when this device's own server is actually known.  This service can be
+             * started cold, before the settings are readable, and getSource then returns "none"
+             * for a null server url.  Refusing a refresh on the strength of that would drop
+             * every refresh that arrived while the app was not running, which is most of them.
+             */
+            val known = !currentServer.isNullOrEmpty() && !currentServer.equals("none", ignoreCase = true)
+            if (known && !messageServer.equals(currentServer, ignoreCase = true)) {
                 Timber.w(
                     "Ignoring refresh for %s, this device is registered to %s",
                     messageServer, currentServer
                 )
                 return
             }
-        }
-
-        // Make sure SD card is ready, if not don't try to send
-        if (Environment.getExternalStorageState() != Environment.MEDIA_MOUNTED) {
-            Timber.w("External storage not mounted, skipping notification handling")
-            return
+            if (!known) {
+                Timber.w("Cannot tell which server this device uses, accepting the refresh for %s", messageServer)
+            }
         }
 
         // Check if auto-send is enabled (wifi or cellular) using fieldTask5 Settings architecture
@@ -101,10 +107,13 @@ class NotificationService : FirebaseMessagingService() {
         val isAutoSendEnabled = autoSendOption != "off"
 
         if (isAutoSendEnabled) {
-            // Auto-send enabled: Refresh - download new tasks from server
-            Timber.i("Auto-send enabled, downloading tasks")
-            val downloadTasksTask = DownloadTasksTask()
-            downloadTasksTask.doInBackground()
+            /*
+             * Schedule the refresh rather than running it here.  Firebase allows this callback
+             * about twenty seconds, and less for a device woken out of doze, which is not enough
+             * for a sync of assignments, forms, manifests and media on a slow connection.
+             */
+            Timber.i("Auto-send enabled, scheduling a refresh")
+            RefreshTaskSpec.schedule(scheduler)
         } else {
             // Auto-send disabled: Show notification that server has changed
             Timber.i("Auto-send disabled, showing server changed notification")
