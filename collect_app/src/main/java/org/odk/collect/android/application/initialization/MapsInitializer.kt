@@ -70,7 +70,13 @@ class MapsInitializer @Inject constructor(
         try {
             com.google.android.gms.maps.MapsInitializer.initialize(
                 context,
-                com.google.android.gms.maps.MapsInitializer.Renderer.LEGACY
+                // smap - was pinned to LEGACY in May 2026 (74cb30e990) because the LATEST
+                // renderer threw Resources.NotFoundException in the Maps dynamite module on some
+                // Android 13 + GMS combinations.  Restored to upstream's LATEST after Google Maps
+                // stopped rendering on play-services-maps 20.0.0; the legacy renderer is served by
+                // the dynamite module at runtime, so the pin outlived the SDK that supported it.
+                // If the Android 13 crash returns, fix it without pinning the renderer.
+                com.google.android.gms.maps.MapsInitializer.Renderer.LATEST
             ) { renderer: com.google.android.gms.maps.MapsInitializer.Renderer ->
                 when (renderer) {
                     com.google.android.gms.maps.MapsInitializer.Renderer.LATEST -> Timber.d("The latest version of Google Maps renderer is used.")
