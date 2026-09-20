@@ -123,4 +123,9 @@ object AnalyticsEvents {
      * `columns-n`
      */
     const val GALLERY_SELECT = "GallerySelect"
+
+    /**
+     * Logged whenever a form open is blocked due to an in-progress update
+     */
+    const val FORM_OPEN_DURING_UPDATE = "FromUpdateDuringUpdate"
 }

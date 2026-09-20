@@ -17,6 +17,7 @@ import org.odk.collect.analytics.Analytics
 import org.odk.collect.android.R
 import org.odk.collect.android.activities.FormFillingActivity
 import org.odk.collect.android.analytics.AnalyticsEvents
+import org.odk.collect.android.analytics.AnalyticsUtils
 import org.odk.collect.android.formentry.FormOpeningMode
 import org.odk.collect.android.injection.DaggerUtils
 import org.odk.collect.android.instancemanagement.InstanceDeleter
@@ -363,6 +364,7 @@ private class FormUriViewModel(
             return if (isLocAcquired) {
                 null
             } else {
+                AnalyticsUtils.logFormEvent(AnalyticsEvents.FORM_OPEN_DURING_UPDATE, form)
                 resources.getString(string.cannot_open_form_because_of_forms_update)
             }
         } else {

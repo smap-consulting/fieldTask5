@@ -25,6 +25,11 @@ object AnalyticsUtils {
     }
 
     @JvmStatic
+    fun logFormEvent(event: String, form: Form) {
+        Analytics.log(event, "form", getFormHash(form))
+    }
+
+    @JvmStatic
     fun logServerEvent(event: String, generalSettings: Settings) {
         Analytics.log(event, "server", getServerHash(generalSettings)!!)
     }

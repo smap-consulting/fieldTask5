@@ -1,7 +1,11 @@
 package org.odk.collect.android.application.initialization
 
 import android.content.Context
-
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import com.google.android.gms.maps.MapView
+import org.odk.collect.android.application.MapboxClassInstanceCreator
 import org.odk.collect.android.geo.MapConfiguratorProvider
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.settings.keys.ProjectKeys
@@ -22,8 +26,30 @@ class MapsInitializer @Inject constructor(
         // It was moved off the main thread to avoid an ANR from the Binder IPC in
         // isGooglePlayServicesAvailable; if that returns, defer this call rather than rethread it.
         resetToAvailableFramework()
-        if (!FRAMEWORKS_INITIALIZED) {
-            initializeFrameworks()
+        initializeFrameworks()
+    }
+
+    fun initializeUIComponents(activity: FragmentActivity, fragmentContainer: Int) {
+        if (!UI_COMPONENTS_INITIALIZED) {
+            val mapView = MapView(activity.application)
+            mapView.onCreate(null)
+            activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
+                override fun onDestroy(owner: LifecycleOwner) {
+                    mapView.onDestroy()
+                }
+            })
+
+            if (MapboxClassInstanceCreator.isMapboxAvailable()) {
+                activity.supportFragmentManager
+                    .beginTransaction()
+                    .add(
+                        fragmentContainer,
+                        MapboxClassInstanceCreator.createMapBoxInitializationFragment()
+                    )
+                    .commit()
+            }
+
+            UI_COMPONENTS_INITIALIZED = true
         }
     }
 
@@ -51,10 +77,6 @@ class MapsInitializer @Inject constructor(
                     com.google.android.gms.maps.MapsInitializer.Renderer.LEGACY -> Timber.d("The legacy version of Google Maps renderer is used.")
                 }
             }
-            // smap - upstream posts MapView(context).onCreate(null) to the main looper here.
-            // smap - We leave it out entirely: it caused an ANR through synchronous Binder IPC
-            // smap - and MapsInitializer.initialize() above is sufficient.
-            FRAMEWORKS_INITIALIZED = true // smap - was never set to true in upstream
         } catch (ignore: Exception) {
             // ignored
         } catch (ignore: Error) {
@@ -63,6 +85,6 @@ class MapsInitializer @Inject constructor(
     }
 
     companion object {
-        private var FRAMEWORKS_INITIALIZED = false
+        private var UI_COMPONENTS_INITIALIZED = false
     }
 }

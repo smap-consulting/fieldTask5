@@ -33,15 +33,20 @@ class ForegroundServiceLocationTracker(private val application: Application) : L
         return application.getState().getFlow(LOCATION_KEY, null)
     }
 
-    override fun start(retainMockAccuracy: Boolean, updateInterval: Long?) {
+    override fun start(retainMockAccuracy: Boolean, updateInterval: Long?, notification: Boolean) {
         val intent = Intent(application, LocationTrackerService::class.java).also { intent ->
             intent.putExtra(LocationTrackerService.EXTRA_RETAIN_MOCK_ACCURACY, retainMockAccuracy)
+            intent.putExtra(LocationTrackerService.EXTRA_NOTIFICATION, notification)
             updateInterval?.let {
                 intent.putExtra(LocationTrackerService.EXTRA_UPDATE_INTERVAL, it)
             }
         }
 
-        ContextCompat.startForegroundService(application, intent)
+        if (notification) {
+            application.startForegroundService(intent)
+        } else {
+            application.startService(intent)
+        }
     }
 
     override fun stop() {
@@ -69,27 +74,29 @@ class LocationTrackerService : Service(), LocationClient.LocationClientListener 
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        setupNotificationChannel()
-
-        // smap - Check location permission before startForeground() with FOREGROUND_SERVICE_TYPE_LOCATION.
-        // On API 34+ (targetSDK 35), startForeground() with location type throws SecurityException if
-        // runtime location permission is not granted. Use 2-arg fallback then stop if permission missing.
+        // smap - runtime location permission must be held before startForeground() with
+        // FOREGROUND_SERVICE_TYPE_LOCATION.  On API 34+ that call throws SecurityException
+        // without it, so fall back to the 2-arg form and stop if the permission is missing.
         val hasLocationPermission =
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && hasLocationPermission) {
-                startForeground(uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER), createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
-            } else {
-                startForeground(uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER), createNotification())
+        if (intent?.getBooleanExtra(EXTRA_NOTIFICATION, true) != false) {
+            setupNotificationChannel()
+
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && hasLocationPermission) {
+                    startForeground(uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER), createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+                } else {
+                    startForeground(uniqueIdGenerator.getInt(NOTIFICATION_IDENTIFIER), createNotification())
+                }
+            } catch (e: Exception) { // smap
+                stopSelf()
+                return START_NOT_STICKY
             }
-        } catch (e: Exception) {
-            stopSelf()
-            return START_NOT_STICKY
         }
 
-        if (!hasLocationPermission) {
+        if (!hasLocationPermission) { // smap
             stopSelf()
             return START_NOT_STICKY
         }
@@ -144,7 +151,12 @@ class LocationTrackerService : Service(), LocationClient.LocationClientListener 
     }
 
     private fun createNotificationIntent() =
-        PendingIntent.getActivity(this, 0, Intent(this, ReturnToAppActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
+        PendingIntent.getActivity(
+            this,
+            0,
+            Intent(this, ReturnToAppActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE
+        )
 
     private fun setupNotificationChannel() {
         val notificationChannel = NotificationChannel(
@@ -161,6 +173,7 @@ class LocationTrackerService : Service(), LocationClient.LocationClientListener 
     companion object {
         const val EXTRA_RETAIN_MOCK_ACCURACY = "retain_mock_accuracy"
         const val EXTRA_UPDATE_INTERVAL = "update_interval"
+        const val EXTRA_NOTIFICATION = "notification"
 
         private const val NOTIFICATION_IDENTIFIER = "location_tracking"
         private const val NOTIFICATION_CHANNEL = "location_tracking"

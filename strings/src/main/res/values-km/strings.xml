@@ -174,6 +174,13 @@
   <string name="open_file">បើក​ឯកសារ</string>
   <string name="rank_items">ចំណាត់ថ្នាក់ធាតុ</string>
   <string name="invalid_range_widget">ធាតុក្រាហ្វិកនេះមានប៉ារ៉ាម៉ែត្រមិនត្រឹមត្រូវ!</string>
+  <!--Content description for a horizontal slider used in range widgets-->
+  <!--Content description for a vertical slider used in range widgets-->
+  <!--Content description for the label showing the current value of the slider-->
+  <!--Content description for each tick mark on the slider indicating discrete steps-->
+  <!--Content description for the draggable thumb handle of the slider-->
+  <!--Content description for the label at the start (minimum) of the slider-->
+  <!--Content description for the label at the end (maximum) of the slider-->
   <string name="svg_file_does_not_exist">ឯកសារ SVG មិនត្រូវបានរកឃើញ</string>
   <string name="capture_image">ថត​រូបភាព</string>
   <string name="choose_image">ជ្រើសរើសរូបថត</string>
@@ -336,10 +343,7 @@
   <!--##############################################
     # GEO
     ##############################################-->
-  <!--TODO(ping): Delete these openmap_* strings when we're ready to move on from OSMDroid.
-   These strings are only being used to preserve compatibility with pre-existing
-    tile caches, and are not shown in the UI.-->
-    <string name="basemap">ផែនទីមូលដ្ឋាន</string>
+  <string name="basemap">ផែនទីមូលដ្ឋាន</string>
   <string name="basemap_source">ប្រភព</string>
   <string name="map_style_label">%s រចនាបទផែនទី</string>
   <string name="streets">ផ្លូវ</string>
@@ -515,7 +519,7 @@
   <string name="change_password">ពាក្យ​សម្ងាត់ ODK</string>
   <string name="password_error_whitespace">ការ​ដក​ឃ្លា​មិន​ត្រូវ​បាន​អនុញ្ញាតិ​នៅ​ក្នុង​ពាក្យ​សម្ងាត់​នៅផ្នែក​ខាង​មុខ ឬ​ខាង​ក្រោយ</string>
   <string name="username_error_whitespace">ការ​ដក​ឃ្លា​មិន​ត្រូវ​បាន​អនុញ្ញាតិ​នៅ​ក្នុង​ឈ្មោះ​អ្នក​ប្រើ​ប្រាស់​នៅ​ផ្នែក​​ខាង​​មុខ​ ឬ​​ខាង​​ក្រោយ</string>
-    <string name="language">ភាសា</string>
+  <string name="language">ភាសា</string>
   <string name="use_device_language">ប្រើ​ប្រាស់​ភាសារបស់​ឧបករណ៍</string>
   <string name="font_size">ទំហំពុម្ភអក្សរ</string>
   <string name="change_font_size">ទំហំពុម្ភអក្សរ</string>
@@ -743,16 +747,10 @@
   <!--##############################################
     # Crash handling
     ##############################################-->
+  <!--Message shown when the app crashed due to running out of memory last time it was run.-->
   <!--##############################################
     # Google Drive deprecation
     ##############################################-->
-  <!--##############################################
-    # Min SDK deprecation banner
-    ##############################################-->
-  <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <!--Button text that opens a forum post with more information about upcoming device support changes-->
-  <!--Button text to dismiss the banner-->
   <!--##############################################
     # Developer tools
     ##############################################-->

@@ -92,3 +92,6 @@
 -keepclassmembers,allowobfuscation class * {
   @com.google.gson.annotations.SerializedName <fields>;
 }
+
+# Prevent optimizations and the obscure NullPointerException crashes
+-processkotlinnullchecks keep

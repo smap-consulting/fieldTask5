@@ -22,9 +22,12 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.core.graphics.toColorInt
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
-import org.odk.collect.androidshared.system.getParcelableCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewmodel.viewModelFactory
 import org.odk.collect.androidshared.ui.DialogFragmentUtils.showIfNotShowing
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
 import org.odk.collect.async.Scheduler
@@ -36,7 +39,6 @@ import org.odk.collect.geo.GeoUtils.toMapPoint
 import org.odk.collect.geo.R
 import org.odk.collect.geo.geopoint.LocationAccuracy.Improving
 import org.odk.collect.geo.items.MappableData
-import org.odk.collect.geo.items.MappableItem
 import org.odk.collect.geo.items.MappableItemsDelegate
 import org.odk.collect.location.tracker.LocationTracker
 import org.odk.collect.location.tracker.getCurrentLocation
@@ -54,10 +56,10 @@ import org.odk.collect.webpage.WebPageService
 import javax.inject.Inject
 
 class GeoPointMapFragment(
-    val inputPoint: MapPoint?,
-    val draggable: Boolean,
-    val readOnly: Boolean,
-    val retainMockAccuracy: Boolean,
+    val inputPoint: MapPoint? = null,
+    val draggable: Boolean = true,
+    val readOnly: Boolean = false,
+    val retainMockAccuracy: Boolean = false,
     val mappableData: MappableData? = null,
     val previousPoints: List<MapPoint> = emptyList() // smap - "history-map"
 ) : Fragment() {
@@ -87,34 +89,31 @@ class GeoPointMapFragment(
 
     private var locationStatus: AccuracyStatusView? = null
 
-    private var location: MapPoint? = null
     private var placeMarkerButton: ImageButton? = null
-
-    private var isDragged = false
 
     private var zoomButton: ImageButton? = null
     private var clearButton: ImageButton? = null
-
-    private var captureLocation = false
 
     /**
      * True if a tap on the clear button removed an existing marker and
      * no new marker has been placed.
      */
     private var setClear = false
-
-    /**
-     * True if the current point was not via interacting with the UI
-     */
-    private var hasInputPoint = false
-
     /**
      * While true, the point cannot be moved by dragging or long-pressing.
      */
-    private var isPointLocked = false
+    private var isPointLocked = inputPoint != null
 
     private val currentLocationDelegate = CurrentLocationDelegate()
     private val mappableItemsDelegate = MappableItemsDelegate(background = true, clickable = false)
+
+    private val geoPointViewModel: GeoPointViewModel by viewModels {
+        viewModelFactory {
+            addInitializer(GeoPointViewModel::class) {
+                GeoPointViewModel(inputPoint)
+            }
+        }
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -166,6 +165,10 @@ class GeoPointMapFragment(
         if (mappableData != null) {
             showItemLoading(mappableData)
         }
+
+        geoPointViewModel.isInputPoint.asLiveData().observe(viewLifecycleOwner) {
+            locationStatus!!.isVisible = !it
+        }
     }
 
     override fun onSaveInstanceState(state: Bundle) {
@@ -180,20 +183,14 @@ class GeoPointMapFragment(
             return
         }
 
-        state.putParcelable(POINT_KEY, map!!.getMarkerPoint(featureId))
-
         // Flags
-        state.putBoolean(IS_DRAGGED_KEY, isDragged)
-        state.putBoolean(CAPTURE_LOCATION_KEY, captureLocation)
         state.putBoolean(SET_CLEAR_KEY, setClear)
-        state.putBoolean(HAS_INPUT_POINT_KEY, hasInputPoint)
         state.putBoolean(IS_POINT_LOCKED_KEY, isPointLocked)
 
         // UI state
         state.putBoolean(PLACE_MARKER_BUTTON_ENABLED_KEY, placeMarkerButton!!.isEnabled)
         state.putBoolean(ZOOM_BUTTON_ENABLED_KEY, zoomButton!!.isEnabled)
         state.putBoolean(CLEAR_BUTTON_ENABLED_KEY, clearButton!!.isEnabled)
-        state.putInt(LOCATION_STATUS_VISIBILITY_KEY, locationStatus!!.visibility)
     }
 
     private fun returnLocation() {
@@ -201,10 +198,11 @@ class GeoPointMapFragment(
 
         if (setClear || (readOnly && featureId == -1)) {
             result = ""
-        } else if (isDragged || readOnly || hasInputPoint) {
-            result = formatResult(map!!.getMarkerPoint(featureId)!!)
-        } else if (location != null) {
-            result = formatResult(location!!)
+        } else {
+            val geoPoint = geoPointViewModel.geoPoint.value
+            if (geoPoint != null) {
+                result = formatResult(geoPoint)
+            }
         }
 
         if (result != null) {
@@ -233,8 +231,8 @@ class GeoPointMapFragment(
             val currentLocation = locationTracker.getCurrentLocation()
             if (currentLocation != null) {
                 val mapPoint = currentLocation.toMapPoint()
-                placeMarker(mapPoint)
-                zoomToMarker(true)
+                geoPointViewModel.place(mapPoint)
+                map!!.zoomToPoint(map!!.getMarkerPoint(featureId), true)
             }
         }
 
@@ -257,8 +255,6 @@ class GeoPointMapFragment(
         clearButton!!.isEnabled = false
         clearButton!!.setOnClickListener {
             clear()
-            locationStatus!!.visibility = View.VISIBLE
-            hasInputPoint = false
         }
 
         if (!draggable) {
@@ -268,27 +264,15 @@ class GeoPointMapFragment(
         }
 
         if (readOnly) {
-            captureLocation = true
             clearButton!!.isEnabled = false
-        }
-
-        if (inputPoint != null) {
-            // If the point is initially set, the "place marker"
-            // button, dragging, and long-pressing are all initially disabled.
-            // To enable them, the user must clear the marker and add a new one.
-            isPointLocked = true
-            placeMarker(inputPoint)
-            placeMarkerButton!!.isEnabled = false
-
-            captureLocation = true
-            hasInputPoint = true
-            locationStatus!!.visibility = View.GONE
-            zoomButton!!.isEnabled = true
-            zoomToMarker(false)
         }
 
         if (previousState != null) {
             restoreFromInstanceState(previousState!!)
+        }
+
+        if (inputPoint != null && !map!!.hasCenter()) {
+            map!!.setCenter(inputPoint, animate = true)
         }
 
         map!!.showCurrentLocation(
@@ -303,14 +287,18 @@ class GeoPointMapFragment(
             (map as MapFragment).showData(mappableData, mappableItemsDelegate)
         }
 
-        drawHistoryMarkers()
+        drawHistoryMarkers() // smap - "history-map"
+
+        geoPointViewModel.geoPoint.asLiveData().observe(viewLifecycleOwner) {
+            updateMarker(it)
+        }
     }
 
     /**
      * smap - "history-map": draws the locations collected by earlier instances of this repeat.
-     * The markers are added once; clear() and placeMarker() only clear this fragment's own
-     * feature, so they survive.  With no answer yet, frame them so the first GPS fix does not
-     * zoom away from them.
+     * The markers are added once and are never cleared, because clear() and the marker update
+     * path only touch this fragment's own feature.  With no answer yet, frame them so the first
+     * GPS fix does not zoom away from them.
      */
     private fun drawHistoryMarkers() {
         if (previousPoints.isEmpty()) {
@@ -338,30 +326,12 @@ class GeoPointMapFragment(
     }
 
     private fun restoreFromInstanceState(state: Bundle) {
-        isDragged = state.getBoolean(IS_DRAGGED_KEY, false)
-        captureLocation = state.getBoolean(CAPTURE_LOCATION_KEY, false)
         setClear = state.getBoolean(SET_CLEAR_KEY, false)
-        hasInputPoint = state.getBoolean(HAS_INPUT_POINT_KEY, false)
-        isPointLocked = state.getBoolean(IS_POINT_LOCKED_KEY, false)
-
-        // Restore the marker and dialog after the flags, because they use some of them.
-        val point = state.getParcelableCompat<MapPoint>(POINT_KEY)
-        if (point != null) {
-            placeMarker(point)
-        }
-
-        // Restore the flags again, because placeMarker() and clear() modify some of them.
-        isDragged = state.getBoolean(IS_DRAGGED_KEY, false)
-        captureLocation = state.getBoolean(CAPTURE_LOCATION_KEY, false)
-        setClear = state.getBoolean(SET_CLEAR_KEY, false)
-        hasInputPoint = state.getBoolean(HAS_INPUT_POINT_KEY, false)
         isPointLocked = state.getBoolean(IS_POINT_LOCKED_KEY, false)
 
         placeMarkerButton!!.isEnabled = state.getBoolean(PLACE_MARKER_BUTTON_ENABLED_KEY, false)
         zoomButton!!.isEnabled = state.getBoolean(ZOOM_BUTTON_ENABLED_KEY, false)
         clearButton!!.isEnabled = state.getBoolean(CLEAR_BUTTON_ENABLED_KEY, false)
-
-        locationStatus!!.visibility = state.getInt(LOCATION_STATUS_VISIBILITY_KEY, View.GONE)
     }
 
     private fun onLocationChanged(point: MapPoint?) {
@@ -372,8 +342,8 @@ class GeoPointMapFragment(
         if (point != null) {
             enableZoomButton()
 
-            if (!captureLocation && !setClear) {
-                placeMarker(point)
+            if (!geoPointViewModel.hasGeoPoint() && !setClear) {
+                geoPointViewModel.place(point)
                 placeMarkerButton!!.isEnabled = true
             }
 
@@ -397,18 +367,15 @@ class GeoPointMapFragment(
 
     private fun onDragEnd(draggedFeatureId: Int) {
         if (draggedFeatureId == featureId) {
-            isDragged = true
-            captureLocation = true
             setClear = false
-            map!!.setCenter(map!!.getMarkerPoint(featureId), true)
+            geoPointViewModel.place(map!!.getMarkerPoint(featureId)!!)
         }
     }
 
     private fun onLongPress(point: MapPoint) {
         if (draggable && !readOnly && !isPointLocked) {
-            placeMarker(point)
+            geoPointViewModel.place(point)
             enableZoomButton()
-            isDragged = true
         }
     }
 
@@ -418,30 +385,22 @@ class GeoPointMapFragment(
         }
     }
 
-    private fun zoomToMarker(animate: Boolean) {
-        map!!.zoomToPoint(map!!.getMarkerPoint(featureId), animate)
-    }
-
     private fun clear() {
-        map!!.clearFeatures(listOf(featureId))
-        featureId = -1
+        geoPointViewModel.clear()
         clearButton!!.isEnabled = false
         placeMarkerButton!!.isEnabled = true
 
         isPointLocked = false
-        isDragged = false
-        captureLocation = false
         setClear = true
     }
 
-    /**
-     * Places the marker and enables the button to remove it.
-     */
-    private fun placeMarker(point: MapPoint) {
-        this.location = point
-
+    private fun updateMarker(point: MapPoint?) {
         if (featureId != -1) {
             map!!.clearFeatures(listOf(featureId))
+        }
+
+        if (point == null) {
+            return
         }
 
         val iconDescription = MarkerIconDescription.DrawableResource(
@@ -457,26 +416,21 @@ class GeoPointMapFragment(
                 iconDescription
             )
         )
+
         if (!readOnly) {
             clearButton!!.isEnabled = true
         }
-        captureLocation = true
+
         setClear = false
     }
 
     companion object {
-        const val POINT_KEY: String = "point"
-
-        const val IS_DRAGGED_KEY: String = "is_dragged"
-        const val CAPTURE_LOCATION_KEY: String = "capture_location"
         const val SET_CLEAR_KEY: String = "set_clear"
-        const val HAS_INPUT_POINT_KEY: String = "has_input_point"
         const val IS_POINT_LOCKED_KEY: String = "is_point_locked"
 
         const val PLACE_MARKER_BUTTON_ENABLED_KEY: String = "place_marker_button_enabled"
         const val ZOOM_BUTTON_ENABLED_KEY: String = "zoom_button_enabled"
         const val CLEAR_BUTTON_ENABLED_KEY: String = "clear_button_enabled"
-        const val LOCATION_STATUS_VISIBILITY_KEY: String = "location_status_visibility"
 
         const val MARKER_COLOR: String = "#52C268"
         const val HISTORY_MARKER_COLOR: String = "#2962FF" // smap - "history-map"

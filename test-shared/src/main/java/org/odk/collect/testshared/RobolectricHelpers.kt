@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
+import org.odk.collect.servicetest.NotificationDetails
 import org.odk.collect.servicetest.ServiceScenario
 import org.odk.collect.servicetest.ServiceScenario.Companion.launch
 import org.robolectric.Robolectric
@@ -102,6 +103,10 @@ object RobolectricHelpers {
 
     fun clearServices() {
         services.clear()
+    }
+
+    fun getForegroundServiceNotifications(): List<NotificationDetails> {
+        return services.mapNotNull { it.value.getForegroundNotification() }
     }
 
     @Suppress("UNCHECKED_CAST")
