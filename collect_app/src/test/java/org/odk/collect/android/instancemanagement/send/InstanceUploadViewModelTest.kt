@@ -92,6 +92,14 @@ class InstanceUploadViewModelTest {
                 viewModel.cancel()
                 return "Success"
             }
+
+            // smap - pre-batch auth probe; nothing to check in this test
+            override fun checkSubmissionAuth(
+                projectId: String,
+                instance: Instance,
+                deviceId: String?,
+                overrideURL: String?
+            ) = Unit
         }
 
         val instancesSubmitter = InstanceSubmitter(

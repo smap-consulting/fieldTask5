@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.getodk</groupId>
   <artifactId>javarosa</artifactId>
-  <version>5.1.5-smap</version>
+  <version>5.1.6-smap</version>
   <dependencies>
     <dependency>
       <groupId>joda-time</groupId>

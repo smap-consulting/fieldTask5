@@ -24,7 +24,7 @@ buildscript {
 
 allprojects {
     repositories {
-        // Project-local Maven repo (checked in) - contains custom javarosa 5.1.5-smap
+        // Project-local Maven repo (checked in) - contains custom javarosa 5.1.6-smap
         // This allows out-of-box builds without setting up JavaRosa repository
         maven {
             url "${rootDir}/.local-m2/"

@@ -3,7 +3,7 @@
   "component": {
     "group": "org.getodk",
     "module": "javarosa",
-    "version": "5.1.5-smap",
+    "version": "5.1.6-smap",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -83,13 +83,13 @@
       ],
       "files": [
         {
-          "name": "javarosa-5.1.5-smap.jar",
-          "url": "javarosa-5.1.5-smap.jar",
-          "size": 698710,
-          "sha512": "7cd93a92bfecd061291032253643a2b275074a69c8c3f8ccbd4192c3eda06b27f125eb80981522e469e3f1d5eba20e50e5710a26545953356fa18680ad99332c",
-          "sha256": "1d01ea762979f4acc048e5d05b0c2b2b8d8f9c50db09d8b3140e67cc99117038",
-          "sha1": "43e52d891885fd6dba6106e927318a780466856c",
-          "md5": "a1250fc9d0938653d4426a60f6a43dfc"
+          "name": "javarosa-5.1.6-smap.jar",
+          "url": "javarosa-5.1.6-smap.jar",
+          "size": 698641,
+          "sha512": "05c85427389abd14a8b9b3501289e4bc610f933a06f019d4cbc9796f8cdc1226039ed767fee1b39561585333459a8b1713f6d6450ab4d632d6d753ec5ec91b39",
+          "sha256": "5e5105e8de05b4b79ddef58585c6fe1366887ee5d39698b3c7be40467b728230",
+          "sha1": "08e77276eccbc09cf6df35d780e3a163caa89007",
+          "md5": "e6abbbc217e7f38b8849c4fc6ec36b6e"
         }
       ]
     },
@@ -162,13 +162,13 @@
       ],
       "files": [
         {
-          "name": "javarosa-5.1.5-smap.jar",
-          "url": "javarosa-5.1.5-smap.jar",
-          "size": 698710,
-          "sha512": "7cd93a92bfecd061291032253643a2b275074a69c8c3f8ccbd4192c3eda06b27f125eb80981522e469e3f1d5eba20e50e5710a26545953356fa18680ad99332c",
-          "sha256": "1d01ea762979f4acc048e5d05b0c2b2b8d8f9c50db09d8b3140e67cc99117038",
-          "sha1": "43e52d891885fd6dba6106e927318a780466856c",
-          "md5": "a1250fc9d0938653d4426a60f6a43dfc"
+          "name": "javarosa-5.1.6-smap.jar",
+          "url": "javarosa-5.1.6-smap.jar",
+          "size": 698641,
+          "sha512": "05c85427389abd14a8b9b3501289e4bc610f933a06f019d4cbc9796f8cdc1226039ed767fee1b39561585333459a8b1713f6d6450ab4d632d6d753ec5ec91b39",
+          "sha256": "5e5105e8de05b4b79ddef58585c6fe1366887ee5d39698b3c7be40467b728230",
+          "sha1": "08e77276eccbc09cf6df35d780e3a163caa89007",
+          "md5": "e6abbbc217e7f38b8849c4fc6ec36b6e"
         }
       ]
     }
