@@ -47,7 +47,6 @@ class EntityFormFinalizationProcessorTest {
     @Test
     fun `when form does not have entity element, adds no entities to extras`() {
         val scenario = Scenario.init(
-            "Normal form",
             html(
                 head(
                     title("Normal form"),
@@ -76,7 +75,6 @@ class EntityFormFinalizationProcessorTest {
     @Test
     fun `when saveTo is not relevant, it is not included in entity`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -122,7 +120,6 @@ class EntityFormFinalizationProcessorTest {
     @Test
     fun `creates entity with values treated as opaque strings`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -167,48 +164,8 @@ class EntityFormFinalizationProcessorTest {
     }
 
     @Test
-    fun `does not create entity with blank labels`() {
-        val scenario = Scenario.init(
-            "Create entity form",
-            html(
-                listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
-                head(
-                    title("Create entity form"),
-                    model(
-                        listOf(Pair("entities:entities-version", "2024.1.0")),
-                        mainInstance(
-                            t(
-                                "data id=\"create-entity-form\"",
-                                t("name"),
-                                t("meta", entityNode("people", CREATE))
-                            )
-                        ),
-                        bind("/data/name").type("date")
-                            .withSaveTo("name"),
-                        bind("/data/meta/entity/@id").type("string"),
-                        bind("/data/meta/entity/label").type("string")
-                            .calculate("/data/name"),
-                        setvalue("odk-instance-first-load", "/data/meta/entity/@id", "uuid()")
-                    )
-                ),
-                body(
-                    input("/data/name")
-                )
-            )
-        )
-
-        val processor = EntityFormFinalizationProcessor()
-        val model = scenario.formEntryController.model
-        processor.processForm(model)
-
-        val entities = model.extras.get(EntitiesExtra::class.java).entities
-        assertThat(entities.size, equalTo(0))
-    }
-
-    @Test
     fun `when saveTo is in not relevant group, it is not included in entity`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -260,7 +217,6 @@ class EntityFormFinalizationProcessorTest {
     @Test
     fun `when saveTo is nested in an extra group, creates entity with values`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(

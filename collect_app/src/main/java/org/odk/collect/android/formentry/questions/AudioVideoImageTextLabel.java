@@ -36,6 +36,7 @@ import org.odk.collect.android.databinding.AudioVideoImageTextLabelBinding;
 import org.odk.collect.android.listeners.SelectItemClickListener;
 import org.odk.collect.android.utilities.FormEntryPromptUtils;
 import org.odk.collect.android.utilities.MediaUtils;
+import org.odk.collect.androidshared.system.ContextExt;
 import org.odk.collect.audioclips.AudioPlayer;
 import org.odk.collect.audioclips.Clip;
 import org.odk.collect.imageloader.ImageLoader;
@@ -160,7 +161,7 @@ public class AudioVideoImageTextLabel extends RelativeLayout implements View.OnC
 
     public void playVideo() {
         if (videoFile != null) {  // smap: guard against autoplay="video" with no video file
-            mediaUtils.openFile(getContext(), videoFile, "video/*");
+            mediaUtils.openFile(ContextExt.getActivity(getContext()), videoFile, "video/*");
         }
     }
 
@@ -206,7 +207,7 @@ public class AudioVideoImageTextLabel extends RelativeLayout implements View.OnC
 
     private void onImageClick() {
         if (bigImageFile != null) {
-            mediaUtils.openFile(getContext(), bigImageFile, "image/*");
+            mediaUtils.openFile(ContextExt.getActivity(getContext()), bigImageFile, "image/*");
         } else {
             selectItem();
         }

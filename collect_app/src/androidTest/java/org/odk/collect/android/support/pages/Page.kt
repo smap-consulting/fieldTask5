@@ -307,8 +307,9 @@ abstract class Page<T : Page<T>> {
         return destination
     }
 
-    fun clickOnString(stringID: Int): T {
-        clickOnText(getTranslatedString(stringID))
+    @JvmOverloads
+    fun clickOnString(stringID: Int, assertionFramework: AssertionFramework = AssertionFramework.ESPRESSO): T {
+        clickOnText(getTranslatedString(stringID), assertionFramework)
         return this as T
     }
 
@@ -322,13 +323,22 @@ abstract class Page<T : Page<T>> {
         return FormHierarchyPage(formName)
     }
 
-    fun clickOnText(text: String): T {
-        EspressoInteractions.clickOn(
-            allOf(
-                withText(text),
-                withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
-            )
-        )
+    @JvmOverloads
+    fun clickOnText(text: String, assertionFramework: AssertionFramework = AssertionFramework.ESPRESSO): T {
+        when (assertionFramework) {
+            AssertionFramework.ESPRESSO -> {
+                EspressoInteractions.clickOn(
+                    allOf(
+                        withText(text),
+                        withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
+                    )
+                )
+            }
+
+            AssertionFramework.COMPOSE -> {
+                ComposeInteractions.clickOn(composeRule!!, hasText(text))
+            }
+        }
         return this as T
     }
 
@@ -599,7 +609,10 @@ abstract class Page<T : Page<T>> {
     }
 
     fun closeSnackbar(): T {
-        EspressoInteractions.clickOn(withContentDescription(org.odk.collect.strings.R.string.close_snackbar))
+        waitFor {
+            EspressoInteractions.clickOn(withContentDescription(org.odk.collect.strings.R.string.close_snackbar))
+        }
+
         return this as T
     }
 

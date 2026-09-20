@@ -55,6 +55,8 @@ import org.odk.collect.maps.traces.LineDescription;
 import org.odk.collect.maps.MapConsts;
 import org.odk.collect.maps.MapFragmentFactory;
 import org.odk.collect.maps.MapFragment;
+import org.odk.collect.maps.MapFragmentKt;
+import org.odk.collect.maps.circles.CurrentLocationDelegate;
 import org.odk.collect.maps.MapPoint;
 import org.odk.collect.maps.layers.OfflineMapLayersPickerBottomSheetDialogFragment;
 import org.odk.collect.maps.layers.ReferenceLayerRepository;
@@ -102,6 +104,9 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     // smap - true once the map has been zoomed to the first GPS fix
     private boolean zoomedToFirstFix;
+
+    // smap - MapFragment no longer tracks GPS itself; we drive it from LocationTracker
+    private final CurrentLocationDelegate currentLocationDelegate = new CurrentLocationDelegate();
 
     @Inject
     ReferenceLayerRepository referenceLayerRepository;
@@ -279,14 +284,14 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         });
 
         recordButton = findViewById(R.id.record_button);
-        recordButton.setOnClickListener(v -> recordPoint(map.getGpsLocation()));
+        recordButton.setOnClickListener(v -> recordPoint(getCurrentMapPoint()));
 
         findViewById(R.id.layers).setOnClickListener(v -> {
             DialogFragmentUtils.showIfNotShowing(OfflineMapLayersPickerBottomSheetDialogFragment.class, getSupportFragmentManager());
         });
 
         zoomButton = findViewById(R.id.zoom);
-        zoomButton.setOnClickListener(v -> map.zoomToPoint(map.getGpsLocation(), true));
+        zoomButton.setOnClickListener(v -> map.zoomToPoint(getCurrentMapPoint(), true));
 
         // Get the marker types from the appearance
         Intent intent = getIntent();
@@ -316,7 +321,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
             points = map.getPolyPoints(lineFeatureId);
         } else {
             // Create the polyline
-            lineFeatureId = map.addPolyLine(new LineDescription(points, null, null, false, false)); // smap - draggable=false avoids TracePoint circles that obscure compound markers
+            lineFeatureId = map.addPolyLine(new LineDescription(points, null, null, false, false, false, true)); // smap - draggable=false avoids TracePoint circles that obscure compound markers
 
             // Create markers for marked vertices
             createMarkersForVertices();
@@ -332,11 +337,13 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         map.setClickListener(this::onClick);
         // Also allow long press to place point to match prior versions
         map.setLongPressListener(this::onClick);
-        map.setGpsLocationEnabled(true);
-        map.setGpsLocationListener(this::onGpsLocation);
+        // smap - upstream removed MapFragment's own GPS tracking; drive it from LocationTracker
+        GeoUtils.showCurrentLocation(map, locationTracker, currentLocationDelegate,
+                getIntent() != null && getIntent().getBooleanExtra(EXTRA_RETAIN_MOCK_ACCURACY, false),
+                this::onGpsLocation);
         if (!points.isEmpty()) {
             map.zoomToBoundingBox(points, 0.6, false);
-        } else if (map.getGpsLocation() != null) {
+        } else if (getCurrentMapPoint() != null) {
             // smap - MapFragment#runOnGpsLocationReady was removed upstream; zoom now if there
             // is already a fix, otherwise onGpsLocation() does it on the first one.
             zoomedToFirstFix = true;
@@ -377,7 +384,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
             map.setMarkerIcon(existingFeatureId, iconDesc);
         } else {
             MarkerDescription markerDesc = new MarkerDescription(point, false, MapFragment.IconAnchor.CENTER, iconDesc);
-            int newFeatureId = map.addMarker(markerDesc);
+            int newFeatureId = MapFragmentKt.addMarker(map, markerDesc);
             markerFeatureIds.put(vertexIdx, newFeatureId);
         }
     }
@@ -403,7 +410,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         if (recordingEnabled && recordingAutomatic) {
             locationTracker.start();
 
-            recordPoint(map.getGpsLocation());
+            recordPoint(getCurrentMapPoint());
             schedulerHandler = executorServiceScheduler.scheduleAtFixedRate(() -> runOnUiThread(() -> {
                 Location currentLocation = LocationTrackerKt.getCurrentLocation(locationTracker);
 
@@ -502,7 +509,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     }
 
     private Integer findNearestVertex() {
-        MapPoint gps = map.getGpsLocation();
+        MapPoint gps = getCurrentMapPoint();
         MapPoint center = map.getCenter();
         MapPoint ref = (gps != null) ? gps : center;
         List<MapPoint> points = map.getPolyPoints(lineFeatureId);
@@ -547,10 +554,24 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         }
     }
 
+    /** smap - current fix from the LocationTracker, replacing MapFragment#getGpsLocation */
+    private MapPoint getCurrentMapPoint() {
+        Location currentLocation = LocationTrackerKt.getCurrentLocation(locationTracker);
+        if (currentLocation == null) {
+            return null;
+        }
+        return new MapPoint(
+                currentLocation.getLatitude(),
+                currentLocation.getLongitude(),
+                currentLocation.getAltitude(),
+                currentLocation.getAccuracy()
+        );
+    }
+
     private void onGpsLocationReady(MapFragment map) {
         // Don't zoom to current location if a user is manually entering points
         if (getWindow().isActive() && (!inputActive || recordingEnabled)) {
-            map.zoomToPoint(map.getGpsLocation(), true);
+            map.zoomToPoint(getCurrentMapPoint(), true);
         }
         updateUi();
     }
@@ -606,7 +627,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     private void clear() {
         map.clearFeatures();
-        lineFeatureId = map.addPolyLine(new LineDescription(new ArrayList<>(), null, null, false, false)); // smap
+        lineFeatureId = map.addPolyLine(new LineDescription(new ArrayList<>(), null, null, false, false, false, true)); // smap
         markerFeatureIds.clear();
         markers.clear();
         inputActive = false;
@@ -616,7 +637,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     /** Updates the state of various UI widgets to reflect internal state. */
     private void updateUi() {
         final int numPoints = map.getPolyPoints(lineFeatureId).size();
-        final MapPoint location = map.getGpsLocation();
+        final MapPoint location = getCurrentMapPoint();
 
         // Visibility state
         playButton.setVisibility(inputActive ? View.GONE : View.VISIBLE);

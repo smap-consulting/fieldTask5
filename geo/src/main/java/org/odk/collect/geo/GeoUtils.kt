@@ -2,8 +2,18 @@ package org.odk.collect.geo
 
 import android.content.Context
 import android.location.Location
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import org.javarosa.core.model.data.GeoPointData
+import org.odk.collect.geo.items.MappableData
+import org.odk.collect.geo.items.MappableItem
+import org.odk.collect.geo.items.MappableItemsDelegate
+import org.odk.collect.location.tracker.LocationTracker
+import org.odk.collect.location.tracker.bindToLifecycle
+import org.odk.collect.maps.MapFragment
 import org.odk.collect.maps.MapPoint
+import org.odk.collect.maps.circles.CurrentLocationDelegate
+import org.odk.collect.material.MaterialProgressDialogFragment
 import org.odk.collect.shared.strings.StringUtils.removeEnd
 import org.odk.collect.strings.R
 import java.text.DecimalFormat
@@ -93,7 +103,70 @@ object GeoUtils {
         return MapPoint(this.getPart(0), this.getPart(1), this.getPart(2), this.getPart(3))
     }
 
+    @JvmStatic
     fun org.odk.collect.location.Location.toMapPoint(): MapPoint {
         return MapPoint(this.latitude, this.longitude, this.altitude, this.accuracy.toDouble())
+    }
+
+    @JvmStatic
+    @JvmOverloads
+    fun MapFragment.showCurrentLocation(
+        locationTracker: LocationTracker,
+        currentLocationDelegate: CurrentLocationDelegate,
+        retainMockAccuracy: Boolean = false,
+        afterUpdate: (MapPoint) -> Unit = {}
+    ) {
+        val lifecycleOwner = this as Fragment
+        locationTracker.bindToLifecycle(lifecycleOwner, retainMockAccuracy)
+        locationTracker.getLocation().asLiveData().observe(lifecycleOwner) {
+            if (it != null) {
+                val mapPoint = it.toMapPoint()
+                currentLocationDelegate.update(this, mapPoint)
+                afterUpdate(mapPoint)
+            }
+        }
+    }
+
+    /**
+     * smap - Java friendly wrapper around [showCurrentLocation], for GeoCompoundActivity which
+     * is an Activity rather than a Fragment and so cannot call the extension directly.
+     */
+    @JvmStatic
+    fun showCurrentLocation(
+        map: MapFragment,
+        locationTracker: LocationTracker,
+        currentLocationDelegate: CurrentLocationDelegate,
+        retainMockAccuracy: Boolean,
+        afterUpdate: MapFragment.PointListener
+    ) {
+        map.showCurrentLocation(locationTracker, currentLocationDelegate, retainMockAccuracy) {
+            afterUpdate.onPoint(it)
+        }
+    }
+
+    fun MapFragment.showData(
+        mappableData: MappableData,
+        mappableItemsDelegate: MappableItemsDelegate,
+        afterUpdate: (List<MappableItem>) -> Unit = {}
+    ) {
+        val fragment = this as Fragment
+        mappableData.getMappableItems().observe(fragment) { items ->
+            if (items != null) {
+                mappableItemsDelegate.updateFeatures(this, items)
+                afterUpdate(items)
+            }
+        }
+    }
+
+    fun Fragment.showItemLoading(mappableData: MappableData) {
+        MaterialProgressDialogFragment.showOn(
+            viewLifecycleOwner,
+            mappableData.isLoading(),
+            childFragmentManager
+        ) {
+            MaterialProgressDialogFragment().also { dialog ->
+                dialog.message = getString(R.string.loading)
+            }
+        }
     }
 }

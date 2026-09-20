@@ -1,6 +1,8 @@
 package org.odk.collect.mapbox
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import com.mapbox.geojson.Point
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationDragListener
@@ -25,6 +27,8 @@ internal class DynamicPolyLineFeature(
     private val featureDragEndListener: MapFragment.FeatureListener?,
     private val lineDescription: LineDescription
 ) : LineFeature {
+    private val mainHandler = Handler(Looper.getMainLooper())
+
     override val points: List<MapPoint>
         get() = _points.toList()
 
@@ -110,6 +114,7 @@ internal class DynamicPolyLineFeature(
                     .withPoints(points)
                     .withLineColor(lineDescription.getStrokeColor())
                     .withLineWidth(MapUtils.convertStrokeWidth(lineDescription))
+                    .withLineSortKey(MapUtils.sortKey(lineDescription.background))
             ).also {
                 polylineAnnotationManager.update(it)
             }
@@ -145,7 +150,11 @@ internal class DynamicPolyLineFeature(
             if (featureDragEndListener != null) {
                 for (pointAnnotation in pointAnnotations) {
                     if (annotation.id == pointAnnotation.id) {
-                        featureDragEndListener.onFeature(featureId)
+                        // Deferred to avoid ConcurrentModificationException caused by Mapbox iterating over
+                        // its annotation list while this callback disposes and recreates annotations.
+                        mainHandler.post {
+                            featureDragEndListener.onFeature(featureId)
+                        }
                         break
                     }
                 }

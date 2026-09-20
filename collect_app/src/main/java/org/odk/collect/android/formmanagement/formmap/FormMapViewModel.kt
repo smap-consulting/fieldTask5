@@ -12,15 +12,16 @@ import org.odk.collect.android.instancemanagement.showAsEditable
 import org.odk.collect.android.instancemanagement.userVisibleInstanceName
 import org.odk.collect.androidshared.livedata.MutableNonNullLiveData
 import org.odk.collect.androidshared.livedata.NonNullLiveData
+import org.odk.collect.androidshared.ui.DisplayString
 import org.odk.collect.async.Scheduler
 import org.odk.collect.forms.Form
 import org.odk.collect.forms.FormsRepository
 import org.odk.collect.forms.instances.Instance
 import org.odk.collect.forms.instances.InstancesRepository
-import org.odk.collect.geo.selection.IconifiedText
-import org.odk.collect.geo.selection.MappableSelectItem
+import org.odk.collect.geo.items.IconifiedText
+import org.odk.collect.geo.items.MappableItem
 import org.odk.collect.geo.selection.SelectionMapData
-import org.odk.collect.geo.selection.Status
+import org.odk.collect.geo.items.Status
 import org.odk.collect.maps.MapPoint
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.settings.keys.ProtectedProjectKeys
@@ -29,7 +30,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class FormMapViewModel(
-    private val resources: Resources,
+    @Deprecated("Should not pass Resources to ViewModel") private val resources: Resources,
     private val formId: Long,
     private val formsRepository: FormsRepository,
     private val instancesRepository: InstancesRepository,
@@ -40,7 +41,7 @@ class FormMapViewModel(
     private var _form: Form? = null
 
     private val mapTitle = MutableLiveData<String?>()
-    private var mappableItems = MutableLiveData<List<MappableSelectItem>>(null)
+    private var mappableItems = MutableLiveData<List<MappableItem>>(emptyList())
     private var itemCount = MutableNonNullLiveData(0)
     private val isLoading = MutableNonNullLiveData(false)
 
@@ -48,15 +49,19 @@ class FormMapViewModel(
         return mapTitle
     }
 
-    override fun getItemType(): String {
-        return resources.getString(org.odk.collect.strings.R.string.saved_forms)
+    override fun getItemType(): DisplayString {
+        return DisplayString.Resource(org.odk.collect.strings.R.string.saved_forms)
     }
 
     override fun getItemCount(): NonNullLiveData<Int> {
         return itemCount
     }
 
-    override fun getMappableItems(): LiveData<List<MappableSelectItem>?> {
+    override fun isSelected(mappableItem: MappableItem): Boolean {
+        return false
+    }
+
+    override fun getMappableItems(): LiveData<List<MappableItem>> {
         return mappableItems
     }
 
@@ -71,7 +76,7 @@ class FormMapViewModel(
             background = {
                 val form = _form ?: formsRepository.get(formId)!!.also { _form = it }
                 val instances = instancesRepository.getAllByFormId(form.formId)
-                val items = mutableListOf<MappableSelectItem>()
+                val items = mutableListOf<MappableItem>()
 
                 for (instance in instances) {
                     if (instance.geometry != null && instance.geometryType == Instance.GEOMETRY_TYPE_POINT) {
@@ -94,7 +99,7 @@ class FormMapViewModel(
             },
             foreground = {
                 mapTitle.value = it.first
-                mappableItems.value = it.second as List<MappableSelectItem>
+                mappableItems.value = it.second as List<MappableItem>
                 itemCount.value = it.third
                 isLoading.value = false
             }
@@ -105,7 +110,7 @@ class FormMapViewModel(
         instance: Instance,
         latitude: Double,
         longitude: Double
-    ): MappableSelectItem {
+    ): MappableItem {
         val instanceLastStatusChangeDate = instance.getStatusDescription(resources)
 
         return if (instance.deletedDate != null) {
@@ -116,7 +121,7 @@ class FormMapViewModel(
             )
 
             val info = "$instanceLastStatusChangeDate\n${dateFormat.format(instance.deletedDate)}"
-            MappableSelectItem.MappableSelectPoint(
+            MappableItem.Point(
                 instance.dbId,
                 instance.userVisibleInstanceName(resources),
                 point = MapPoint(latitude, longitude),
@@ -131,7 +136,7 @@ class FormMapViewModel(
             ).contains(instance.status)
         ) {
             val info = "$instanceLastStatusChangeDate\n${resources.getString(org.odk.collect.strings.R.string.cannot_edit_completed_form)}"
-            MappableSelectItem.MappableSelectPoint(
+            MappableItem.Point(
                 instance.dbId,
                 instance.userVisibleInstanceName(resources),
                 point = MapPoint(latitude, longitude),
@@ -147,7 +152,7 @@ class FormMapViewModel(
                     createViewAction()
                 }
 
-            MappableSelectItem.MappableSelectPoint(
+            MappableItem.Point(
                 instance.dbId,
                 instance.userVisibleInstanceName(resources),
                 point = MapPoint(latitude, longitude),
@@ -171,7 +176,7 @@ class FormMapViewModel(
     private fun createViewAction(): IconifiedText {
         return IconifiedText(
             R.drawable.ic_visibility,
-            resources.getString(org.odk.collect.strings.R.string.view_data)
+            DisplayString.Resource(org.odk.collect.strings.R.string.view_data)
         )
     }
 
@@ -181,7 +186,7 @@ class FormMapViewModel(
 
         return IconifiedText(
             if (canEditSaved) org.odk.collect.icons.R.drawable.ic_edit else R.drawable.ic_visibility,
-            resources.getString(if (canEditSaved) org.odk.collect.strings.R.string.edit_data else org.odk.collect.strings.R.string.view_data)
+            DisplayString.Resource(if (canEditSaved) org.odk.collect.strings.R.string.edit_data else org.odk.collect.strings.R.string.view_data)
         )
     }
 

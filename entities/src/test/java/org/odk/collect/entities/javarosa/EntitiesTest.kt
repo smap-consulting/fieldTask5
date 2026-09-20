@@ -55,7 +55,6 @@ class EntitiesTest {
     @Test
     fun `filling form without create does not create any entities`() {
         val scenario = Scenario.init(
-            "Entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -93,7 +92,6 @@ class EntitiesTest {
     @Test
     fun `filling form with create makes entity available`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -141,7 +139,6 @@ class EntitiesTest {
     @Test
     fun `filling form with create in multiple groups makes entities available`() {
         val scenario = Scenario.init(
-            "Create entities from multiple groups form",
             html(
                 listOf("entities" to "http://www.opendatakit.org/xforms/entities"),
                 head(
@@ -231,7 +228,6 @@ class EntitiesTest {
     @Test
     fun `filling form with update in multiple groups makes entities available`() {
         val scenario = Scenario.init(
-            "Update entities from multiple groups form",
             html(
                 listOf("entities" to "http://www.opendatakit.org/xforms/entities"),
                 head(
@@ -323,7 +319,6 @@ class EntitiesTest {
     @Test
     fun `filling form with create in repeats makes entities available`() {
         val scenario = Scenario.init(
-            "Create entities from repeats form",
             html(
                 listOf("entities" to "http://www.opendatakit.org/xforms/entities"),
                 head(
@@ -396,7 +391,6 @@ class EntitiesTest {
     @Test
     fun `filling form with update in repeats makes entities available`() {
         val scenario = Scenario.init(
-            "Update entities from repeats form",
             html(
                 listOf("entities" to "http://www.opendatakit.org/xforms/entities"),
                 head(
@@ -469,7 +463,6 @@ class EntitiesTest {
     @Test
     fun `filling form with create in nested repeats makes entities available`() {
         val scenario = Scenario.init(
-            "Create entities from nested repeats form",
             html(
                 listOf("entities" to "http://www.opendatakit.org/xforms/entities"),
                 head(
@@ -579,7 +572,6 @@ class EntitiesTest {
     @Test
     fun `filling form with update in nested repeats makes entities available`() {
         val scenario = Scenario.init(
-            "Update entities from nested repeats form",
             html(
                 listOf("entities" to "http://www.opendatakit.org/xforms/entities"),
                 head(
@@ -687,134 +679,8 @@ class EntitiesTest {
     }
 
     @Test
-    fun `filling form with create without an id makes invalid entity available`() {
-        val scenario = Scenario.init(
-            "Create entity form",
-            html(
-                listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
-                head(
-                    title("Create entity form"),
-                    model(
-                        listOf(Pair("entities:entities-version", "2024.1.0")),
-                        mainInstance(
-                            t(
-                                "data id=\"create-entity-form\"",
-                                t("id"),
-                                t("name"),
-                                t(
-                                    "meta",
-                                    t("entity dataset=\"people\" create=\"1\" id=\"\"",
-                                        t("label")
-                                    )
-                                )
-                            )
-                        ),
-                        bind("/data/id").type("string"),
-                        bind("/data/meta/entity/@id").type("string").calculate("/data/id"),
-                        bind("/data/meta/entity/label").type("string").calculate("/data/name")
-                    )
-                ),
-                body(
-                    input("/data/id"),
-                    input("/data/name")
-                )
-            )
-        )
-
-        scenario.formEntryController.addPostProcessor(EntityFormFinalizationProcessor())
-        scenario.finalizeInstance()
-
-        val entitiesExtra = scenario.formEntryController.model.extras.get(EntitiesExtra::class.java)
-        val (entities, invalidEntities) = entitiesExtra
-        assertThat(entities.size, equalTo(0))
-        assertThat(invalidEntities.size, equalTo(1))
-        assertThat(invalidEntities[0].dataset, equalTo("people"))
-        assertThat(invalidEntities[0].id, equalTo(null))
-    }
-
-    @Test
-    fun `filling form with blank label makes invalid entity available`() {
-        val scenario = Scenario.init(
-            "Create entity form",
-            html(
-                listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
-                head(
-                    title("Create entity form"),
-                    model(
-                        listOf(Pair("entities:entities-version", "2024.1.0")),
-                        mainInstance(
-                            t(
-                                "data id=\"create-entity-form\"",
-                                t("name"),
-                                t("meta", entityNode("people", CREATE))
-                            )
-                        ),
-                        bind("/data/name").type("string").withSaveTo("name"),
-                        entityLabelBind("/data/name"),
-                    )
-                ),
-                body(
-                    input("/data/name")
-                )
-            )
-        )
-
-        scenario.formEntryController.addPostProcessor(EntityFormFinalizationProcessor())
-        scenario.answer("/data/name", " ")
-        scenario.finalizeInstance()
-
-        val entitiesExtra = scenario.formEntryController.model.extras.get(EntitiesExtra::class.java)
-        val (entities, invalidEntities) = entitiesExtra
-        assertThat(entities.size, equalTo(0))
-        assertThat(invalidEntities.size, equalTo(1))
-        assertThat(invalidEntities[0].dataset, equalTo("people"))
-        assertThat(invalidEntities[0].label, equalTo(" "))
-    }
-
-    @Test
-    fun `filling fom with non-UUID id makes invalid entity available`() {
-        val scenario = Scenario.init(
-            "Create entity form",
-            html(
-                listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
-                head(
-                    title("Create entity form"),
-                    model(
-                        listOf(Pair("entities:entities-version", "2024.1.0")),
-                        mainInstance(
-                            t(
-                                "data id=\"create-entity-form\"",
-                                t("name"),
-                                t("meta", entityNode("people", CREATE))
-                            )
-                        ),
-                        bind("/data/name").type("string").withSaveTo("name"),
-                        entityLabelBind("/data/name"),
-                        setvalue("odk-instance-first-load", "/data/meta/entity/@id", "1")
-                    )
-                ),
-                body(
-                    input("/data/name")
-                )
-            )
-        )
-
-        scenario.formEntryController.addPostProcessor(EntityFormFinalizationProcessor())
-        scenario.answer("/data/name", "Dylan")
-        scenario.finalizeInstance()
-
-        val entitiesExtra = scenario.formEntryController.model.extras.get(EntitiesExtra::class.java)
-        val (entities, invalidEntities) = entitiesExtra
-        assertThat(entities.size, equalTo(0))
-        assertThat(invalidEntities.size, equalTo(1))
-        assertThat(invalidEntities[0].dataset, equalTo("people"))
-        assertThat(invalidEntities[0].id, equalTo("1"))
-    }
-
-    @Test
     fun `filling form with update makes entity available`() {
         val scenario = Scenario.init(
-            "Update entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -859,46 +725,8 @@ class EntitiesTest {
     }
 
     @Test
-    fun `filling form with update without an id does not make entity available`() {
+    fun `filling form with create and update makes entity available with upsert action`() {
         val scenario = Scenario.init(
-            "Update entity form",
-            html(
-                listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
-                head(
-                    title("Update entity form"),
-                    model(
-                        listOf(Pair("entities:entities-version", "2024.1.0")),
-                        mainInstance(
-                            t(
-                                "data id=\"update-entity-form\"",
-                                t("id"),
-                                t(
-                                    "meta",
-                                    t("entity dataset=\"people\" update=\"1\" id=\"\" baseVersion=\"\"")
-                                )
-                            )
-                        ),
-                        bind("/data/id").type("string"),
-                        bind("/data/meta/entity/@id").type("string").calculate("/data/id").readonly()
-                    )
-                ),
-                body(
-                    input("/data/id")
-                )
-            )
-        )
-
-        scenario.formEntryController.addPostProcessor(EntityFormFinalizationProcessor())
-        scenario.finalizeInstance()
-
-        val entities = scenario.formEntryController.model.extras.get(EntitiesExtra::class.java).entities
-        assertThat(entities.size, equalTo(0))
-    }
-
-    @Test
-    fun `filling form with create and update does not make entity available`() {
-        val scenario = Scenario.init(
-            "Upsert entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -918,6 +746,8 @@ class EntitiesTest {
                             )
                         ),
                         bind("/data/name").type("string").withSaveTo("name"),
+                        entityIdBind(),
+                        entityIdSetValue(),
                         bind("/data/meta/entity/label").type("string").calculate("/data/name")
                     )
                 ),
@@ -932,13 +762,17 @@ class EntitiesTest {
         scenario.finalizeInstance()
 
         val entities = scenario.formEntryController.model.extras.get(EntitiesExtra::class.java).entities
-        assertThat(entities.size, equalTo(0))
+        assertThat(entities.size, equalTo(1))
+        assertThat(entities[0].dataset, equalTo("people"))
+        assertThat(entities[0].id, notNullValue())
+        assertThat(entities[0].label, equalTo("Tom Wambsgans"))
+        assertThat(entities[0].properties, equalTo(listOf(Pair("name", "Tom Wambsgans"))))
+        assertThat(entities[0].action, equalTo(EntityAction.UPSERT))
     }
 
     @Test
     fun `filling form with dynamic create expression conditionally creates entities`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -996,7 +830,6 @@ class EntitiesTest {
     @Test
     fun `entity form can be serialized`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -1042,7 +875,6 @@ class EntitiesTest {
     @Test
     fun `entities namespace works regardless of name`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("blah", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -1081,7 +913,6 @@ class EntitiesTest {
     @Test
     fun `filling form with select saveto and with create saves values correctly to entity`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -1123,7 +954,6 @@ class EntitiesTest {
     @Test
     fun `when saveto question is not answered, entity property is empty string`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(
@@ -1163,7 +993,6 @@ class EntitiesTest {
     @Test
     fun `saveto is removed from bind attributes for clients`() {
         val scenario = Scenario.init(
-            "Create entity form",
             html(
                 listOf(Pair("entities", "http://www.opendatakit.org/xforms/entities")),
                 head(

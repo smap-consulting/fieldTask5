@@ -47,7 +47,13 @@ import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder;
 import org.odk.collect.maps.traces.LineDescription;
+import org.odk.collect.geo.GeoDependencyComponentProvider;
+import org.odk.collect.geo.GeoUtils;
+import org.odk.collect.location.tracker.LocationTracker;
+import org.odk.collect.location.tracker.LocationTrackerKt;
 import org.odk.collect.maps.MapFragment;
+import org.odk.collect.maps.MapFragmentKt;
+import org.odk.collect.maps.circles.CurrentLocationDelegate;
 import org.odk.collect.maps.MapFragmentFactory;
 import org.odk.collect.maps.MapPoint;
 import org.odk.collect.maps.markers.MarkerDescription;
@@ -93,6 +99,27 @@ public class SmapTaskMapFragment extends Fragment {
 
     @Inject
     MapFragmentFactory mapFragmentFactory;
+
+    // smap - replaces MapFragment's own GPS tracking, removed upstream
+    private LocationTracker locationTracker;
+    private final CurrentLocationDelegate currentLocationDelegate = new CurrentLocationDelegate();
+
+    /** smap - current fix as a MapPoint, replacing MapFragment#getGpsLocation */
+    private MapPoint getCurrentMapPoint() {
+        if (locationTracker == null) {
+            return null;
+        }
+        org.odk.collect.location.Location currentLocation = LocationTrackerKt.getCurrentLocation(locationTracker);
+        if (currentLocation == null) {
+            return null;
+        }
+        return new MapPoint(
+                currentLocation.getLatitude(),
+                currentLocation.getLongitude(),
+                currentLocation.getAltitude(),
+                currentLocation.getAccuracy()
+        );
+    }
 
     public static SmapTaskMapFragment newInstance() {
         return new SmapTaskMapFragment();
@@ -145,11 +172,16 @@ public class SmapTaskMapFragment extends Fragment {
             .getString(ProjectKeys.KEY_BASEMAP_SOURCE);
         mapFragment.setLongPressListener(this::onMapLongPress);
         mapFragment.setFeatureClickListener(this::onFeatureClick);
-        mapFragment.setGpsLocationEnabled(true);
+
+        // smap - MapFragment no longer tracks GPS itself; drive the current location marker
+        // from the geo module's LocationTracker instead
+        locationTracker = ((GeoDependencyComponentProvider) requireContext().getApplicationContext())
+                .getGeoDependencyComponent().getLocationTracker();
+        GeoUtils.showCurrentLocation(mapFragment, locationTracker, currentLocationDelegate, false, point -> { });
 
         ImageButton locationButton = rootView.findViewById(R.id.show_location);
         locationButton.setOnClickListener(v -> {
-            MapPoint gpsLocation = map.getGpsLocation();
+            MapPoint gpsLocation = getCurrentMapPoint();
             if (gpsLocation != null) {
                 map.zoomToCurrentLocation(gpsLocation);
             } else {
@@ -294,7 +326,7 @@ public class SmapTaskMapFragment extends Fragment {
                         point, false, MapFragment.IconAnchor.BOTTOM,
                         new MarkerIconDescription.DrawableResource(iconDrawable)
                     );
-                    int featureId = mapFragment.addMarker(desc);
+                    int featureId = MapFragmentKt.addMarker(mapFragment, desc);
                     markerTaskMap.put(featureId, t);
                 }
             }
@@ -312,7 +344,7 @@ public class SmapTaskMapFragment extends Fragment {
         for (int i = data.size() - 1; i >= 0; i--) {
             points.add(new MapPoint(data.get(i).lat, data.get(i).lon));
         }
-        polyFeatureId = mapFragment.addPolyLine(new LineDescription(points, null, null, false, false));
+        polyFeatureId = mapFragment.addPolyLine(new LineDescription(points, null, null, false, false, false, true));
     }
 
     public void updatePath(MapPoint point) {

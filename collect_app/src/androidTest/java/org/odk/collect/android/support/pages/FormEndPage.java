@@ -40,8 +40,7 @@ public class FormEndPage extends Page<FormEndPage> {
     }
 
     public MainMenuPage clickFinalize() {
-        clickFinalize(new MainMenuPage());
-        return new MainMenuPage();
+        return clickFinalize(new MainMenuPage());
     }
 
     public FormEndPage clickFinalizeWithError(String errorMsg) {

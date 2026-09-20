@@ -2,32 +2,29 @@ package org.odk.collect.android.instancemanagement.send
 
 import android.content.ContentValues
 import android.net.Uri
-import org.odk.collect.android.utilities.WebCredentialsUtils
-import org.odk.collect.forms.instances.Instance
-import org.odk.collect.forms.instances.InstancesRepository
-import org.odk.collect.openrosa.http.OpenRosaConstants
-import org.odk.collect.openrosa.http.OpenRosaHttpInterface
-import org.odk.collect.settings.keys.ProjectKeys
-import org.odk.collect.shared.settings.Settings
-import timber.log.Timber
-import java.io.File
-import java.io.UnsupportedEncodingException
-import java.net.URI
-import java.net.URLEncoder
-import androidx.core.net.toUri
+import au.smap.fieldTask.utilities.Utilities
 import org.odk.collect.analytics.Analytics
 import org.odk.collect.android.analytics.AnalyticsEvents
-import org.odk.collect.android.analytics.AnalyticsUtils
 import org.odk.collect.android.application.Collect
-import au.smap.fieldTask.utilities.Utilities
 import org.odk.collect.android.database.instances.DatabaseInstanceColumns
 import org.odk.collect.android.projects.ProjectDependencyModule
 import org.odk.collect.android.provider.InstanceProviderAPI
 import org.odk.collect.android.utilities.ResponseMessageParser
+import org.odk.collect.android.utilities.WebCredentialsUtils
+import org.odk.collect.entities.javarosa.parse.toUri
+import org.odk.collect.forms.instances.Instance
+import org.odk.collect.forms.instances.InstancesRepository
 import org.odk.collect.openrosa.http.CaseInsensitiveHeaders
 import org.odk.collect.openrosa.http.HttpHeadResult
+import org.odk.collect.openrosa.http.OpenRosaConstants
+import org.odk.collect.openrosa.http.OpenRosaHttpInterface
 import org.odk.collect.projects.ProjectDependencyFactory
+import org.odk.collect.settings.keys.ProjectKeys
+import org.odk.collect.shared.settings.Settings
 import org.odk.collect.strings.localization.getLocalizedString
+import timber.log.Timber
+import java.io.File
+import java.net.URI
 import java.net.URLDecoder
 import javax.net.ssl.HttpsURLConnection
 
@@ -132,7 +129,6 @@ class OpenRosaServerInstanceUploader(
 
         markSubmissionComplete(instance, instancesRepository)
         logOverrideURL(referrer, overrideURL)
-        logUploadedForm(submissionUri)
 
         return if (messageParser.isValid) {
             messageParser.messageResponse
@@ -289,12 +285,7 @@ class OpenRosaServerInstanceUploader(
             else -> getServerSubmissionURL(unprotectedSettings)
         }
 
-        return try {
-            "$urlString?deviceID=" + URLEncoder.encode(deviceId ?: "", "UTF-8")
-        } catch (e: UnsupportedEncodingException) {
-            Timber.i(e, "Error encoding URL for device id : %s", deviceId)
-            urlString
-        }
+        return urlString.toUri("deviceID" to deviceId).toString()
     }
 
     private fun getServerSubmissionURL(unprotectedSettings: Settings): String {
@@ -352,16 +343,6 @@ class OpenRosaServerInstanceUploader(
                 referrer
             )
         }
-    }
-
-    private fun logUploadedForm(submissionUri: Uri) {
-        val isHttps = "https".equals(submissionUri.scheme, ignoreCase = true)
-
-        Analytics.log(
-            AnalyticsEvents.SUBMISSION,
-            "label",
-            if (isHttps) "HTTPS" else "HTTP",
-        )
     }
 
     companion object {

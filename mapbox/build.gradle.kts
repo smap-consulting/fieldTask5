@@ -26,6 +26,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    buildFeatures {
+        viewBinding = true
+    }
+
     namespace = "org.odk.collect.mapbox"
 }
 
@@ -34,7 +38,6 @@ dependencies {
 
     implementation(project(":androidshared"))
     implementation(project(":icons"))
-    implementation(project(":location"))
     implementation(project(":maps"))
     implementation(project(":settings"))
     implementation(project(":shared"))

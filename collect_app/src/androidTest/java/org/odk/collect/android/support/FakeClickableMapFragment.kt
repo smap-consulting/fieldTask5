@@ -3,13 +3,13 @@ package org.odk.collect.android.support
 import android.os.Handler
 import android.os.Looper
 import androidx.fragment.app.Fragment
-import org.odk.collect.maps.traces.LineDescription
 import org.odk.collect.maps.MapFragment
 import org.odk.collect.maps.MapPoint
 import org.odk.collect.maps.circles.CircleDescription
-import org.odk.collect.maps.traces.PolygonDescription
 import org.odk.collect.maps.markers.MarkerDescription
 import org.odk.collect.maps.markers.MarkerIconDescription
+import org.odk.collect.maps.traces.LineDescription
+import org.odk.collect.maps.traces.PolygonDescription
 
 class FakeClickableMapFragment : Fragment(), MapFragment {
 
@@ -32,9 +32,7 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
     }
 
     override fun setCenter(center: MapPoint?, animate: Boolean) {}
-    override fun zoomToCurrentLocation(center: MapPoint?) {
-        TODO("Not yet implemented")
-    }
+    override fun zoomToCurrentLocation(center: MapPoint?) {}
 
     override fun zoomToPoint(center: MapPoint?, animate: Boolean) {}
 
@@ -46,11 +44,6 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
         animate: Boolean
     ) {}
 
-    override fun addMarker(markerDescription: MarkerDescription): Int {
-        val id = idCounter++
-        return id
-    }
-
     override fun updateMarker(
         featureId: Int,
         markerDescription: MarkerDescription
@@ -60,7 +53,7 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
 
     override fun addMarkers(markers: List<MarkerDescription>): List<Int> {
         return markers.map {
-            addMarker(it)
+            idCounter++
         }
     }
 
@@ -103,6 +96,7 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
     override fun removeFeature(featureId: Int) {}
 
     override fun clearFeatures() {}
+    override fun clearFeatures(ids: List<Int>) {}
 
     override fun setClickListener(listener: MapFragment.PointListener?) {}
 
@@ -114,16 +108,6 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
 
     override fun setDragEndListener(listener: MapFragment.FeatureListener?) {}
 
-    override fun setGpsLocationEnabled(enabled: Boolean) {}
-
-    override fun getGpsLocation(): MapPoint? {
-        return null
-    }
-
-    override fun setGpsLocationListener(listener: MapFragment.PointListener?) {}
-
-    override fun setRetainMockAccuracy(retainMockAccuracy: Boolean) {}
-
     override fun hasCenter(): Boolean {
         return false
     }
@@ -132,7 +116,7 @@ class FakeClickableMapFragment : Fragment(), MapFragment {
         var done = false
 
         Handler(Looper.getMainLooper()).post {
-            featureClickListener?.onFeature(featureId)
+            featureClickListener!!.onFeature(featureId)
             done = true
         }
 

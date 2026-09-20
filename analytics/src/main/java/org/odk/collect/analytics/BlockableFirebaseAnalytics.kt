@@ -5,7 +5,7 @@ import android.os.Bundle
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
-class BlockableFirebaseAnalytics(application: Application) : Analytics {
+class BlockableFirebaseAnalytics(application: Application, private val crashReports: Boolean) : Analytics {
     private val firebaseAnalytics = FirebaseAnalytics.getInstance(application)
     private val crashlytics = FirebaseCrashlytics.getInstance()
 
@@ -13,9 +13,15 @@ class BlockableFirebaseAnalytics(application: Application) : Analytics {
         firebaseAnalytics.logEvent(event, null)
     }
 
-    override fun logEventWithParam(event: String, key: String, value: String) {
-        val bundle = Bundle()
-        bundle.putString(key, value)
+    override fun logEventWithParams(
+        event: String,
+        params: Map<String, String>
+    ) {
+        val bundle = params.entries.fold(Bundle()) { bundle, entry ->
+            bundle.putString(entry.key, entry.value)
+            bundle
+        }
+
         firebaseAnalytics.logEvent(event, bundle)
     }
 
@@ -29,7 +35,9 @@ class BlockableFirebaseAnalytics(application: Application) : Analytics {
 
     override fun setAnalyticsCollectionEnabled(isAnalyticsEnabled: Boolean) {
         firebaseAnalytics.setAnalyticsCollectionEnabled(isAnalyticsEnabled)
-        crashlytics.setCrashlyticsCollectionEnabled(isAnalyticsEnabled)
+        if (!crashReports) {
+            crashlytics.isCrashlyticsCollectionEnabled = isAnalyticsEnabled
+        }
     }
 
     override fun setUserProperty(name: String, value: String) {

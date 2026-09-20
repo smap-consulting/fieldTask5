@@ -1,5 +1,6 @@
 package org.odk.collect.android.widgets
 
+import android.app.Activity
 import android.content.Context
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -8,8 +9,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.odk.collect.android.utilities.MediaUtils
 import org.odk.collect.android.utilities.QuestionMediaManager
+import org.odk.collect.android.utilities.getExistingAnswerFile
 import org.odk.collect.androidshared.utils.getVideoThumbnail
 import org.odk.collect.async.Scheduler
+import java.io.File
 
 class MediaWidgetAnswerViewModel(
     private val scheduler: Scheduler,
@@ -19,7 +22,7 @@ class MediaWidgetAnswerViewModel(
     fun getFrame(answer: String?, context: Context): StateFlow<ImageBitmap?> {
         val bitmapState = MutableStateFlow<ImageBitmap?>(null)
 
-        val file = questionMediaManager.getAnswerFile(answer)
+        val file = questionMediaManager.getExistingAnswerFile(answer)
         if (file != null) {
             scheduler.immediate {
                 val thumbnail = file.getVideoThumbnail(context)?.asImageBitmap()
@@ -30,10 +33,14 @@ class MediaWidgetAnswerViewModel(
         return bitmapState
     }
 
-    fun openFile(context: Context, answer: String?, mimeType: String? = null) {
-        val file = questionMediaManager.getAnswerFile(answer)
+    fun getImage(answer: String?): File? {
+        return questionMediaManager.getExistingAnswerFile(answer)
+    }
+
+    fun openFile(activity: Activity, answer: String?, mimeType: String? = null) {
+        val file = questionMediaManager.getExistingAnswerFile(answer)
         if (file != null) {
-            mediaUtils.openFile(context, file, mimeType)
+            mediaUtils.openFile(activity, file, mimeType)
         }
     }
 }

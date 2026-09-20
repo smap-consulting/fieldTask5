@@ -9,8 +9,10 @@ import androidx.annotation.LayoutRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import com.google.android.material.snackbar.Snackbar
 import org.odk.collect.androidshared.system.ContextExt.isDarkTheme
 
 object EdgeToEdge {
@@ -41,17 +43,35 @@ object EdgeToEdge {
     }
 
     @JvmStatic
-    fun View.applyBottomBarInsetMargins() {
+    fun View.applyBottomInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
-            val systemBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val keyboardInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
-
-            v.updatePadding(
-                bottom = maxOf(0, keyboardInsets.bottom - systemBarsInsets.bottom)
-            )
-
+            v.updatePadding(bottom = windowInsets.keyboardSafeOffset())
             windowInsets
         }
+    }
+
+    fun Snackbar.applyBottomInsets(anchorView: View?) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+            view.post { // wait for anchorView to reposition before reading its offset
+                val anchorOffset = if (anchorView != null && anchorView.isVisible) {
+                    val layoutParams = anchorView.layoutParams as? ViewGroup.MarginLayoutParams
+                    anchorView.height + (layoutParams?.bottomMargin ?: 0)
+                } else {
+                    0
+                }
+
+                view.translationY  = -maxOf(windowInsets.keyboardSafeOffset(), anchorOffset).toFloat()
+            }
+            windowInsets
+        }
+
+        ViewCompat.requestApplyInsets(view)
+    }
+
+    private fun WindowInsetsCompat.keyboardSafeOffset(): Int {
+        val systemBars = getInsets(WindowInsetsCompat.Type.systemBars())
+        val keyboard = getInsets(WindowInsetsCompat.Type.ime())
+        return maxOf(0, keyboard.bottom - systemBars.bottom)
     }
 
     private fun Window.avoidEdgeToEdge() {

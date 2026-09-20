@@ -27,6 +27,7 @@ import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
 import org.odk.collect.async.Scheduler
 import org.odk.collect.audiorecorder.recording.AudioRecorder
 import org.odk.collect.crashhandler.CrashHandler
+import org.odk.collect.crashhandler.hasCrashed
 import org.odk.collect.location.LocationClient
 import org.odk.collect.permissions.PermissionsChecker
 import org.odk.collect.permissions.PermissionsProvider

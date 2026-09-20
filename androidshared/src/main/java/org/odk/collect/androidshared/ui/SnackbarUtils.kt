@@ -26,6 +26,7 @@ import com.google.android.material.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import org.odk.collect.androidshared.data.Consumable
+import org.odk.collect.androidshared.ui.EdgeToEdge.applyBottomInsets
 
 /**
  * Convenience wrapper around Android's [Snackbar] API.
@@ -101,10 +102,6 @@ object SnackbarUtils {
             view.findViewById<TextView>(R.id.snackbar_text)
         textView.isSingleLine = false
 
-        if (anchorView?.visibility != View.GONE) {
-            this.anchorView = anchorView
-        }
-
         if (displayDismissButton) {
             view.findViewById<Button>(R.id.snackbar_action).let {
                 val dismissButton = ImageView(view.context).apply {
@@ -132,6 +129,8 @@ object SnackbarUtils {
                 dismiss()
             }
         }
+
+        applyBottomInsets(anchorView)
     }.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
         override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
             super.onDismissed(transientBottomBar, event)

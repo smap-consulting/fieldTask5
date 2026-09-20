@@ -5,34 +5,29 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import org.javarosa.form.api.FormEntryPrompt
-import org.odk.collect.android.javarosawrapper.FormController
 import org.odk.collect.android.utilities.Appearances
 import org.odk.collect.android.utilities.ApplicationConstants
 import org.odk.collect.android.utilities.FormEntryPromptUtils
+import org.odk.collect.android.widgets.geo.GeoPointMapDialogFragment
+import org.odk.collect.android.widgets.geo.GeoPolyDialogFragment
 import org.odk.collect.android.widgets.interfaces.GeoDataRequester
 import org.odk.collect.android.widgets.utilities.BindAttributes.ALLOW_MOCK_ACCURACY
 import org.odk.collect.androidshared.ui.DialogFragmentUtils
-import org.odk.collect.geo.Constants.EXTRA_DRAGGABLE_ONLY
 import org.odk.collect.geo.Constants.EXTRA_READ_ONLY
 import org.odk.collect.geo.Constants.EXTRA_RETAIN_MOCK_ACCURACY
 import org.odk.collect.geo.geocompound.GeoCompoundActivity
 import org.odk.collect.geo.geopoint.GeoPointActivity
-import org.odk.collect.geo.geopoint.GeoPointMapActivity
-import org.odk.collect.geo.geopoly.GeoPolyUtils.parseGeometry
-import org.odk.collect.maps.MapPoint
 import org.odk.collect.permissions.PermissionListener
 import org.odk.collect.permissions.PermissionsProvider
 import java.lang.Boolean.parseBoolean
 
 class ActivityGeoDataRequester(
     private val permissionsProvider: PermissionsProvider,
-    private val activity: FragmentActivity,
-    private val formController: FormController?
+    private val activity: FragmentActivity
 ) : GeoDataRequester {
 
     override fun requestGeoPoint(
         prompt: FormEntryPrompt,
-        answerText: String?,
         waitingForDataRegistry: WaitingForDataRegistry
     ) {
         permissionsProvider.requestEnabledLocationPermissions(
@@ -41,59 +36,49 @@ class ActivityGeoDataRequester(
                 override fun granted() {
                     waitingForDataRegistry.waitForData(prompt.index)
 
-                    val bundle = Bundle().also {
-                        val parsedGeometry = parseGeometry(answerText)
-                        if (parsedGeometry.isNotEmpty()) {
-                            it.putParcelable(
-                                GeoPointMapActivity.EXTRA_LOCATION,
-                                parsedGeometry[0]
+                    if (isMapsAppearance(prompt)) {
+                        DialogFragmentUtils.showIfNotShowing(
+                            GeoPointMapDialogFragment::class.java,
+                            bundleOf(WidgetAnswerDialogFragment.ARG_FORM_INDEX to prompt.index),
+                            activity.supportFragmentManager
+                        )
+                    } else {
+                        val bundle = Bundle().also {
+                            val accuracyThreshold =
+                                FormEntryPromptUtils.getAdditionalAttribute(
+                                    prompt,
+                                    "accuracyThreshold"
+                                )
+                            val unacceptableAccuracyThreshold =
+                                FormEntryPromptUtils.getAdditionalAttribute(
+                                    prompt,
+                                    "unacceptableAccuracyThreshold"
+                                )
+
+                            it.putFloat(
+                                GeoPointActivity.EXTRA_ACCURACY_THRESHOLD,
+                                accuracyThreshold?.toFloatOrNull() ?: DEFAULT_ACCURACY_THRESHOLD
                             )
+
+                            it.putFloat(
+                                GeoPointActivity.EXTRA_UNACCEPTABLE_ACCURACY_THRESHOLD,
+                                unacceptableAccuracyThreshold?.toFloatOrNull()
+                                    ?: DEFAULT_UNACCEPTABLE_ACCURACY_THRESHOLD
+                            )
+
+                            it.putBoolean(EXTRA_RETAIN_MOCK_ACCURACY, getAllowMockAccuracy(prompt))
+                            it.putBoolean(EXTRA_READ_ONLY, prompt.isReadOnly)
                         }
 
-                        val accuracyThreshold =
-                            FormEntryPromptUtils.getAdditionalAttribute(prompt, "accuracyThreshold")
-                        val unacceptableAccuracyThreshold =
-                            FormEntryPromptUtils.getAdditionalAttribute(
-                                prompt,
-                                "unacceptableAccuracyThreshold"
-                            )
-
-                        it.putFloat(
-                            GeoPointActivity.EXTRA_ACCURACY_THRESHOLD,
-                            accuracyThreshold?.toFloatOrNull() ?: DEFAULT_ACCURACY_THRESHOLD
-                        )
-
-                        it.putFloat(
-                            GeoPointActivity.EXTRA_UNACCEPTABLE_ACCURACY_THRESHOLD,
-                            unacceptableAccuracyThreshold?.toFloatOrNull()
-                                ?: DEFAULT_UNACCEPTABLE_ACCURACY_THRESHOLD
-                        )
-
-                        it.putBoolean(EXTRA_RETAIN_MOCK_ACCURACY, getAllowMockAccuracy(prompt))
-                        it.putBoolean(EXTRA_READ_ONLY, prompt.isReadOnly)
-                        it.putBoolean(EXTRA_DRAGGABLE_ONLY, hasPlacementMapAppearance(prompt))
-
-                        // smap - "history-map": show previously collected locations from the repeat
-                        val previousPoints = getPreviousPoints(prompt)
-                        if (previousPoints.isNotEmpty()) {
-                            it.putParcelableArrayList(
-                                GeoPointMapActivity.EXTRA_HISTORY_LOCATIONS,
-                                previousPoints
-                            )
+                        val intent = Intent(activity, GeoPointActivity::class.java).also {
+                            it.putExtras(bundle)
                         }
-                    }
 
-                    val intent = Intent(
-                        activity,
-                        if (isMapsAppearance(prompt)) GeoPointMapActivity::class.java else GeoPointActivity::class.java
-                    ).also {
-                        it.putExtras(bundle)
+                        activity.startActivityForResult(
+                            intent,
+                            ApplicationConstants.RequestCodes.LOCATION_CAPTURE
+                        )
                     }
-
-                    activity.startActivityForResult(
-                        intent,
-                        ApplicationConstants.RequestCodes.LOCATION_CAPTURE
-                    )
                 }
             }
         )
@@ -142,17 +127,6 @@ class ActivityGeoDataRequester(
     }
 
     // smap - first point of each previous repeat instance for the "history-map" appearance
-    private fun getPreviousPoints(prompt: FormEntryPrompt): ArrayList<MapPoint> {
-        val points = ArrayList<MapPoint>()
-        for (value in HistoryMapUtils.getPreviousGeometryValues(formController, prompt)) {
-            val parsed = parseGeometry(value)
-            if (parsed.isNotEmpty()) {
-                points.add(parsed[0])
-            }
-        }
-        return points
-    }
-
     private fun getAllowMockAccuracy(prompt: FormEntryPrompt): Boolean {
         return parseBoolean(
             FormEntryPromptUtils.getBindAttribute(

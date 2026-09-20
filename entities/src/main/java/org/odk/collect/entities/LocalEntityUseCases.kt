@@ -2,15 +2,18 @@ package org.odk.collect.entities
 
 import org.apache.commons.csv.CSVRecord
 import org.javarosa.core.model.instance.SecondaryInstanceCSVParserBuilder
+import org.odk.collect.entities.debug.EntityEvent
 import org.odk.collect.entities.javarosa.finalization.EntitiesExtra
+import org.odk.collect.entities.javarosa.finalization.FormEntity
 import org.odk.collect.entities.javarosa.parse.EntitySchema
+import org.odk.collect.entities.javarosa.parse.isV4UUID
 import org.odk.collect.entities.javarosa.spec.EntityAction
 import org.odk.collect.entities.server.EntitySource
 import org.odk.collect.entities.storage.EntitiesRepository
 import org.odk.collect.entities.storage.Entity
+import org.odk.collect.entities.storage.findEntityById
 import org.odk.collect.forms.MediaFile
-import org.odk.collect.shared.DebugLogger
-import org.odk.collect.shared.Query
+import org.odk.collect.shared.debug.DebugLogger
 import java.io.File
 import java.util.UUID
 
@@ -20,53 +23,80 @@ object LocalEntityUseCases {
     fun updateLocalEntitiesFromForm(
         formEntities: EntitiesExtra?,
         entitiesRepository: EntitiesRepository,
-        debugLogger: DebugLogger? = null
+        debugLogger: DebugLogger<EntityEvent>? = null
     ) {
         formEntities?.entities?.forEach { formEntity ->
-            val id = formEntity.id
-            val label = formEntity.label
-            when (formEntity.action) {
-                EntityAction.CREATE -> {
-                    val list = entitiesRepository.getList(formEntity.dataset)
-                    if (list != null && !list.needsApproval) {
-                        val entity = Entity.New(
-                            id,
-                            label,
-                            1,
-                            formEntity.properties,
-                            branchId = UUID.randomUUID().toString()
-                        )
+            if (formEntity.id.isV4UUID()) {
+                when (formEntity.action) {
+                    EntityAction.CREATE -> saveNewEntity(formEntity, entitiesRepository, debugLogger)
 
-                        entitiesRepository.save(formEntity.dataset, entity)
+                    EntityAction.UPDATE -> {
+                        val existing = entitiesRepository.findEntityById(formEntity.dataset, formEntity.id)
+                        if (existing != null) {
+                            saveUpdatedEntity(formEntity, existing, entitiesRepository)
+                        } else {
+                            debugLogger?.log(EntityEvent.UpdateNoMatch(formEntity))
+                        }
+                    }
+
+                    EntityAction.UPSERT -> {
+                        val existing = entitiesRepository.findEntityById(formEntity.dataset, formEntity.id)
+                        if (existing == null) {
+                            saveNewEntity(formEntity, entitiesRepository, debugLogger)
+                        } else {
+                            saveUpdatedEntity(formEntity, existing, entitiesRepository)
+                        }
                     }
                 }
-
-                EntityAction.UPDATE -> {
-                    val existing = entitiesRepository.query(
-                        formEntity.dataset,
-                        Query.StringEq(EntitySchema.ID, formEntity.id)
-                    ).firstOrNull()
-
-                    if (existing != null) {
-                        entitiesRepository.save(
-                            formEntity.dataset,
-                            existing.copy(
-                                label = label.ifBlank { existing.label },
-                                properties = formEntity.properties,
-                                version = existing.version + 1
-                            )
-                        )
-                    }
+            } else {
+                val event = if (formEntity.id.isNullOrBlank()) {
+                    EntityEvent.NoId(formEntity)
+                } else {
+                    EntityEvent.InvalidId(formEntity)
                 }
+
+                debugLogger?.log(event)
             }
         }
+    }
 
-        formEntities?.invalidEntities?.forEach {
-            debugLogger?.log(
-                "Entities",
-                "Failed to create/update dataset=${it.dataset}, id=${it.id}, label=${it.label}"
-            )
+    private fun saveNewEntity(
+        formEntity: FormEntity,
+        entitiesRepository: EntitiesRepository,
+        debugLogger: DebugLogger<EntityEvent>? = null
+    ) {
+        if (formEntity.label.isNotBlank()) {
+            val list = entitiesRepository.getList(formEntity.dataset)
+            if (list != null && !list.needsApproval) {
+                entitiesRepository.save(
+                    formEntity.dataset,
+                    Entity.New(
+                        formEntity.id!!,
+                        formEntity.label,
+                        1,
+                        formEntity.properties,
+                        branchId = UUID.randomUUID().toString()
+                    )
+                )
+            }
+        } else {
+            debugLogger?.log(EntityEvent.CreateNoLabel(formEntity))
         }
+    }
+
+    private fun saveUpdatedEntity(
+        formEntity: FormEntity,
+        existing: Entity.Saved,
+        entitiesRepository: EntitiesRepository
+    ) {
+        entitiesRepository.save(
+            formEntity.dataset,
+            existing.copy(
+                label = formEntity.label.ifBlank { existing.label },
+                properties = formEntity.properties,
+                version = existing.version + 1
+            )
+        )
     }
 
     fun updateLocalEntitiesFromServer(
@@ -88,6 +118,8 @@ object LocalEntityUseCases {
             return
         }
 
+        val serverProperties = csvParser.headerMap.removeReservedProperties().keys
+        entitiesRepository.cleanUpProperties(list, serverProperties)
         val localEntities = entitiesRepository.query(list)
 
         val missingFromServer = localEntities.associateBy { it.id }.toMutableMap()
@@ -160,9 +192,9 @@ object LocalEntityUseCases {
     private fun parseEntityFromRecord(record: CSVRecord): ServerEntity? {
         val map = record.toMap()
 
-        val id = map.remove(EntitySchema.ID)
-        val label = map.remove(EntitySchema.LABEL)
-        val version = map.remove(EntitySchema.VERSION)?.toInt()
+        val id = map[EntitySchema.ID]
+        val label = map[EntitySchema.LABEL]
+        val version = map[EntitySchema.VERSION]?.toInt()
         if (id == null || label == null || version == null) {
             return null
         }
@@ -171,7 +203,7 @@ object LocalEntityUseCases {
             id,
             label,
             version,
-            map
+            map.removeReservedProperties()
         )
     }
 }
@@ -192,5 +224,11 @@ private data class ServerEntity(
             branchId = UUID.randomUUID().toString(),
             trunkVersion = this.version
         )
+    }
+}
+
+private fun <T> Map<String, T>.removeReservedProperties(): Map<String, T> {
+    return filterNot {
+        it.key == EntitySchema.ID || it.key == EntitySchema.LABEL || it.key.startsWith("__")
     }
 }

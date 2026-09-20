@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Document;
+import org.odk.collect.entities.javarosa.parse.StringExtKt;
 import org.odk.collect.openrosa.http.HttpCredentialsInterface;
 import org.odk.collect.openrosa.http.HttpGetResult;
 import org.odk.collect.openrosa.http.OpenRosaHttpInterface;
@@ -17,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import kotlin.Pair;
 import timber.log.Timber;
 
 /**
@@ -29,11 +31,13 @@ public class OpenRosaXmlFetcher {
     private static final String HTTP_CONTENT_TYPE_TEXT_XML = "text/xml";
 
     private final OpenRosaHttpInterface httpInterface;
-    private WebCredentialsProvider webCredentialsUtils;
+    private WebCredentialsProvider webCredentialsProvider;
+    private final String deviceId;
 
-    public OpenRosaXmlFetcher(OpenRosaHttpInterface httpInterface, WebCredentialsProvider webCredentialsUtils) {
+    public OpenRosaXmlFetcher(OpenRosaHttpInterface httpInterface, WebCredentialsProvider webCredentialsProvider, String deviceId) {  // smap - public, used outside the package
         this.httpInterface = httpInterface;
-        this.webCredentialsUtils = webCredentialsUtils;
+        this.webCredentialsProvider = webCredentialsProvider;
+        this.deviceId = deviceId;
     }
 
     /**
@@ -94,15 +98,16 @@ public class OpenRosaXmlFetcher {
             throw new Exception("Invalid server URL (no hostname): " + downloadUrl);
         }
 
-        if(!credentials) {       // Smap do not pass credentials if it is not required (proxyPass 400 error)
+        uri = URI.create(StringExtKt.toUri(uri.toString(), new Pair<>("deviceID", deviceId)).toString());
+        if (!credentials) {       // Smap do not pass credentials if it is not required (proxyPass 400 error)
             return httpInterface.executeGetRequest(uri, contentType, null);
         } else {
-            return httpInterface.executeGetRequest(uri, contentType, webCredentialsUtils.getCredentials(uri));
+            return httpInterface.executeGetRequest(uri, contentType, webCredentialsProvider.getCredentials(uri));
         }
     }
 
-    public void updateWebCredentialsProvider(WebCredentialsProvider webCredentialsUtils) {
-        this.webCredentialsUtils = webCredentialsUtils;
+    public void updateWebCredentialsProvider(WebCredentialsProvider webCredentialsProvider) {
+        this.webCredentialsProvider = webCredentialsProvider;
     }
 
     public interface WebCredentialsProvider {

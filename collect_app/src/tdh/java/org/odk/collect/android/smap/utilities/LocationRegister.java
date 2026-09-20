@@ -1,16 +1,16 @@
 package org.odk.collect.android.smap.utilities;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.preference.PreferenceManager;
 
-import org.odk.collect.android.database.TraceUtilities;
+import org.odk.collect.android.R;
+import org.odk.collect.permissions.PermissionListener;
+
+import au.smap.fieldTask.activities.SmapMain;
+import org.odk.collect.permissions.PermissionsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
-
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import timber.log.Timber;
 
 public class LocationRegister {
 
@@ -23,9 +23,12 @@ public class LocationRegister {
     }
 
     public void register(Context context, Location location) {
-        // Do nothing
+       // Do nothing
     }
 
+    public int getMessageId() {
+        return R.string.smap_request_foreground_location_permission;
+    }
     /*
      * Disable permissions concerned with background location
      */
@@ -34,8 +37,27 @@ public class LocationRegister {
         settings.save(ProjectKeys.KEY_SMAP_OVERRIDE_LOCATION, true);
     }
 
-    // Check that the installation is good
+    // Start foreground location recording
+    public void locationStart(Activity currentActivity, PermissionsProvider permissionsProvider) {
+        permissionsProvider.requestEnabledLocationPermissions(currentActivity, new PermissionListener() {
+            @Override
+            public void granted() {
+                ((SmapMain) currentActivity).startLocationService();
+            }
+
+            @Override
+            public void denied() {
+            }
+        });
+    }
+
+    // Check that the installation is not on a rooted device
     public void isValidInstallation(Context context) {
+    }
+
+    // Return true if the default for a new installation is to logon with a token rather than a password
+    public static boolean defaultForceToken() {
+        return false;
     }
 
     // Return true if a numeric pulldata record index of 0 should list all matching

@@ -37,8 +37,8 @@ public class OpenRosaFormListApiSmap implements FormListApiSmap {
     private String serverURL;
     private final String formListPath;
 
-    public OpenRosaFormListApiSmap(String serverURL, String formListPath, OpenRosaHttpInterface openRosaHttpInterface, WebCredentialsUtils webCredentialsUtils) {
-        this.openRosaXMLFetcher = new OpenRosaXmlFetcher(openRosaHttpInterface, webCredentialsUtils);
+    public OpenRosaFormListApiSmap(String serverURL, String formListPath, OpenRosaHttpInterface openRosaHttpInterface, WebCredentialsUtils webCredentialsUtils, String deviceId) {
+        this.openRosaXMLFetcher = new OpenRosaXmlFetcher(openRosaHttpInterface, webCredentialsUtils, deviceId);
         this.serverURL = serverURL;
         this.formListPath = formListPath;
     }

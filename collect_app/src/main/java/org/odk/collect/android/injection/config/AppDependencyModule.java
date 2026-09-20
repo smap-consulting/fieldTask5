@@ -94,6 +94,7 @@ import org.odk.collect.androidshared.system.BroadcastReceiverRegister;
 import org.odk.collect.androidshared.system.BroadcastReceiverRegisterImpl;
 import org.odk.collect.androidshared.system.IntentLauncher;
 import org.odk.collect.androidshared.system.IntentLauncherImpl;
+import org.odk.collect.androidshared.system.TamperDetector;
 import org.odk.collect.androidshared.utils.ScreenUtils;
 import org.odk.collect.androidshared.utils.SettingsUniqueIdGenerator;
 import org.odk.collect.androidshared.utils.UniqueIdGenerator;
@@ -204,7 +205,8 @@ public class AppDependencyModule {
     @Singleton
     public Analytics providesAnalytics(Application application) {
         // smap - FieldTask does not collect usage data. Firebase Analytics is also deactivated
-        // in the manifest, Firebase is only used for Crashlytics and push notifications
+        // in the manifest, Firebase is only used for Crashlytics and push notifications.
+        // Upstream returns a BlockableFirebaseAnalytics gated on TamperDetector here.
         return new NoopAnalytics();
     }
 
@@ -488,8 +490,8 @@ public class AppDependencyModule {
     }
 
     @Provides
-    public OpenRosaClientProvider providesFormSourceProvider(SettingsProvider settingsProvider, OpenRosaHttpInterface openRosaHttpInterface) {
-        return new OpenRosaClientProvider(settingsProvider::getUnprotectedSettings, openRosaHttpInterface);
+    public OpenRosaClientProvider providesFormSourceProvider(SettingsProvider settingsProvider, OpenRosaHttpInterface openRosaHttpInterface, InstallIDProvider installIDProvider) {
+        return new OpenRosaClientProvider(settingsProvider::getUnprotectedSettings, openRosaHttpInterface, installIDProvider);
     }
 
     @Provides

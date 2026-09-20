@@ -1,14 +1,14 @@
 package org.odk.collect.maps
 
 import org.odk.collect.maps.circles.CircleDescription
-import org.odk.collect.maps.traces.LineDescription
 import org.odk.collect.maps.markers.MarkerDescription
 import org.odk.collect.maps.markers.MarkerIconDescription
+import org.odk.collect.maps.traces.LineDescription
 import org.odk.collect.maps.traces.PolygonDescription
 
 /**
  * Interface for a Fragment that renders a map view.  The plan is to have one
- * implementation for each map SDK, e.g. GoogleMapFragment, OsmDroidMapFragment, etc.
+ * implementation for each map SDK, e.g. GoogleMapFragment etc.
  *
  * This is intended to be a single map API that provides all functionality needed
  * for the three geo widgets (collecting or editing a point, a trace, or a shape):
@@ -79,10 +79,8 @@ interface MapFragment {
      * the user will be able to drag the marker to change its location.
      * Returns a positive integer, the featureId for the newly added shape.
      */
-    fun addMarker(markerDescription: MarkerDescription): Int
-    fun updateMarker(featureId: Int, markerDescription: MarkerDescription)
-
     fun addMarkers(markers: List<MarkerDescription>): List<Int>
+    fun updateMarker(featureId: Int, markerDescription: MarkerDescription)
 
     /** Sets the icon for a marker.  */
     @Deprecated(message = "Use #updateMarker instead")
@@ -126,6 +124,7 @@ interface MapFragment {
 
     /** Removes all map features from the map.  */
     fun clearFeatures()
+    fun clearFeatures(ids: List<Int>)
 
     /** Sets or clears the callback for a click on the map.  */
     fun setClickListener(listener: PointListener?)
@@ -138,29 +137,6 @@ interface MapFragment {
 
     /** Sets or clears the callback for when a drag is completed.  */
     fun setDragEndListener(listener: FeatureListener?)
-
-    /**
-     * Enables/disables GPS tracking.  While enabled, the GPS location is shown
-     * on the map, the first GPS fix will trigger any pending callbacks set by
-     * runOnGpsLocationReady(), and every GPS fix will invoke the callback set
-     * by setGpsLocationListener().
-     */
-    @Deprecated(message = "Location should be handled outside of MapFragment")
-    fun setGpsLocationEnabled(enabled: Boolean)
-
-    /** Gets the last GPS location fix, or null if there hasn't been one.  */
-    @Deprecated(message = "Location should be handled outside of MapFragment")
-    fun getGpsLocation(): MapPoint?
-
-    /**
-     * Sets or clears the callback for GPS location updates.  This callback
-     * will only be invoked while GPS is enabled with setGpsLocationEnabled().
-     */
-    @Deprecated(message = "Location should be handled outside of MapFragment")
-    fun setGpsLocationListener(listener: PointListener?)
-
-    @Deprecated(message = "Location should be handled outside of MapFragment")
-    fun setRetainMockAccuracy(retainMockAccuracy: Boolean)
 
     /**
      * @return true if the [MapFragment] center has already been set (by [MapFragment.zoomToPoint] for instance).
@@ -192,4 +168,8 @@ interface MapFragment {
     }
 
     enum class IconAnchor { CENTER, BOTTOM }
+}
+
+fun MapFragment.addMarker(marker: MarkerDescription): Int {
+    return addMarkers(listOf(marker))[0]
 }

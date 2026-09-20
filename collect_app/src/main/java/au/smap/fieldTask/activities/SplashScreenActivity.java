@@ -24,6 +24,7 @@ import org.odk.collect.android.activities.CrashHandlerActivity;
 import org.odk.collect.android.injection.DaggerUtils;
 import org.odk.collect.android.projects.ProjectsDataService;
 import org.odk.collect.crashhandler.CrashHandler;
+import org.odk.collect.crashhandler.CrashHandlerKt;
 import org.odk.collect.settings.keys.ProjectKeys;
 import au.smap.fieldTask.preferences.GeneralSharedPreferencesSmap;
 import org.odk.collect.projects.ProjectsRepository;
@@ -54,7 +55,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         // smap - If Application init failed (e.g. external storage unavailable), applicationComponent
         // will be null. Redirect to CrashHandlerActivity rather than crashing with IllegalStateException.
         CrashHandler crashHandler = CrashHandler.getInstance(this);
-        if (crashHandler != null && crashHandler.hasCrashed(this)) {
+        if (crashHandler != null && CrashHandlerKt.hasCrashed(crashHandler, this)) {
             super.onCreate(null);
             ActivityUtils.startActivityAndCloseAllOthers(this, CrashHandlerActivity.class);
             return;

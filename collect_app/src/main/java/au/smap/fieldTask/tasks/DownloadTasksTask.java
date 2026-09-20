@@ -1009,7 +1009,7 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
             mf.deleteForms(formMap, results);
 
             MultiFormDownloaderSmap multiFormDownloader = new MultiFormDownloaderSmap(
-                    new OpenRosaXmlFetcher(httpInterface, webCredentialsUtils),
+                    new OpenRosaXmlFetcher(httpInterface, webCredentialsUtils, propertyManager.getSingularProperty(PropertyManager.PROPMGR_DEVICE_ID)),
                     formsRepository,
                     propertyManager);
             Timber.i("Downloading " + toDownload.size() + " forms");

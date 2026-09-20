@@ -11,7 +11,7 @@ import org.odk.collect.async.Scheduler
 import org.odk.collect.geo.geocompound.GeoCompoundActivity
 import org.odk.collect.geo.geopoint.GeoPointActivity
 import org.odk.collect.geo.geopoint.GeoPointDialogFragment
-import org.odk.collect.geo.geopoint.GeoPointMapActivity
+import org.odk.collect.geo.geopoint.GeoPointMapFragment
 import org.odk.collect.geo.geopoint.GeoPointViewModelFactory
 import org.odk.collect.geo.geopoint.LocationTrackerGeoPointViewModel
 import org.odk.collect.geo.geopoly.GeoPolyFragment
@@ -45,12 +45,12 @@ interface GeoDependencyComponent {
         fun build(): GeoDependencyComponent
     }
 
-    fun inject(geoPointMapActivity: GeoPointMapActivity)
-    fun inject(geoCompoundActivity: GeoCompoundActivity)
+    fun inject(geoCompoundActivity: GeoCompoundActivity) // smap
     fun inject(geoPointDialogFragment: GeoPointDialogFragment)
     fun inject(geoPointActivity: GeoPointActivity)
     fun inject(selectionMapFragment: SelectionMapFragment)
     fun inject(geoPolyFragment: GeoPolyFragment)
+    fun inject(geoPointMapFragment: GeoPointMapFragment)
 
     val scheduler: Scheduler
     val locationTracker: LocationTracker

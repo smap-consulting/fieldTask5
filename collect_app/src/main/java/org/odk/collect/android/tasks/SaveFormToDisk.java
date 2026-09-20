@@ -63,7 +63,7 @@ import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 import org.odk.collect.maps.MapPoint;
-import org.odk.collect.shared.DebugLogger;
+import org.odk.collect.shared.debug.DebugLogger;
 import org.odk.collect.shared.files.FileExt;
 
 import java.io.File;
@@ -474,18 +474,10 @@ public class SaveFormToDisk {
 
             instance = updateInstanceDatabase(false, canEditAfterCompleted, validationResult);
 
-            if (!canEditAfterCompleted || formController.hasPiiAnonymisedFields()) {
-                manageFilesAfterSavingEncryptedForm(instanceXml, submissionXml);
-            } else {
-                // try to delete the submissionXml file, since it is
-                // identical to the existing instanceXml file
-                // (we don't need to delete and rename anything).
-                if (!submissionXml.delete()) {
-                    String msg = "Error deleting " + submissionXml.getAbsolutePath()
-                            + " (instance is re-openable)";
-                    Timber.w(msg);
-                }
-            }
+            // smap - we used to do this only when the instance could not be edited after
+            // completion, or when PII fields had been anonymised.  Upstream now always replaces
+            // the instance file with the submission, which covers the PII case too.
+            replaceInstanceFileWithSubmissionFile(instanceXml, submissionXml);
 
             // if encrypted, delete all plaintext files
             // (anything not named instanceXml or anything not ending in .enc)
@@ -526,7 +518,7 @@ public class SaveFormToDisk {
         }
     }
 
-    public static void manageFilesAfterSavingEncryptedForm(File instanceXml, File submissionXml) throws IOException {
+    public static void replaceInstanceFileWithSubmissionFile(File instanceXml, File submissionXml) throws IOException {
         // AT THIS POINT, there is no going back.  We are committed
         // to returning "success" (true) whether or not we can
         // rename "submission.xml" to instanceXml and whether or

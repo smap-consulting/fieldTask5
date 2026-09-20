@@ -43,6 +43,7 @@ import javax.inject.Inject
 import org.odk.collect.android.activities.ActivityUtils
 import org.odk.collect.android.activities.CrashHandlerActivity
 import org.odk.collect.crashhandler.CrashHandler
+import org.odk.collect.crashhandler.hasCrashed
 
 const val FORM_ENTRY_TOKEN = "form_entry_token"
 

@@ -1,47 +1,50 @@
 package org.odk.collect.mapbox
 
 import android.graphics.Color
-import android.location.Location
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.startup.AppInitializer
-import com.google.android.gms.location.LocationListener
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.android.gestures.StandardScaleGestureDetector
 import com.mapbox.geojson.Point
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
-import com.mapbox.maps.Style
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.style.layers.Layer
+import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.addLayerAbove
+import com.mapbox.maps.extension.style.layers.addLayerAt
 import com.mapbox.maps.extension.style.layers.addLayerBelow
 import com.mapbox.maps.extension.style.layers.generated.LineLayer
 import com.mapbox.maps.extension.style.layers.generated.RasterLayer
+import com.mapbox.maps.extension.style.layers.generated.rasterLayer
+import com.mapbox.maps.extension.style.layers.getLayer
 import com.mapbox.maps.extension.style.sources.Source
 import com.mapbox.maps.extension.style.sources.TileSet
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.RasterSource
+import com.mapbox.maps.extension.style.sources.generated.Scheme
 import com.mapbox.maps.extension.style.sources.generated.VectorSource
+import com.mapbox.maps.extension.style.sources.generated.rasterSource
 import com.mapbox.maps.extension.style.sources.getSource
 import com.mapbox.maps.loader.MapboxMapsInitializer
-import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.MapAnimationOptions.Companion.mapAnimationOptions
 import com.mapbox.maps.plugin.animation.flyTo
 import com.mapbox.maps.plugin.annotation.AnnotationConfig
 import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.CircleAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createCircleAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolygonAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPolylineAnnotationManager
@@ -54,13 +57,9 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapLongClickListener
 import com.mapbox.maps.plugin.gestures.addOnMoveListener
 import com.mapbox.maps.plugin.gestures.addOnScaleListener
-import com.mapbox.maps.plugin.locationcomponent.location
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.odk.collect.androidshared.utils.ScreenUtils
-import org.odk.collect.location.LocationClient
-import org.odk.collect.location.LocationClient.LocationClientListener
-import org.odk.collect.maps.traces.LineDescription
 import org.odk.collect.maps.MapFragment
 import org.odk.collect.maps.MapFragment.ErrorListener
 import org.odk.collect.maps.MapFragment.FeatureListener
@@ -69,86 +68,72 @@ import org.odk.collect.maps.MapFragment.ReadyListener
 import org.odk.collect.maps.MapPoint
 import org.odk.collect.maps.MapViewModel
 import org.odk.collect.maps.MapViewModelMapFragment
-import org.odk.collect.maps.traces.PolygonDescription
 import org.odk.collect.maps.Zoom
 import org.odk.collect.maps.ZoomObserver
 import org.odk.collect.maps.circles.CircleDescription
-import org.odk.collect.maps.layers.MapFragmentReferenceLayerUtils.getReferenceLayerFile
 import org.odk.collect.maps.layers.MbtilesFile
 import org.odk.collect.maps.layers.ReferenceLayerRepository
 import org.odk.collect.maps.markers.MarkerDescription
 import org.odk.collect.maps.markers.MarkerIconCreator
 import org.odk.collect.maps.markers.MarkerIconDescription
+import org.odk.collect.maps.traces.LineDescription
+import org.odk.collect.maps.traces.PolygonDescription
 import org.odk.collect.settings.SettingsProvider
+import org.odk.collect.settings.keys.ProjectKeys.KEY_MAPBOX_MAP_STYLE
 import org.odk.collect.shared.injection.ObjectProviderHost
+import org.odk.collect.shared.settings.Settings
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
 
-private const val POLYLINE_ANNOTATION_LAYER_ID = "polyline_annotation_layer"
-private const val POLYGON_ANNOTATION_LAYER_ID = "polygon_annotation_layer"
-private const val POINT_ANNOTATION_LAYER_ID = "point_annotation_layer"
-
-private val ANNOTATION_LAYER_IDS = setOf(
-    POLYLINE_ANNOTATION_LAYER_ID,
-    POLYGON_ANNOTATION_LAYER_ID,
-    POINT_ANNOTATION_LAYER_ID
-)
-
-class MapboxMapFragment :
+class MapboxMapFragment(private val configuration: Configuration) :
     MapViewModelMapFragment(),
     OnMapClickListener,
-    OnMapLongClickListener,
-    LocationListener,
-    LocationClientListener {
+    OnMapLongClickListener {
 
+    constructor(configuration: String) : this(Configurations.all.getValue(configuration))
+
+    private lateinit var settings: Settings
     private lateinit var mapView: MapView
     private lateinit var mapboxMap: MapboxMap
 
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var polylineAnnotationManager: PolylineAnnotationManager
     private lateinit var polygonAnnotationManager: PolygonAnnotationManager
+    private lateinit var circleAnnotationManager: CircleAnnotationManager
     private var mapReadyListener: ReadyListener? = null
-    private val gpsLocationReadyListeners = mutableListOf<ReadyListener>()
 
     private var nextFeatureId = 1
     private val features = mutableMapOf<Int, MapFeature>()
-
-    private var gpsLocationListener: PointListener? = null
     private var clickListener: PointListener? = null
     private var longPressListener: PointListener? = null
 
     private var featureClickListener: FeatureListener? = null
     private var featureDragEndListener: FeatureListener? = null
-
-    private var lastLocationProvider: String? = null
-    private var lastLocationFix: MapPoint? = null
     private var tileServer: TileHttpServer? = null
     private var referenceLayerFile: File? = null
-    private var clientWantsLocationUpdates = false
-    private var topStyleLayerId: String? = null
+    private var basemapTopLayer: String? = null
 
     private val _mapViewModel by viewModels<MapViewModel> {
         viewModelFactory {
             addInitializer(MapViewModel::class) {
                 MapViewModel(
                     settingsProvider.getUnprotectedSettings(),
-                    settingsProvider.getMetaSettings()
+                    settingsProvider.getMetaSettings(),
+                    referenceLayerRepository
                 )
             }
         }
     }
 
     private val settingsProvider: SettingsProvider by lazy {
-        (requireActivity().applicationContext as ObjectProviderHost).getObjectProvider().provide(SettingsProvider::class.java)
+        (requireActivity().applicationContext as ObjectProviderHost).getObjectProvider()
+            .provide(SettingsProvider::class.java)
     }
 
     private val referenceLayerRepository: ReferenceLayerRepository by lazy {
-        (requireActivity().applicationContext as ObjectProviderHost).getObjectProvider().provide(ReferenceLayerRepository::class.java)
-    }
-
-    private val locationClient: LocationClient by lazy {
-        (requireActivity().applicationContext as ObjectProviderHost).getObjectProvider().provide(LocationClient::class.java)
+        (requireActivity().applicationContext as ObjectProviderHost).getObjectProvider()
+            .provide(ReferenceLayerRepository::class.java)
     }
 
     override fun init(readyListener: ReadyListener?, errorListener: ErrorListener?) {
@@ -167,7 +152,8 @@ class MapboxMapFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AppInitializer.getInstance(requireContext()).initializeComponent(MapboxMapsInitializer::class.java)
+        AppInitializer.getInstance(requireContext())
+            .initializeComponent(MapboxMapsInitializer::class.java)
     }
 
     override fun onCreateView(
@@ -194,7 +180,8 @@ class MapboxMapFragment :
                     override fun onScaleBegin(detector: StandardScaleGestureDetector) = Unit
 
                     override fun onScaleEnd(detector: StandardScaleGestureDetector) {
-                        val center = MapPoint(cameraState.center.latitude(), cameraState.center.longitude())
+                        val center =
+                            MapPoint(cameraState.center.latitude(), cameraState.center.longitude())
                         getMapViewModel().onUserZoom(center, cameraState.zoom)
                     }
                 })
@@ -203,7 +190,8 @@ class MapboxMapFragment :
                     override fun onMoveBegin(detector: MoveGestureDetector) = Unit
 
                     override fun onMoveEnd(detector: MoveGestureDetector) {
-                        val center = MapPoint(cameraState.center.latitude(), cameraState.center.longitude())
+                        val center =
+                            MapPoint(cameraState.center.latitude(), cameraState.center.longitude())
                         getMapViewModel().onUserMove(center, cameraState.zoom)
                     }
                 })
@@ -219,11 +207,14 @@ class MapboxMapFragment :
             .annotations
             .createPolygonAnnotationManager(AnnotationConfig(layerId = POLYGON_ANNOTATION_LAYER_ID))
 
+        circleAnnotationManager = mapView
+            .annotations
+            .createCircleAnnotationManager(AnnotationConfig(layerId = CIRCLE_ANNOTATION_LAYER_ID))
+
         pointAnnotationManager = mapView
             .annotations
             .createPointAnnotationManager(AnnotationConfig(layerId = POINT_ANNOTATION_LAYER_ID))
 
-        initLocationComponent()
         moveOrAnimateCamera(MapFragment.INITIAL_CENTER, false, MapFragment.INITIAL_ZOOM.toDouble())
 
         // If the screen is rotated before the map is ready, this fragment could already be detached,
@@ -232,10 +223,14 @@ class MapboxMapFragment :
             mapReadyListener!!.onReady(this)
         }
 
-        val mapConfigurator = MapboxMapConfigurator()
-        getMapViewModel().getSettings(mapConfigurator.prefKeys).observe(viewLifecycleOwner) {
-            val newConfig = mapConfigurator.buildConfig(it)
-            onConfigChanged(newConfig)
+        getMapViewModel().getSettings(setOf(KEY_MAPBOX_MAP_STYLE)).observe(viewLifecycleOwner) {
+            settings = it
+            loadStyle(settings)
+        }
+
+        getMapViewModel().getReferenceLayer().observe(viewLifecycleOwner) {
+            referenceLayerFile = it
+            loadStyle(settings)
         }
 
         getMapViewModel().zoom.observe(viewLifecycleOwner, object : ZoomObserver() {
@@ -271,31 +266,57 @@ class MapboxMapFragment :
         return mapView
     }
 
-    override fun onResume() {
-        super.onResume()
-        enableLocationUpdates(clientWantsLocationUpdates)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        enableLocationUpdates(false)
-    }
-
     override fun onDestroy() {
         tileServer?.destroy()
         MarkerIconCreator.clearCache()
         super.onDestroy()
     }
 
-    private fun onConfigChanged(config: Bundle) {
-        val styleUrl = config.getString(KEY_STYLE_URL) ?: Style.MAPBOX_STREETS
-        referenceLayerFile = getReferenceLayerFile(config, referenceLayerRepository)
-        mapboxMap.loadStyleUri(styleUrl) {
-            if (topStyleLayerId == null) {
-                // remember the id of the top style layer
-                topStyleLayerId = it.styleLayers.last().id
+    private fun loadStyle(settings: Settings) {
+        val uri = if (configuration.uri != null) {
+            configuration.uri
+        } else if (configuration.styleSetting != null) {
+            configuration.styleOptions.getValue(settings.getString(configuration.styleSetting)!!).uri
+        } else {
+            throw IllegalArgumentException("Invalid Configuration!")
+        }
+
+        when (uri) {
+            is BasemapUri.Raster -> {
+                mapboxMap.loadStyleUri("") { style ->
+                    val tileSet = TileSet.Builder("2.1.0", listOf(uri.value))
+                        .attribution(configuration.attribution ?: "")
+                        .scheme(Scheme.XYZ)
+                        .build()
+
+                    if (style.getSource("basemap_source") == null) {
+                        style.addSource(
+                            rasterSource("basemap_source") {
+                                tileSet(tileSet)
+                            }
+                        )
+                    }
+
+                    if (style.getLayer("basemap_layer") == null) {
+                        if (style.styleLayers.isEmpty()) {
+                            style.addLayer(rasterLayer("basemap_layer", "basemap_source") {})
+                        } else {
+                            style.addLayerAt(rasterLayer("basemap_layer", "basemap_source") {}, 0)
+                        }
+
+                        basemapTopLayer = "basemap_layer"
+                    }
+
+                    loadReferenceOverlay()
+                }
             }
-            loadReferenceOverlay()
+
+            is BasemapUri.Mapbox -> {
+                mapboxMap.loadStyleUri(uri.value) {
+                    basemapTopLayer = it.styleLayers.last().id
+                    loadReferenceOverlay()
+                }
+            }
         }
     }
 
@@ -310,10 +331,6 @@ class MapboxMapFragment :
 
     override fun getMapViewModel(): MapViewModel {
         return _mapViewModel
-    }
-
-    override fun addMarker(markerDescription: MarkerDescription): Int {
-        return addMarkers(listOf(markerDescription)).first()
     }
 
     override fun updateMarker(
@@ -458,14 +475,24 @@ class MapboxMapFragment :
     }
 
     override fun addCircle(circleDescription: CircleDescription): Int {
-        return -1
+        val featureId = nextFeatureId++
+        addCircle(featureId, circleDescription)
+        return featureId
     }
 
     override fun updateCircle(
         featureId: Int,
         circleDescription: CircleDescription
     ) {
+        features[featureId]?.dispose()
+        addCircle(featureId, circleDescription)
+    }
 
+    private fun addCircle(
+        featureId: Int,
+        circleDescription: CircleDescription
+    ) {
+        features[featureId] = CircleFeature(mapboxMap, circleAnnotationManager, circleDescription)
     }
 
     override fun getPolyPoints(featureId: Int): List<MapPoint> {
@@ -504,6 +531,10 @@ class MapboxMapFragment :
         nextFeatureId = 1
     }
 
+    override fun clearFeatures(ids: List<Int>) {
+        ids.forEach { features.remove(it)?.dispose() }
+    }
+
     override fun setClickListener(listener: PointListener?) {
         clickListener = listener
     }
@@ -520,25 +551,6 @@ class MapboxMapFragment :
         featureDragEndListener = listener
     }
 
-    override fun setGpsLocationEnabled(enabled: Boolean) {
-        if (enabled != clientWantsLocationUpdates) {
-            clientWantsLocationUpdates = enabled
-            enableLocationUpdates(clientWantsLocationUpdates)
-        }
-    }
-
-    override fun getGpsLocation(): MapPoint? {
-        return lastLocationFix
-    }
-
-    override fun setGpsLocationListener(listener: PointListener?) {
-        gpsLocationListener = listener
-    }
-
-    override fun setRetainMockAccuracy(retainMockAccuracy: Boolean) {
-        locationClient.setRetainMockAccuracy(retainMockAccuracy)
-    }
-
     override fun onMapClick(point: Point): Boolean {
         clickListener?.onPoint(MapPoint(point.latitude(), point.longitude()))
 
@@ -552,51 +564,6 @@ class MapboxMapFragment :
     override fun onMapLongClick(point: Point): Boolean {
         longPressListener?.onPoint(MapPoint(point.latitude(), point.longitude()))
         return true
-    }
-
-    override fun onLocationChanged(location: Location) {
-        lastLocationFix = MapPoint(
-            location.latitude,
-            location.longitude,
-            location.altitude,
-            location.accuracy.toDouble()
-        )
-        lastLocationProvider = location.provider
-        Timber.i(
-            "Received location update: %s (%s)",
-            lastLocationFix,
-            lastLocationProvider
-        )
-        for (listener in gpsLocationReadyListeners) {
-            listener.onReady(this)
-        }
-        gpsLocationReadyListeners.clear()
-        gpsLocationListener?.onPoint(lastLocationFix!!)
-    }
-
-    @SuppressWarnings("MissingPermission") // permission checks for location services are handled in widgets
-    private fun enableLocationUpdates(enabled: Boolean) {
-        if (enabled) {
-            Timber.i("Starting LocationClient %s (for MapFragment %s)", locationClient, this)
-            locationClient.start(this)
-        } else {
-            Timber.i("Stopping LocationClient %s (for MapFragment %s)", locationClient, this)
-            locationClient.stop()
-        }
-
-        mapView.location.enabled = enabled
-    }
-
-    private fun initLocationComponent() {
-        mapView.location.updateSettings {
-            this.enabled = true
-            this.locationPuck = LocationPuck2D(
-                AppCompatResources.getDrawable(
-                    requireContext(),
-                    org.odk.collect.maps.R.drawable.ic_crosshairs
-                )
-            )
-        }
     }
 
     private fun moveOrAnimateCamera(point: MapPoint, animate: Boolean, zoom: Double? = getZoom()) {
@@ -704,16 +671,20 @@ class MapboxMapFragment :
     private fun addOverlayLayer(layer: Layer) {
         val style = mapboxMap.getStyle() ?: return
 
-        // styleLayers runs bottom (index 0) to top.  Put the reference overlay below the lowest
-        // annotation layer so it sits under every feature whatever order the managers were
-        // created in.  Before those layers exist there is nothing to go under, so fall back to
-        // sitting just above the basemap.
-        val lowestAnnotationLayer = style.styleLayers.firstOrNull { it.id in ANNOTATION_LAYER_IDS }?.id
+        // styleLayers is ordered bottom (index 0) to top. Insert the reference overlay below the
+        // lowest annotation layer currently in the style so it ends up below every feature,
+        // regardless of the order the annotation managers were created in.
+        val lowestAnnotationLayer = style.styleLayers.firstOrNull {
+            it.id == POLYLINE_ANNOTATION_LAYER_ID ||
+                it.id == POLYGON_ANNOTATION_LAYER_ID ||
+                it.id == CIRCLE_ANNOTATION_LAYER_ID ||
+                it.id == POINT_ANNOTATION_LAYER_ID
+        }?.id
 
         if (lowestAnnotationLayer != null) {
             style.addLayerBelow(layer, lowestAnnotationLayer)
         } else {
-            topStyleLayerId?.let { style.addLayerAbove(layer, it) }
+            basemapTopLayer?.let { style.addLayerAbove(layer, it) }
         }
     }
 
@@ -723,18 +694,10 @@ class MapboxMapFragment :
         }
     }
 
-    override fun onClientStart() {
-        Timber.i("Requesting location updates (to %s)", this)
-        locationClient.requestLocationUpdates(this)
-    }
-
-    override fun onClientStartFailure() {
-    }
-
-    override fun onClientStop() {
-    }
-
     companion object {
-        const val KEY_STYLE_URL = "STYLE_URL"
+        private const val POLYLINE_ANNOTATION_LAYER_ID = "polyline_annotation_layer"
+        private const val POLYGON_ANNOTATION_LAYER_ID = "polygon_annotation_layer"
+        private const val CIRCLE_ANNOTATION_LAYER_ID = "circle_annotation_layer"
+        private const val POINT_ANNOTATION_LAYER_ID = "point_annotation_layer"
     }
 }

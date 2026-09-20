@@ -10,15 +10,16 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.odk.collect.android.R
 import org.odk.collect.android.instancemanagement.userVisibleInstanceName
+import org.odk.collect.androidshared.ui.DisplayString
 import org.odk.collect.forms.Form
 import org.odk.collect.forms.instances.Instance
 import org.odk.collect.formstest.FormUtils
 import org.odk.collect.formstest.InMemFormsRepository
 import org.odk.collect.formstest.InMemInstancesRepository
 import org.odk.collect.formstest.InstanceUtils
-import org.odk.collect.geo.selection.IconifiedText
-import org.odk.collect.geo.selection.MappableSelectItem
-import org.odk.collect.geo.selection.Status
+import org.odk.collect.geo.items.IconifiedText
+import org.odk.collect.geo.items.MappableItem
+import org.odk.collect.geo.items.Status
 import org.odk.collect.maps.MapPoint
 import org.odk.collect.settings.InMemSettingsProvider
 import org.odk.collect.settings.keys.ProtectedProjectKeys
@@ -107,7 +108,7 @@ class FormMapViewModelTest {
         val viewModel = createAndLoadViewModel(form)
         assertThat(viewModel.getMappableItems().value!!.size, equalTo(1))
 
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instanceWithPoint.dbId,
             instanceWithPoint.displayName,
             point = MapPoint(2.0, 1.0),
@@ -115,7 +116,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_incomplete_48dp,
             action = IconifiedText(
                 org.odk.collect.icons.R.drawable.ic_edit,
-                application.getString(org.odk.collect.strings.R.string.edit_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.edit_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.saved_on_date_at_time,
@@ -146,7 +147,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -154,7 +155,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_incomplete_48dp,
             action = IconifiedText(
                 org.odk.collect.icons.R.drawable.ic_edit,
-                application.getString(org.odk.collect.strings.R.string.edit_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.edit_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.saved_on_date_at_time,
@@ -185,7 +186,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -193,7 +194,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_incomplete_48dp,
             action = IconifiedText(
                 org.odk.collect.icons.R.drawable.ic_edit,
-                application.getString(org.odk.collect.strings.R.string.edit_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.edit_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.saved_on_date_at_time,
@@ -224,7 +225,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -232,7 +233,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_incomplete_48dp,
             action = IconifiedText(
                 org.odk.collect.icons.R.drawable.ic_edit,
-                application.getString(org.odk.collect.strings.R.string.edit_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.edit_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.saved_on_date_at_time,
@@ -263,7 +264,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -271,7 +272,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_complete_48dp,
             action = IconifiedText(
                 R.drawable.ic_visibility,
-                application.getString(org.odk.collect.strings.R.string.view_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.view_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.finalized_on_date_at_time,
@@ -303,7 +304,7 @@ class FormMapViewModelTest {
         settingsProvider.getProtectedSettings().save(ProtectedProjectKeys.KEY_EDIT_SAVED, false)
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -311,7 +312,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_complete_48dp,
             action = IconifiedText(
                 R.drawable.ic_visibility,
-                application.getString(org.odk.collect.strings.R.string.view_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.view_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.finalized_on_date_at_time,
@@ -341,7 +342,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -379,7 +380,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -387,7 +388,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_submitted_48dp,
             action = IconifiedText(
                 R.drawable.ic_visibility,
-                application.getString(org.odk.collect.strings.R.string.view_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.view_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.sent_on_date_at_time,
@@ -417,7 +418,7 @@ class FormMapViewModelTest {
         )
 
         val viewModel = createAndLoadViewModel(form)
-        val expectedItem = MappableSelectItem.MappableSelectPoint(
+        val expectedItem = MappableItem.Point(
             instance.dbId,
             instance.userVisibleInstanceName(),
             point = MapPoint(2.0, 1.0),
@@ -425,7 +426,7 @@ class FormMapViewModelTest {
             largeIcon = R.drawable.ic_room_form_state_submission_failed_48dp,
             action = IconifiedText(
                 R.drawable.ic_visibility,
-                application.getString(org.odk.collect.strings.R.string.view_data)
+                DisplayString.Resource(org.odk.collect.strings.R.string.view_data)
             ),
             info = formatDate(
                 org.odk.collect.strings.R.string.sending_failed_on_date_at_time,
@@ -506,11 +507,11 @@ class FormMapViewModelTest {
 
         val viewModel = createViewModel(form)
         assertThat(viewModel.isLoading().value, equalTo(false))
-        assertThat(viewModel.getMappableItems().value, equalTo(null))
+        assertThat(viewModel.getMappableItems().value, equalTo(emptyList()))
 
         viewModel.load()
         assertThat(viewModel.isLoading().value, equalTo(true))
-        assertThat(viewModel.getMappableItems().value, equalTo(null))
+        assertThat(viewModel.getMappableItems().value, equalTo(emptyList()))
 
         scheduler.runBackground()
         scheduler.runForeground()

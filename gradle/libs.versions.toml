@@ -58,7 +58,6 @@ playServicesMaps = { group = "com.google.android.gms", name = "play-services-map
 playServicesLocation = { group = "com.google.android.gms", name = "play-services-location", version = "21.3.0" }
 playServicesOssLicenses = { group = "com.google.android.gms", name = "play-services-oss-licenses", version = "17.4.0" }
 mapboxAndroidSdk = { group = "com.mapbox.maps", name = "android-ndk27", version = "10.19.1" } # Check if https://github.com/mapbox/mapbox-maps-android/issues/2389#issuecomment-2432018812 no longer takes place before upgrading
-osmdroid = { group = "org.osmdroid", name = "osmdroid-android", version = "6.1.20" }
 okHttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp3" }
 okHttpTls = { group = "com.squareup.okhttp3", name = "okhttp-tls", version.ref = "okhttp3" }
 okHttpDigest = { group = "io.github.rburgst", name = "okhttp-digest", version = "3.1.1" }
@@ -108,6 +107,8 @@ camera-mlkit-vision = { group = "androidx.camera", name = "camera-mlkit-vision",
 jsoup = { group = "org.jsoup", name = "jsoup", version = "1.22.1" }
 mlkit-barcodescanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version = "18.3.1" }
 runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
+coil = { group = "io.coil-kt.coil3", name = "coil-compose", version = "3.4.0" }
+coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version = "3.4.0" }
 
 # Test dependencies
 junit = { group = "junit", name = "junit", version = "4.13.2" }

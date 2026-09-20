@@ -34,6 +34,7 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
      * A list of submitted forms, maintained in the original order of submission, with the oldest forms appearing first.
      */
     private val submittedForms: MutableList<File> = mutableListOf()
+    private val submittedAttachments: MutableList<File> = mutableListOf()
     private val deletedEntities: MutableList<String> = mutableListOf()
     private var includeIntegrityUrl = false
 
@@ -43,6 +44,9 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
 
     val submissions: List<File>
         get() = submittedForms
+
+    val submittedMediaFiles: List<File>
+        get() = submittedAttachments
 
     var accesses = 0
         private set
@@ -139,6 +143,7 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
             return HttpPostResult("", 401, "")
         } else if (uri.path == OpenRosaConstants.SUBMISSION) {
             submittedForms.add(submissionFile)
+            submittedAttachments.addAll(fileList)
             return HttpPostResult("", 201, "")
         } else {
             return HttpPostResult("", 404, "")
@@ -326,12 +331,13 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
         }
 
     private fun getFormResponse(uri: URI): InputStream {
-        val formID = uri.query.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+        val formID = getFormId(uri)
         return getFormXML(formID)
     }
 
     private fun getManifestResponse(uri: URI): InputStream? {
-        val formID = uri.query.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+        val formID = getFormId(uri)
+
         val xformItem = forms[formID.toInt()]
 
         if (xformItem.mediaFiles.isEmpty()) {
@@ -446,6 +452,11 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
             )
         )
     }
+
+    private fun getFormId(uri: URI) =
+        uri.query.split("&")
+            .first { it.startsWith("formId=") }
+            .substringAfter("=")
 
     fun deleteEntity(id: String) {
         deletedEntities.add(id)

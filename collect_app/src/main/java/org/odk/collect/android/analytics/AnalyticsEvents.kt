@@ -24,11 +24,6 @@ object AnalyticsEvents {
     const val OPEN_DELETED_INSTANCE = "OpenDeletedInstance"
 
     /**
-     * Tracks how often users switch between projects
-     */
-    const val SWITCH_PROJECT = "ProjectSwitch"
-
-    /**
      * Tracks how often users choose to try the demo project
      */
     const val TRY_DEMO = "ProjectCreateDemo"
@@ -122,4 +117,10 @@ object AnalyticsEvents {
      * Tracks how often the range decimal widget is used
      */
     const val RANGE_DECIMAL_WIDGET = "RangeDecimalWidget"
+
+    /**
+     * Tracks how many forms include the `no-buttons` appearance combined with `columns` or
+     * `columns-n`
+     */
+    const val GALLERY_SELECT = "GallerySelect"
 }

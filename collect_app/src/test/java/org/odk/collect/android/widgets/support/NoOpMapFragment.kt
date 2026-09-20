@@ -44,10 +44,6 @@ class NoOpMapFragment : Fragment(), MapFragment {
     ) {
     }
 
-    override fun addMarker(markerDescription: MarkerDescription): Int {
-        TODO("Not yet implemented")
-    }
-
     override fun updateMarker(
         featureId: Int,
         markerDescription: MarkerDescription
@@ -113,6 +109,9 @@ class NoOpMapFragment : Fragment(), MapFragment {
     override fun clearFeatures() {
     }
 
+    override fun clearFeatures(ids: List<Int>) {
+    }
+
     override fun setClickListener(listener: MapFragment.PointListener?) {
     }
 
@@ -123,19 +122,6 @@ class NoOpMapFragment : Fragment(), MapFragment {
     }
 
     override fun setDragEndListener(listener: MapFragment.FeatureListener?) {
-    }
-
-    override fun setGpsLocationEnabled(enabled: Boolean) {
-    }
-
-    override fun getGpsLocation(): MapPoint? {
-        TODO("Not yet implemented")
-    }
-
-    override fun setGpsLocationListener(listener: MapFragment.PointListener?) {
-    }
-
-    override fun setRetainMockAccuracy(retainMockAccuracy: Boolean) {
     }
 
     override fun hasCenter(): Boolean {
