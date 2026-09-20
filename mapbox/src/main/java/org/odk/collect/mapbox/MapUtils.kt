@@ -8,7 +8,7 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import org.odk.collect.maps.MapFragment
 import org.odk.collect.maps.MapPoint
-import org.odk.collect.maps.TraceDescription
+import org.odk.collect.maps.traces.TraceDescription
 import org.odk.collect.maps.markers.MarkerDescription
 import org.odk.collect.maps.markers.MarkerIconCreator.toBitmap
 
@@ -49,9 +49,9 @@ object MapUtils {
         return pointAnnotationManager.create(pointAnnotationOptionsList)
     }
 
-    private fun getIconAnchorValue(@MapFragment.Companion.IconAnchor iconAnchor: String): IconAnchor {
+    private fun getIconAnchorValue(iconAnchor: MapFragment.IconAnchor): IconAnchor {
         return when (iconAnchor) {
-            MapFragment.BOTTOM -> IconAnchor.BOTTOM
+            MapFragment.IconAnchor.BOTTOM -> IconAnchor.BOTTOM
             else -> IconAnchor.CENTER
         }
     }

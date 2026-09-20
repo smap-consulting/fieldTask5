@@ -8,6 +8,7 @@ import org.odk.collect.android.tasks.SaveToDiskResult;
 import org.odk.collect.android.utilities.MediaUtils;
 import org.odk.collect.entities.storage.EntitiesRepository;
 import org.odk.collect.forms.instances.InstancesRepository;
+import org.odk.collect.shared.DebugLogger;
 
 import java.util.ArrayList;
 
@@ -15,9 +16,9 @@ public class DiskFormSaver implements FormSaver {
 
     @Override
     public SaveToDiskResult save(Uri instanceContentURI, FormController formController, MediaUtils mediaUtils, boolean shouldFinalize, boolean exitAfter,
-                                 String updatedSaveName, ProgressListener progressListener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository, String surveyNotes) {  // smap added surveyNotes
+                                 String updatedSaveName, ProgressListener progressListener, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository, DebugLogger debugLogger, String surveyNotes) {  // smap added surveyNotes
         SaveFormToDisk saveFormToDisk = new SaveFormToDisk(formController, mediaUtils, exitAfter, shouldFinalize,
-                updatedSaveName, instanceContentURI, tempFiles, currentProjectId, entitiesRepository, instancesRepository, surveyNotes);  // smap added surveyNotes
+                updatedSaveName, instanceContentURI, tempFiles, currentProjectId, entitiesRepository, instancesRepository, debugLogger, surveyNotes);  // smap added surveyNotes
         return saveFormToDisk.saveForm(progressListener);
     }
 }

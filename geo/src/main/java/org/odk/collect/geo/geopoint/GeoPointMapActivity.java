@@ -14,6 +14,7 @@
 
 package org.odk.collect.geo.geopoint;
 
+import static org.odk.collect.androidshared.ui.EdgeToEdge.setView;
 import static org.odk.collect.geo.Constants.EXTRA_DRAGGABLE_ONLY;
 import static org.odk.collect.geo.Constants.EXTRA_READ_ONLY;
 import static org.odk.collect.geo.Constants.EXTRA_RETAIN_MOCK_ACCURACY;
@@ -153,7 +154,7 @@ public class GeoPointMapActivity extends LocalizedActivity {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         try {
-            setContentView(R.layout.geopoint_layout);
+            setView(this, R.layout.geopoint_layout, false);
         } catch (NoClassDefFoundError e) {
             Timber.e(e, "Google maps not accessible due to: %s ", e.getMessage());
             ToastUtils.showShortToast(org.odk.collect.strings.R.string.google_play_services_error_occured);
@@ -405,7 +406,7 @@ public class GeoPointMapActivity extends LocalizedActivity {
             return;
         }
         for (MapPoint point : historyLocations) {
-            map.addMarker(new MarkerDescription(point, false, MapFragment.CENTER,
+            map.addMarker(new MarkerDescription(point, false, MapFragment.IconAnchor.CENTER,
                     new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point, HISTORY_MARKER_COLOR, null)));
         }
     }
@@ -426,7 +427,7 @@ public class GeoPointMapActivity extends LocalizedActivity {
     private void placeMarker(@NonNull MapPoint point) {
         map.clearFeatures();
         drawHistoryMarkers();
-        featureId = map.addMarker(new MarkerDescription(point, intentDraggable && !intentReadOnly && !isPointLocked, MapFragment.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point)));
+        featureId = map.addMarker(new MarkerDescription(point, intentDraggable && !intentReadOnly && !isPointLocked, MapFragment.IconAnchor.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point)));
         if (!intentReadOnly) {
             clearButton.setEnabled(true);
         }

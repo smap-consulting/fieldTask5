@@ -727,8 +727,7 @@
   <string name="change_password">Contraseña</string>
   <string name="password_error_whitespace">Los espacios al inicio o al final no están permitidos en las contraseñas</string>
   <string name="username_error_whitespace">No se permiten espacios al inicio o al final en el nombre de usuario.</string>
-  <string name="app_theme">Tema</string>
-  <string name="language">Idioma</string>
+    <string name="language">Idioma</string>
   <string name="use_device_language">Usar el idioma del dispositivo</string>
   <string name="font_size">Tamaño del Texto</string>
   <string name="change_font_size">Tamaño del Texto</string>
@@ -1046,17 +1045,6 @@
     ##############################################-->
   <string name="google_drive_removed_message">Este proyecto estaba previamente conectado a una cuenta de Google Drive. Se ha eliminado la compatibilidad con Google Drive. Puede configurar un servidor o conectar a una computadora.</string>
   <string name="learn_more_button_text">Aprende más</string>
-  <!--##############################################
-    # Min SDK deprecation banner
-    ##############################################-->
-  <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <string name="min_sdk_deprecation_banner_title">Tu dispositivo pronto ya no podrá actualizarse.</string>
-  <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <string name="min_sdk_deprecation_banner_message">A partir de principios de 2026, FieldTask requerirá Android 8+.</string>
-  <!--Button text that opens a forum post with more information about upcoming device support changes-->
-  <string name="min_sdk_deprecation_learn_more">Aprende más</string>
-  <!--Button text to dismiss the banner-->
-  <string name="min_sdk_deprecation_dismiss">Descartar</string>
   <!--##############################################
     # Developer tools
     ##############################################-->

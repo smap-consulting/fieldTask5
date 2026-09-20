@@ -27,6 +27,8 @@ import static org.odk.collect.android.utilities.AnimationUtils.areAnimationsEnab
 import static org.odk.collect.android.utilities.ApplicationConstants.RequestCodes;
 import static org.odk.collect.android.utilities.DialogUtils.getDialog;
 import static org.odk.collect.androidshared.ui.DialogFragmentUtils.showIfNotShowing;
+import static org.odk.collect.androidshared.ui.EdgeToEdge.applyBottomBarInsetMargins;
+import static org.odk.collect.androidshared.ui.EdgeToEdge.setView;
 import static org.odk.collect.androidshared.ui.ToastUtils.showLongToast;
 import static org.odk.collect.androidshared.ui.ToastUtils.showShortToast;
 import static org.odk.collect.settings.keys.ProjectKeys.KEY_NAVIGATION;
@@ -128,13 +130,14 @@ import org.odk.collect.android.formentry.saving.SaveFormProgressDialogFragment;
 import org.odk.collect.android.formhierarchy.FormHierarchyFragmentHostActivity;
 import org.odk.collect.android.fragments.MediaLoadingFragment;
 import org.odk.collect.android.fragments.dialogs.LocationProvidersDisabledDialog;
-import org.odk.collect.android.fragments.dialogs.NumberPickerDialog;
+import org.odk.collect.android.fragments.dialogs.RangePickerDialogFragment;
 import org.odk.collect.android.fragments.dialogs.RankingWidgetDialog;
 import org.odk.collect.android.fragments.dialogs.SelectMinimalDialog;
+import org.odk.collect.android.injection.config.ProjectDependencyModuleFactory;
 import org.odk.collect.android.instancemanagement.InstanceExtKt;
 import org.odk.collect.android.instancemanagement.InstancesDataService;
 import org.odk.collect.android.instancemanagement.LocalInstancesUseCases;
-import org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider;
+import org.odk.collect.android.instancemanagement.send.autosend.AutoSendSettingsProvider;
 import org.odk.collect.android.javarosawrapper.FailedValidationResult;
 import org.odk.collect.android.javarosawrapper.FormController;
 import org.odk.collect.android.javarosawrapper.InstanceMetadata;
@@ -169,8 +172,6 @@ import org.odk.collect.android.widgets.datetime.pickers.CustomDatePickerDialog;
 import org.odk.collect.android.widgets.datetime.pickers.CustomTimePickerDialog;
 import org.odk.collect.android.widgets.interfaces.WidgetDataReceiver;
 import org.odk.collect.android.widgets.items.SelectOneFromMapDialogFragment;
-import org.odk.collect.android.widgets.range.RangePickerDecimalWidget;
-import org.odk.collect.android.widgets.range.RangePickerIntegerWidget;
 import org.odk.collect.android.widgets.utilities.ExternalAppRecordingRequester;
 import org.odk.collect.android.widgets.utilities.FormControllerWaitingForDataRegistry;
 import org.odk.collect.android.widgets.utilities.GeoPolyDialogFragment;
@@ -181,6 +182,7 @@ import org.odk.collect.androidshared.system.PlayServicesChecker;
 import org.odk.collect.androidshared.system.ProcessRestoreDetector;
 import org.odk.collect.androidshared.ui.DialogFragmentUtils;
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder;
+import org.odk.collect.androidshared.ui.DialogUtils;
 import org.odk.collect.androidshared.ui.SnackbarUtils;
 import org.odk.collect.androidshared.ui.ToastUtils;
 import org.odk.collect.async.Scheduler;
@@ -201,6 +203,7 @@ import org.odk.collect.qrcode.zxing.QRCodeCreatorImpl;
 import org.odk.collect.settings.SettingsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 import org.odk.collect.strings.localization.LocalizedActivity;
+import org.odk.collect.timedgrid.NavigationWarning;
 
 import java.io.File;
 import java.util.HashMap;
@@ -224,7 +227,7 @@ import timber.log.Timber;
  */
 public class FormFillingActivity extends LocalizedActivity implements CollectComposeThemeProvider, AnimationListener,
         FormLoaderListener, AdvanceToNextListener, SwipeHandler.OnSwipeListener,
-        SavepointListener, NumberPickerDialog.NumberPickerListener,
+        SavepointListener,
         RankingWidgetDialog.RankingListener, SaveFormIndexTask.SaveFormIndexListener,
         WidgetValueChangedListener, FormLoadingDialogFragment.FormLoadingDialogFragmentListener,
         AudioControllerView.SwipableParent, FormIndexAnimationHandler.Listener,
@@ -376,6 +379,9 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     @Inject
     public AudioPlayerFactory audioPlayerFactory;
 
+    @Inject
+    public ProjectDependencyModuleFactory projectDependencyModuleFactory;
+
     private final LocationProvidersReceiver locationProvidersReceiver = new LocationProvidersReceiver();
 
     private SwipeHandler swipeHandler;
@@ -401,7 +407,10 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
         @Override
         public void handleOnBackPressed() {
-            if (audioRecorder.isRecording() && !backgroundAudioViewModel.isBackgroundRecording()) {
+            NavigationWarning navigationWarning = odkView != null ? odkView.isNavigationBlocked() : null;
+            if (navigationWarning != null) {
+                DialogUtils.show(FormFillingActivity.this, navigationWarning.getTitleRes(), navigationWarning.getMessageRes());
+            } else if (audioRecorder.isRecording() && !backgroundAudioViewModel.isBackgroundRecording()) {
                 // We want the user to stop recording before changing screens
                 DialogFragmentUtils.showIfNotShowing(RecordingWarningDialogFragment.class, getSupportFragmentManager());
             } else if (isReadOnly()) {
@@ -451,7 +460,8 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 new QRCodeCreatorImpl(),
                 new HtmlPrinter(),
                 instancesDataService,
-                changeLockProvider
+                changeLockProvider,
+                projectDependencyModuleFactory
         );
 
         this.getSupportFragmentManager().setFragmentFactory(new FragmentFactoryBuilder()
@@ -461,6 +471,7 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 .forClass(BackgroundAudioPermissionDialogFragment.class, () -> new BackgroundAudioPermissionDialogFragment(viewModelFactory))
                 .forClass(SelectOneFromMapDialogFragment.class, () -> new SelectOneFromMapDialogFragment(viewModelFactory))
                 .forClass(GeoPolyDialogFragment.class, () -> new GeoPolyDialogFragment(viewModelFactory))
+                .forClass(RangePickerDialogFragment.class, () -> new RangePickerDialogFragment(viewModelFactory))
                 .build());
 
         getSupportFragmentManager().setFragmentResultListener(REQUEST_DELETE_REPEAT, this, (requestKey, result) -> deleteGroup());
@@ -479,7 +490,9 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.form_entry);
+        setView(this, R.layout.form_entry, false);
+        applyBottomBarInsetMargins(findViewById(R.id.buttonholder));
+
         setupViewModels(viewModelFactory);
 
         // https://github.com/getodk/collect/issues/5469
@@ -515,6 +528,15 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                     public void save() {
                         saveForm(false, InstancesDaoHelper.isInstanceComplete(getFormController()), null, true);
                     }
+                },
+                () -> {
+                    NavigationWarning navigationWarning = odkView != null ? odkView.isNavigationBlocked() : null;
+                    if (navigationWarning != null) {
+                        DialogUtils.show(this, navigationWarning.getTitleRes(), navigationWarning.getMessageRes());
+                        swipeHandler.setBeenSwiped(false);
+                        return false;
+                    }
+                    return true;
                 }
         );
 
@@ -1315,6 +1337,13 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         FormController formController = getFormController();
         if (formController == null) {
             Timber.d("FormController has a null value");
+            swipeHandler.setBeenSwiped(false);
+            return;
+        }
+
+        NavigationWarning navigationWarning = odkView != null ? odkView.isNavigationBlocked() : null;
+        if (navigationWarning != null) {
+            DialogUtils.show(this, navigationWarning.getTitleRes(), navigationWarning.getMessageRes());
             swipeHandler.setBeenSwiped(false);
             return;
         }
@@ -2295,23 +2324,6 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     public void onSaveFormIndexError(String errorMessage) {
         if (errorMessage != null && errorMessage.trim().length() > 0) {
             showLongToast(getString(org.odk.collect.strings.R.string.save_point_error, errorMessage));
-        }
-    }
-
-    @Override
-    public void onNumberPickerValueSelected(int widgetId, int value) {
-        if (currentView != null) {
-            for (QuestionWidget qw : ((ODKView) currentView).getWidgets()) {
-                if (qw instanceof RangePickerIntegerWidget && widgetId == qw.getId()) {
-                    ((RangePickerIntegerWidget) qw).setNumberPickerValue(value);
-                    widgetValueChanged(qw);
-                    return;
-                } else if (qw instanceof RangePickerDecimalWidget && widgetId == qw.getId()) {
-                    ((RangePickerDecimalWidget) qw).setNumberPickerValue(value);
-                    widgetValueChanged(qw);
-                    return;
-                }
-            }
         }
     }
 

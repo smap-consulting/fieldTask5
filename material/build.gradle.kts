@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.composeCompiler)
 }
 
 apply(from = "../config/quality.gradle")
@@ -12,7 +12,6 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -50,6 +49,13 @@ dependencies {
     api(libs.androidMaterial)
     implementation(libs.androidxFragmentKtx)
     implementation(libs.kotlinStdlib)
+    implementation(libs.androidxCoreKtx)
+
+    val composeBom = platform(libs.androidxComposeBom)
+    implementation(composeBom)
+    implementation(libs.androidXComposeMaterial)
+    implementation(libs.androidXComposePreview)
+    debugImplementation(libs.androidXComposeTooling)
 
     testImplementation(project(":fragments-test"))
     testImplementation(project(":test-shared"))

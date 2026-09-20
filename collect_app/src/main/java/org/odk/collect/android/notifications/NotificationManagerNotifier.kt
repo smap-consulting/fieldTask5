@@ -4,18 +4,16 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import org.odk.collect.android.formmanagement.ServerFormDetails
 import org.odk.collect.android.formmanagement.download.FormDownloadException
+import org.odk.collect.android.instancemanagement.send.InstanceUploadResult
 import org.odk.collect.android.notifications.builders.FormUpdatesAvailableNotificationBuilder
 import org.odk.collect.android.notifications.builders.FormUpdatesDownloadedNotificationBuilder
 import org.odk.collect.android.notifications.builders.FormsSubmissionNotificationBuilder
 import org.odk.collect.android.notifications.builders.FormsSyncFailedNotificationBuilder
 import org.odk.collect.android.notifications.builders.FormsSyncStoppedNotificationBuilder
-import org.odk.collect.android.upload.FormUploadException
 import org.odk.collect.androidshared.utils.UniqueIdGenerator
 import org.odk.collect.forms.FormSourceException
-import org.odk.collect.forms.instances.Instance
 import org.odk.collect.projects.ProjectsRepository
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.settings.keys.MetaKeys
@@ -95,14 +93,14 @@ class NotificationManagerNotifier(
         )
     }
 
-    override fun onSubmission(result: Map<Instance, FormUploadException?>, projectId: String) {
+    override fun onSubmission(uploadResults: List<InstanceUploadResult>, projectId: String) {
         val notificationId = uniqueIdGenerator.getInt(AUTO_SEND_RESULT_NOTIFICATION_IDENTIFIER)
 
         notificationManager.notify(
             notificationId,
             FormsSubmissionNotificationBuilder.build(
                 application,
-                result,
+                uploadResults,
                 getProjectName(projectId),
                 notificationId
             )
@@ -119,14 +117,12 @@ class NotificationManagerNotifier(
     private fun getProjectName(projectId: String) = projectsRepository.get(projectId)?.name ?: ""
 
     init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(
-                NotificationChannel(
-                    COLLECT_NOTIFICATION_CHANNEL,
-                    application.getLocalizedString(org.odk.collect.strings.R.string.notification_channel_name),
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                COLLECT_NOTIFICATION_CHANNEL,
+                application.getLocalizedString(org.odk.collect.strings.R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT
             )
-        }
+        )
     }
 }

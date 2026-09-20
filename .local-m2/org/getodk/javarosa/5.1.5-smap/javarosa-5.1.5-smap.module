@@ -1,0 +1,176 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "org.getodk",
+    "module": "javarosa",
+    "version": "5.1.5-smap",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "joda-time",
+          "module": "joda-time",
+          "version": {
+            "requires": "2.10.13"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.33"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.6.10"
+          }
+        },
+        {
+          "group": "org.bouncycastle",
+          "module": "bcprov-jdk18on",
+          "version": {
+            "requires": "1.77"
+          }
+        },
+        {
+          "group": "net.sf.kxml",
+          "module": "kxml2",
+          "version": {
+            "requires": "2.3.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-csv",
+          "version": {
+            "requires": "1.4"
+          }
+        },
+        {
+          "group": "commons-io",
+          "module": "commons-io",
+          "version": {
+            "requires": "2.5"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "javarosa-5.1.5-smap.jar",
+          "url": "javarosa-5.1.5-smap.jar",
+          "size": 698710,
+          "sha512": "7cd93a92bfecd061291032253643a2b275074a69c8c3f8ccbd4192c3eda06b27f125eb80981522e469e3f1d5eba20e50e5710a26545953356fa18680ad99332c",
+          "sha256": "1d01ea762979f4acc048e5d05b0c2b2b8d8f9c50db09d8b3140e67cc99117038",
+          "sha1": "43e52d891885fd6dba6106e927318a780466856c",
+          "md5": "a1250fc9d0938653d4426a60f6a43dfc"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "joda-time",
+          "module": "joda-time",
+          "version": {
+            "requires": "2.10.13"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "1.7.33"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.13.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.6.10"
+          }
+        },
+        {
+          "group": "org.bouncycastle",
+          "module": "bcprov-jdk18on",
+          "version": {
+            "requires": "1.77"
+          }
+        },
+        {
+          "group": "net.sf.kxml",
+          "module": "kxml2",
+          "version": {
+            "requires": "2.3.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-csv",
+          "version": {
+            "requires": "1.4"
+          }
+        },
+        {
+          "group": "commons-io",
+          "module": "commons-io",
+          "version": {
+            "requires": "2.5"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "javarosa-5.1.5-smap.jar",
+          "url": "javarosa-5.1.5-smap.jar",
+          "size": 698710,
+          "sha512": "7cd93a92bfecd061291032253643a2b275074a69c8c3f8ccbd4192c3eda06b27f125eb80981522e469e3f1d5eba20e50e5710a26545953356fa18680ad99332c",
+          "sha256": "1d01ea762979f4acc048e5d05b0c2b2b8d8f9c50db09d8b3140e67cc99117038",
+          "sha1": "43e52d891885fd6dba6106e927318a780466856c",
+          "md5": "a1250fc9d0938653d4426a60f6a43dfc"
+        }
+      ]
+    }
+  ]
+}

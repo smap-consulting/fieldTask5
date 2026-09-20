@@ -67,7 +67,6 @@ import org.odk.collect.android.projects.ProjectsDataService
 import org.odk.collect.android.projects.QrCodeProjectCreatorDialog
 import org.odk.collect.android.storage.StoragePathProvider
 import org.odk.collect.android.tasks.DownloadFormListTask
-import org.odk.collect.android.tasks.InstanceUploaderTask
 import org.odk.collect.android.tasks.MediaLoadingTask
 import org.odk.collect.android.utilities.AuthDialogUtility
 import org.odk.collect.android.utilities.FormsRepositoryProvider
@@ -131,8 +130,6 @@ interface AppDependencyComponent {
     fun inject(aboutActivity: AboutActivity)
 
     fun inject(formFillingActivity: FormFillingActivity)
-
-    fun inject(uploader: InstanceUploaderTask)
 
     fun inject(serverPreferencesFragment: ServerPreferencesFragment)
 

@@ -15,6 +15,9 @@
 
 package org.odk.collect.draw;
 
+import static org.odk.collect.androidshared.ui.EdgeToEdge.setView;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -108,7 +111,7 @@ public class DrawActivity extends LocalizedActivity {
                 .build());
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.draw_layout);
+        setView(this, R.layout.draw_layout, false);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -170,9 +173,11 @@ public class DrawActivity extends LocalizedActivity {
 
         Bundle extras = getIntent().getExtras();
         String imagePath = drawView.getImagePath();
-        if (extras != null && extras.getInt(SCREEN_ORIENTATION) == 1) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
+
+        // smap - extras can be null when the activity is restarted by the system
+        boolean portrait = extras != null && extras.getInt(SCREEN_ORIENTATION) == 1;
+        setOrientation(portrait);
+
         loadOption = extras != null ? extras.getString(OPTION) : null;
         if (loadOption == null) {
             loadOption = OPTION_DRAW;
@@ -230,6 +235,21 @@ public class DrawActivity extends LocalizedActivity {
         });
 
         getOnBackPressedDispatcher().addCallback(onBackPressedCallback);
+    }
+
+    /**
+     * Only lock orientation on screens that are smaller than 600dp (https://android-developers.googleblog.com/2025/01/orientation-and-resizability-changes-in-android-16.html)
+     */
+    @SuppressLint("SourceLockedOrientationActivity")
+    private void setOrientation(boolean portrait) {
+        int smallestScreenWidthDp = getResources().getConfiguration().smallestScreenWidthDp;
+        if (smallestScreenWidthDp >= 600) {
+            if (portrait) {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+        }
     }
 
     private void reset() {

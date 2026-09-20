@@ -54,8 +54,7 @@ import org.odk.collect.android.widgets.items.SelectOneMinimalWidget;
 import org.odk.collect.android.widgets.items.SelectOneWidget;
 import org.odk.collect.android.widgets.range.RangeDecimalWidget;
 import org.odk.collect.android.widgets.range.RangeIntegerWidget;
-import org.odk.collect.android.widgets.range.RangePickerDecimalWidget;
-import org.odk.collect.android.widgets.range.RangePickerIntegerWidget;
+import org.odk.collect.android.widgets.range.RangePickerWidget;
 import org.odk.collect.android.widgets.utilities.ActivityGeoDataRequester;
 import org.odk.collect.android.widgets.video.ExVideoWidget;
 import org.odk.collect.android.widgets.video.VideoWidget;
@@ -301,6 +300,8 @@ public class WidgetFactory {
                     questionWidget = new LabelWidget(activity, questionDetails, formEntryViewModel, dependencies);
                 } else if (appearance.contains(Appearances.IMAGE_MAP)) {
                     questionWidget = new SelectMultiImageMapWidget(activity, questionDetails, formEntryViewModel, dependencies);
+                } else if (appearance.startsWith(Appearances.X_TIMED_GRID)) {
+                    questionWidget = new TimedGridWidget(activity, questionDetails, dependencies, formEntryViewModel);
                 } else {
                     questionWidget = new SelectMultiWidget(activity, questionDetails, formEntryViewModel, dependencies);
                 }
@@ -318,16 +319,16 @@ public class WidgetFactory {
                     switch (prompt.getDataType()) {
                         case Constants.DATATYPE_INTEGER:
                             if (prompt.getAppearanceHint() != null && prompt.getAppearanceHint().contains(PICKER_APPEARANCE)) {
-                                questionWidget = new RangePickerIntegerWidget(activity, questionDetails, dependencies);
+                                questionWidget = new RangePickerWidget(activity, questionDetails, dependencies, false);
                             } else {
-                                questionWidget = new RangeIntegerWidget(activity, questionDetails, dependencies);
+                                questionWidget = new RangeIntegerWidget(activity, questionDetails, formEntryViewModel, dependencies);
                             }
                             break;
                         case Constants.DATATYPE_DECIMAL:
                             if (prompt.getAppearanceHint() != null && prompt.getAppearanceHint().contains(PICKER_APPEARANCE)) {
-                                questionWidget = new RangePickerDecimalWidget(activity, questionDetails, dependencies);
+                                questionWidget = new RangePickerWidget(activity, questionDetails, dependencies, true);
                             } else {
-                                questionWidget = new RangeDecimalWidget(activity, questionDetails, dependencies);
+                                questionWidget = new RangeDecimalWidget(activity, questionDetails, formEntryViewModel, dependencies);
                             }
                             break;
                         default:

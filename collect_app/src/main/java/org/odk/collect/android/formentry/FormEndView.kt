@@ -5,7 +5,6 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.LayoutInflater
-import android.widget.ScrollView
 import org.odk.collect.android.databinding.FormEntryEndBinding
 import org.odk.collect.android.utilities.FormNameUtils
 

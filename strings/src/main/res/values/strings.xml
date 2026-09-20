@@ -157,13 +157,13 @@
     <!-- Title of the end of form screen -->
     <string name="save_enter_data_description">You are at the end of %s.</string>
     <!-- Text shown in an information box on the end of form screen when auto-send is off or the device is offline -->
-    <string name="form_editing_disabled_after_finalizing">Edits can\'t be made after finalizing.</string>
+    <string name="form_editing_disabled_after_finalizing">Can\'t edit after finalize</string>
     <!-- Text shown in an information box on the end of form screen when auto-send is on and the device is online -->
-    <string name="form_editing_disabled_after_sending">Edits can\'t be made after sending.</string>
+    <string name="form_editing_disabled_after_sending">Can\'t edit after send</string>
     <!-- Text shown in an information box on the end of form screen when auto-send is off and the form allows edits after finalize/send -->
-    <string name="form_editing_enabled_after_finalizing">Edits can be made after finalizing.</string>
+    <string name="form_editing_enabled_after_finalizing">Can edit after finalize</string>
     <!-- Text shown in an information box on the end of form screen when auto-send is on and the form allows edits after finalize/send -->
-    <string name="form_editing_enabled_after_sending">Edits can be made after sending.</string>
+    <string name="form_editing_enabled_after_sending">Can edit after send</string>
     <!-- Details shown in an information box on the end of form screen when the form does not allow edits after finalize/send -->
     <string name="form_editing_disabled_hint">If you need to make edits to your form, \"Save as draft\" until you\'re ready to send.</string>
     <!-- Details shown in an information box on the end of form screen when the form allows edits after finalization -->
@@ -270,6 +270,21 @@
 
     <string name="number_picker_title">Number Picker</string>
     <string name="invalid_range_widget">This widget has invalid parameters!</string>
+
+    <!-- Content description for a horizontal slider used in range widgets -->
+    <string name="horizontal_slider">Horizontal slider</string>
+    <!-- Content description for a vertical slider used in range widgets  -->
+    <string name="vertical_slider">Vertical slider</string>
+    <!-- Content description for the label showing the current value of the slider -->
+    <string name="current_slider_value">Current slider value</string>
+    <!-- Content description for each tick mark on the slider indicating discrete steps -->
+    <string name="slider_tick">Slider tick</string>
+    <!-- Content description for the draggable thumb handle of the slider -->
+    <string name="slider_thumb">Slider thumb</string>
+    <!-- Content description for the label at the start (minimum) of the slider -->
+    <string name="slider_start_label">Slider start label</string>
+    <!-- Content description for the label at the end (maximum) of the slider -->
+    <string name="slider_end_label">Slider end label</string>
 
     <string name="svg_file_does_not_exist">SVG file does not exist!</string>
 
@@ -908,8 +923,6 @@
     <string name="password_error_whitespace">Leading or trailing whitespace not allowed in passwords</string>
     <string name="username_error_whitespace">Leading or trailing whitespace not allowed in usernames</string>
 
-    <string name="app_theme">Theme</string>
-
     <string name="language">Language</string>
     <string name="use_device_language">Use device language</string>
 
@@ -1303,20 +1316,6 @@
     -->
     <string name="google_drive_removed_message">This project was previously connected to a Google Drive account. Google Drive support has been removed. You can configure a server or pull submissions to a computer.</string>
     <string name="learn_more_button_text">Learn more</string>
-
-    <!--
-    ##############################################
-    # Min SDK deprecation banner
-    ##############################################
-    -->
-    <!-- First part of the message shown in the banner, informing the user that their device will soon be unsupported -->
-    <string name="min_sdk_deprecation_banner_title">Your device will soon no longer be able to upgrade.</string>
-    <!-- Second part of the message shown in the banner, informing the user that their device will soon be unsupported -->
-    <string name="min_sdk_deprecation_banner_message">Starting in early 2026, FieldTask requires Android 8+.</string> <!-- smap -->
-    <!-- Button text that opens a forum post with more information about upcoming device support changes -->
-    <string name="min_sdk_deprecation_learn_more">Learn more</string>
-    <!-- Button text to dismiss the banner -->
-    <string name="min_sdk_deprecation_dismiss">Dismiss</string>
 
     <!--
     ##############################################

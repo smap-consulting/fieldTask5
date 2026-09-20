@@ -47,10 +47,6 @@ class ForegroundServiceLocationTracker(private val application: Application) : L
     override fun stop() {
         application.stopService(Intent(application, LocationTrackerService::class.java))
     }
-
-    override fun warm(location: Location?) {
-        application.getState().setFlow(LOCATION_KEY, location)
-    }
 }
 
 class LocationTrackerService : Service(), LocationClient.LocationClientListener {
@@ -153,17 +149,15 @@ class LocationTrackerService : Service(), LocationClient.LocationClientListener 
         PendingIntent.getActivity(this, 0, Intent(this, ReturnToAppActivity::class.java), PendingIntent.FLAG_IMMUTABLE)
 
     private fun setupNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL,
-                getLocalizedString(org.odk.collect.strings.R.string.location_tracking_notification_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            )
+        val notificationChannel = NotificationChannel(
+            NOTIFICATION_CHANNEL,
+            getLocalizedString(org.odk.collect.strings.R.string.location_tracking_notification_channel_name),
+            NotificationManager.IMPORTANCE_LOW
+        )
 
-            (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
-                notificationChannel
-            )
-        }
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(
+            notificationChannel
+        )
     }
 
     companion object {

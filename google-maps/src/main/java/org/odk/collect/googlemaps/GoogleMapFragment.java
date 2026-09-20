@@ -14,7 +14,8 @@
 
 package org.odk.collect.googlemaps;
 
-import static org.odk.collect.maps.TraceDescriptionKt.getMarkersForPoints;
+import static org.odk.collect.googlemaps.MapPointExt.toLatLng;
+import static org.odk.collect.maps.traces.TraceDescriptionKt.getMarkersForPoints;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -52,24 +53,26 @@ import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 
 import org.jetbrains.annotations.NotNull;
-import org.odk.collect.androidshared.system.ContextUtils;
+import org.odk.collect.androidshared.system.ContextExt;
 import org.odk.collect.androidshared.ui.ToastUtils;
 import org.odk.collect.googlemaps.GoogleMapConfigurator.GoogleMapTypeOption;
+import org.odk.collect.googlemaps.circles.CircleFeature;
 import org.odk.collect.googlemaps.scaleview.MapScaleView;
 import org.odk.collect.location.LocationClient;
-import org.odk.collect.maps.LineDescription;
 import org.odk.collect.maps.MapConfigurator;
 import org.odk.collect.maps.MapFragment;
 import org.odk.collect.maps.MapPoint;
 import org.odk.collect.maps.MapViewModel;
 import org.odk.collect.maps.MapViewModelMapFragment;
-import org.odk.collect.maps.PolygonDescription;
 import org.odk.collect.maps.Zoom;
 import org.odk.collect.maps.ZoomObserver;
+import org.odk.collect.maps.circles.CircleDescription;
 import org.odk.collect.maps.layers.MapFragmentReferenceLayerUtils;
 import org.odk.collect.maps.layers.ReferenceLayerRepository;
 import org.odk.collect.maps.markers.MarkerDescription;
 import org.odk.collect.maps.markers.MarkerIconDescription;
+import org.odk.collect.maps.traces.LineDescription;
+import org.odk.collect.maps.traces.PolygonDescription;
 import org.odk.collect.settings.SettingsProvider;
 import org.odk.collect.settings.keys.ProjectKeys;
 
@@ -118,7 +121,6 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
 
     private boolean clientWantsLocationUpdates;
     private MapPoint lastLocationFix;
-    private String lastLocationProvider;
 
     private int nextFeatureId = 1;
     private final Map<Integer, MapFeature> features = new HashMap<>();
@@ -280,6 +282,10 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
 
     @Override public int addMarker(MarkerDescription markerDescription) {
         int featureId = nextFeatureId++;
+        return addMarker(featureId, markerDescription);
+    }
+
+    private int addMarker(int featureId, MarkerDescription markerDescription) {
         features.put(featureId, new MarkerFeature(getActivity(), markerDescription, map));
         return featureId;
     }
@@ -425,18 +431,9 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         }
     }
 
-    @Override public void runOnGpsLocationReady(@NonNull ReadyListener listener) {
-        if (lastLocationFix != null) {
-            listener.onReady(this);
-        } else {
-            gpsLocationReadyListeners.add(listener);
-        }
-    }
-
     @Override public void onLocationChanged(Location location) {
         Timber.i("onLocationChanged: location = %s", location);
         lastLocationFix = fromLocation(location);
-        lastLocationProvider = location.getProvider();
         for (ReadyListener listener : gpsLocationReadyListeners) {
             listener.onReady(this);
         }
@@ -452,10 +449,6 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
 
     @Override public @Nullable MapPoint getGpsLocation() {
         return lastLocationFix;
-    }
-
-    @Override public @Nullable String getLocationProvider() {
-        return lastLocationProvider;
     }
 
     @Override public void onMapClick(LatLng latLng) {
@@ -562,9 +555,7 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         return new MapPoint(position.latitude, position.longitude, alt, sd);
     }
 
-    private static @NonNull LatLng toLatLng(@NonNull MapPoint point) {
-        return new LatLng(point.latitude, point.longitude);
-    }
+
 
     /** Updates the map to reflect the value of referenceLayerFile. */
     private void loadReferenceOverlay() {
@@ -638,7 +629,7 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
             );
         }
         if (accuracyCircle == null) {
-            int stroke = ContextUtils.getThemeAttributeValue(requireContext(), androidx.appcompat.R.attr.colorPrimary);
+            int stroke = ContextExt.getThemeAttributeValue(requireContext(), androidx.appcompat.R.attr.colorPrimary);
             int fill = getResources().getColor(org.odk.collect.androidshared.R.color.color_primary_low_emphasis);
             accuracyCircle = map.addCircle(new CircleOptions()
                 .center(loc)
@@ -706,7 +697,7 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         );
     }
 
-    private static float getIconAnchorValueX(@MapFragment.Companion.IconAnchor String iconAnchor) {
+    private static float getIconAnchorValueX(MapFragment.IconAnchor iconAnchor) {
         switch (iconAnchor) {
             case BOTTOM:
             default:
@@ -714,7 +705,7 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         }
     }
 
-    private static float getIconAnchorValueY(@MapFragment.Companion.IconAnchor String iconAnchor) {
+    private static float getIconAnchorValueY(MapFragment.IconAnchor iconAnchor) {
         switch (iconAnchor) {
             case BOTTOM:
                 return 1.0f;
@@ -758,13 +749,36 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
         }).get(MapViewModel.class);
     }
 
+    @Override
+    public void updateMarker(int featureId, @NotNull MarkerDescription markerDescription) {
+        features.get(featureId).dispose();
+        addMarker(featureId, markerDescription);
+    }
+
+    @Override
+    public int addCircle(@NotNull CircleDescription circleDescription) {
+        int featureId = nextFeatureId++;
+        addCircle(featureId, circleDescription);
+        return featureId;
+    }
+
+    private void addCircle(int featureId, @NotNull CircleDescription circleDescription) {
+        features.put(featureId, new CircleFeature(circleDescription, map));
+    }
+
+    @Override
+    public void updateCircle(int featureId, @NotNull CircleDescription circleDescription) {
+        features.get(featureId).dispose();
+        addCircle(featureId, circleDescription);
+    }
+
     /**
      * A MapFeature is a physical feature on a map, such as a point, a road,
      * a building, a region, etc.  It is presented to the user as one editable
      * object, though its appearance may be constructed from multiple overlays
      * (e.g. geometric elements, handles for manipulation, etc.).
      */
-    interface MapFeature {
+    public interface MapFeature {
         /** Returns true if the given marker belongs to this feature. */
         boolean ownsMarker(Marker marker);
 
@@ -993,7 +1007,7 @@ public class GoogleMapFragment extends MapViewModelMapFragment implements
 
         public void addPoint(MapPoint point) {
             if (map == null) return;
-            MarkerDescription markerDescription = new MarkerDescription(point, true, MapFragment.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point));
+            MarkerDescription markerDescription = new MarkerDescription(point, true, MapFragment.IconAnchor.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point));
             markers.add(createMarker(requireContext(), markerDescription, map));
             update();
         }

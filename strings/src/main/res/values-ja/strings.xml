@@ -569,8 +569,7 @@
   <string name="change_password">ODK パスワード</string>
   <string name="password_error_whitespace">パスワードの先頭または末尾に空白は使用できません</string>
   <string name="username_error_whitespace">ユーザー名の先頭または末尾に空白は使用できません</string>
-  <string name="app_theme">テーマ</string>
-  <string name="language">言語</string>
+    <string name="language">言語</string>
   <string name="use_device_language">デバイスの言語を使用する</string>
   <string name="font_size">文字フォントサイズ</string>
   <string name="change_font_size">文字フォントサイズ</string>
@@ -818,14 +817,6 @@
   <!--##############################################
     # Google Drive deprecation
     ##############################################-->
-  <!--##############################################
-    # Min SDK deprecation banner
-    ##############################################-->
-  <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <!--Button text that opens a forum post with more information about upcoming device support changes-->
-  <!--Button text to dismiss the banner-->
-  <string name="min_sdk_deprecation_dismiss">消去</string>
   <!--##############################################
     # Developer tools
     ##############################################-->

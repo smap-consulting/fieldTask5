@@ -9,12 +9,12 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PolylineAnnotationOptions
-import org.odk.collect.maps.LineDescription
+import org.odk.collect.maps.traces.LineDescription
 import org.odk.collect.maps.MapFragment
 import org.odk.collect.maps.MapPoint
-import org.odk.collect.maps.getMarkersForPoints
 import org.odk.collect.maps.markers.MarkerDescription
 import org.odk.collect.maps.markers.MarkerIconDescription
+import org.odk.collect.maps.traces.getMarkersForPoints
 
 internal class DynamicPolyLineFeature(
     private val context: Context,
@@ -61,7 +61,7 @@ internal class DynamicPolyLineFeature(
 
     fun appendPoint(point: MapPoint) {
         val markerDescription = MarkerDescription(
-            point, true, MapFragment.CENTER,
+            point, true, MapFragment.IconAnchor.CENTER,
             MarkerIconDescription.TracePoint(lineDescription.getStrokeWidth(), lineDescription.getStrokeColor())
         )
         _points.add(point)

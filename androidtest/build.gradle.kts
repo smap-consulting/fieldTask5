@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.kotlinAndroid)
 }
 
 apply(from = "../config/quality.gradle")
@@ -12,7 +11,6 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     compileOptions {
@@ -32,6 +30,7 @@ android {
 dependencies {
     coreLibraryDesugaring(libs.desugar)
 
+    implementation(project(":async"))
     implementation(libs.junit)
     implementation(libs.androidxTestCoreKtx)
     implementation(libs.androidxLifecycleLivedataKtx)

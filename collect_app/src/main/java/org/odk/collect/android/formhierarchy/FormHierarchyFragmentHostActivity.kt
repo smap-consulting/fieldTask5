@@ -13,14 +13,16 @@ import org.odk.collect.android.formentry.FormOpeningMode
 import org.odk.collect.android.formentry.FormSessionRepository
 import org.odk.collect.android.formentry.repeats.DeleteRepeatDialogFragment
 import org.odk.collect.android.injection.DaggerUtils
+import org.odk.collect.android.injection.config.ProjectDependencyModuleFactory
 import org.odk.collect.android.instancemanagement.InstancesDataService
-import org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider
+import org.odk.collect.android.instancemanagement.send.autosend.AutoSendSettingsProvider
 import org.odk.collect.android.projects.ProjectsDataService
 import org.odk.collect.android.utilities.ChangeLockProvider
 import org.odk.collect.android.utilities.FormsRepositoryProvider
 import org.odk.collect.android.utilities.InstancesRepositoryProvider
 import org.odk.collect.android.utilities.MediaUtils
 import org.odk.collect.android.utilities.SavepointsRepositoryProvider
+import org.odk.collect.androidshared.ui.EdgeToEdge.setView
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
 import org.odk.collect.async.Scheduler
 import org.odk.collect.audiorecorder.recording.AudioRecorder
@@ -87,6 +89,9 @@ class FormHierarchyFragmentHostActivity : LocalizedActivity(), CollectComposeThe
     @Inject
     lateinit var changeLockProvider: ChangeLockProvider
 
+    @Inject
+    lateinit var projectDependencyModuleFactory: ProjectDependencyModuleFactory
+
     private val sessionId by lazy { intent.getStringExtra(EXTRA_SESSION_ID)!! }
     private val viewModelFactory by lazy {
         FormEntryViewModelFactory(
@@ -109,7 +114,8 @@ class FormHierarchyFragmentHostActivity : LocalizedActivity(), CollectComposeThe
             QRCodeCreatorImpl(),
             HtmlPrinter(),
             instancesDataService,
-            changeLockProvider
+            changeLockProvider,
+            projectDependencyModuleFactory
         )
     }
 
@@ -148,7 +154,7 @@ class FormHierarchyFragmentHostActivity : LocalizedActivity(), CollectComposeThe
             return
         } else {
             super.onCreate(savedInstanceState)
-            setContentView(R.layout.hierarchy_host_layout)
+            setView(R.layout.hierarchy_host_layout, false)
 
             val navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment

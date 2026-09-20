@@ -52,8 +52,11 @@ import org.odk.collect.android.formmanagement.FormsDataService;
 import org.odk.collect.android.formmanagement.OpenRosaClientProvider;
 import org.odk.collect.android.geo.MapConfiguratorProvider;
 import org.odk.collect.android.geo.MapFragmentFactoryImpl;
+import org.odk.collect.android.instancemanagement.send.InstanceSubmitter;
 import org.odk.collect.android.instancemanagement.InstancesDataService;
-import org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider;
+import org.odk.collect.android.instancemanagement.send.autosend.AutoSendSettingsProvider;
+import org.odk.collect.android.instancemanagement.send.InstanceUploader;
+import org.odk.collect.android.instancemanagement.send.OpenRosaServerInstanceUploader;
 import org.odk.collect.android.instancemanagement.send.ReadyToSendViewModel;
 import org.odk.collect.android.itemsets.FastExternalItemsetsRepository;
 import org.odk.collect.android.mainmenu.MainMenuViewModelFactory;
@@ -94,8 +97,11 @@ import org.odk.collect.androidshared.system.IntentLauncherImpl;
 import org.odk.collect.androidshared.utils.ScreenUtils;
 import org.odk.collect.androidshared.utils.SettingsUniqueIdGenerator;
 import org.odk.collect.androidshared.utils.UniqueIdGenerator;
-import org.odk.collect.async.CoroutineAndWorkManagerScheduler;
+import org.odk.collect.async.coroutines.CoroutineTaskRunner;
 import org.odk.collect.async.Scheduler;
+import org.odk.collect.async.SchedulerBuilder;
+import org.odk.collect.async.services.ForegroundServiceTaskSpecRunner;
+import org.odk.collect.async.workmanager.WorkManagerTaskSpecScheduler;
 import org.odk.collect.async.network.ConnectivityProvider;
 import org.odk.collect.async.network.NetworkStateProvider;
 import org.odk.collect.audioclips.AudioPlayerFactory;
@@ -280,8 +286,12 @@ public class AppDependencyModule {
     }
 
     @Provides
-    public Scheduler providesScheduler(WorkManager workManager) {
-        return new CoroutineAndWorkManagerScheduler(workManager);
+    public Scheduler providesScheduler(WorkManager workManager, Application application) {
+        return SchedulerBuilder.build(
+                new CoroutineTaskRunner(),
+                new ForegroundServiceTaskSpecRunner(application),
+                new WorkManagerTaskSpecScheduler(workManager)
+        );
     }
 
     @Provides
@@ -422,7 +432,9 @@ public class AppDependencyModule {
             return null;
         };
 
-        return new InstancesDataService(getState(application), instanceSubmitScheduler, projectsDependencyProviderFactory, notifier, propertyManager, httpInterface, onUpdate);
+        InstanceUploader instanceUploader = new OpenRosaServerInstanceUploader(projectsDependencyProviderFactory, httpInterface);
+        InstanceSubmitter instanceSubmitter = new InstanceSubmitter(instanceUploader, projectsDependencyProviderFactory, propertyManager);
+        return new InstancesDataService(getState(application), instanceSubmitScheduler, projectsDependencyProviderFactory, notifier, instanceSubmitter, onUpdate);
     }
 
     @Provides

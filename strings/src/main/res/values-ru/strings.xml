@@ -646,8 +646,7 @@
   <string name="change_password">Пароль ODK</string>
   <string name="password_error_whitespace">Не допускается использовать пробелы в начале и конце пароля</string>
   <string name="username_error_whitespace">Не допускается использовать пробелы в начале и конце имени пользователя</string>
-  <string name="app_theme">Тема</string>
-  <string name="language">Язык</string>
+    <string name="language">Язык</string>
   <string name="use_device_language">Использовать язык устройства</string>
   <string name="font_size">Размер шрифта</string>
   <string name="change_font_size">Размер шрифта</string>
@@ -946,13 +945,6 @@
     # Google Drive deprecation
     ##############################################-->
   <string name="learn_more_button_text">Узнать больше</string>
-  <!--##############################################
-    # Min SDK deprecation banner
-    ##############################################-->
-  <!--First part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <!--Second part of the message shown in the banner, informing the user that their device will soon be unsupported-->
-  <!--Button text that opens a forum post with more information about upcoming device support changes-->
-  <string name="min_sdk_deprecation_learn_more">Узнать больше</string>
   <!--Button text to dismiss the banner-->
   <!--##############################################
     # Developer tools

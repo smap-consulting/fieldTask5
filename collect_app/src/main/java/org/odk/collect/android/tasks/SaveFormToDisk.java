@@ -63,6 +63,7 @@ import org.odk.collect.forms.FormsRepository;
 import org.odk.collect.forms.instances.Instance;
 import org.odk.collect.forms.instances.InstancesRepository;
 import org.odk.collect.maps.MapPoint;
+import org.odk.collect.shared.DebugLogger;
 import org.odk.collect.shared.files.FileExt;
 
 import java.io.File;
@@ -85,6 +86,7 @@ public class SaveFormToDisk {
     private final FormController formController;
     private final MediaUtils mediaUtils;
     private final InstancesRepository instancesRepository;
+    private final DebugLogger debugLogger;
     private Uri uri;
     private String instanceName;
     private final ArrayList<String> tempFiles;
@@ -98,7 +100,7 @@ public class SaveFormToDisk {
     public static final int ENCRYPTION_ERROR = 505;
 
     public SaveFormToDisk(FormController formController, MediaUtils mediaUtils, boolean saveAndExit, boolean shouldFinalize, String updatedName,
-                          Uri uri, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository,  InstancesRepository instancesRepository, String surveyNotes) {  // smap added surveyNotes
+                          Uri uri, ArrayList<String> tempFiles, String currentProjectId, EntitiesRepository entitiesRepository, InstancesRepository instancesRepository, DebugLogger debugLogger, String surveyNotes) {  // smap added surveyNotes
         this.formController = formController;
         this.mediaUtils = mediaUtils;
         this.uri = uri;
@@ -109,6 +111,7 @@ public class SaveFormToDisk {
         this.currentProjectId = currentProjectId;
         this.entitiesRepository = entitiesRepository;
         this.instancesRepository = instancesRepository;
+        this.debugLogger = debugLogger;
         this.surveyNotes = surveyNotes;  // smap
     }
 
@@ -128,7 +131,7 @@ public class SaveFormToDisk {
 
             if (shouldFinalize) {
                 Instance instance = updateInstanceDatabase(true, true, validationResult);
-                FormEntryUseCases.finalizeFormController(instance, formController, instancesRepository, entitiesRepository);
+                FormEntryUseCases.finalizeFormController(instance, formController, instancesRepository, entitiesRepository, debugLogger);
             }
 
             // close all open databases of external data.

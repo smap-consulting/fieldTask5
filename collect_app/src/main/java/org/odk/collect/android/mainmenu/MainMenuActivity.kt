@@ -2,6 +2,9 @@ package org.odk.collect.android.mainmenu
 
 import android.os.Build
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 import org.odk.collect.android.R
@@ -12,6 +15,7 @@ import org.odk.collect.android.application.CollectComposeThemeProvider
 import org.odk.collect.android.injection.DaggerUtils
 import org.odk.collect.android.projects.ProjectSettingsDialog
 import org.odk.collect.android.utilities.ThemeUtils
+import org.odk.collect.androidshared.ui.EdgeToEdge.setView
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder
 import org.odk.collect.crashhandler.CrashHandler
 import org.odk.collect.mobiledevicemanagement.MDMConfigObserver
@@ -66,7 +70,7 @@ class MainMenuActivity : LocalizedActivity(), CollectComposeThemeProvider {
         val viewModelProvider = ViewModelProvider(this, viewModelFactory)
         currentProjectViewModel = viewModelProvider[CurrentProjectViewModel::class.java]
 
-        ThemeUtils(this).setDarkModeForCurrentProject()
+        setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
 
         if (!currentProjectViewModel.hasCurrentProject()) {
             super.onCreate(null)
@@ -89,7 +93,7 @@ class MainMenuActivity : LocalizedActivity(), CollectComposeThemeProvider {
                 .build()
 
             super.onCreate(savedInstanceState)
-            setContentView(R.layout.main_menu_activity)
+            setView(R.layout.main_menu_activity, false)
             lifecycle.addObserver(mdmConfigObserver)
         }
     }

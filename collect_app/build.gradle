@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.kotlinKapt)
+    alias(libs.plugins.kotlinKsp)
     alias(libs.plugins.kotlinParcelize)
     alias(libs.plugins.ossLicenses)
     alias(libs.plugins.safeargs)
@@ -75,13 +74,14 @@ android {
         viewBinding true
         buildConfig true
         compose true
+        resValues true
     }
 
     defaultConfig {
         applicationId('org.smap.smapTask.android')
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
-        versionCode project.hasProperty('versionCode') ? project.getProperties()['versionCode'].toInteger() : 53002  // smap
+        versionCode project.hasProperty('versionCode') ? project.getProperties()['versionCode'].toInteger() : 54000  // smap
         versionName getVersionName()
         testInstrumentationRunner('androidx.test.runner.AndroidJUnitRunner')
         vectorDrawables.useSupportLibrary = true
@@ -102,71 +102,71 @@ android {
     productFlavors {
         standard {
             applicationId "org.smap.smapTask.android"
-            versionName "5.3.02"
+            versionName "5.4.0"
         }
         fieldTaskMax {
             applicationId "org.smap.smapTask.android.fieldTaskMax"
-            versionName "5.3.02"
+            versionName "5.4.0"
         }
         plan {
             applicationId "org.smap.smapTask.android.plan"
-            versionName "5.3.02-plan"
+            versionName "5.4.0-plan"
         }
         kontrolid {
             applicationId "org.smap.smapTask.android.kontrolid"
-            versionName "5.3.02-kontrolid"
+            versionName "5.4.0-kontrolid"
         }
         xxx4 {
             applicationId "org.smap.smapTask.android.xxx4"
-            versionName "5.3.02-xxx4"
+            versionName "5.4.0-xxx4"
         }
         kontrolid_corporate {
             applicationId "org.smap.smapTask.android.kontrolid_corporate"
-            versionName "5.3.02-kontrolid"
+            versionName "5.4.0-kontrolid"
         }
         xxx3 {
             applicationId "org.smap.smapTask.android.xxx3"
-            versionName "5.3.02-xxx3"
+            versionName "5.4.0-xxx3"
         }
         xxx1 {
             applicationId "org.smap.smapTask.android.xxx1"
-            versionName "5.3.02-xxx1"
+            versionName "5.4.0-xxx1"
         }
         meqa {
             applicationId "org.smap.smapTask.android.meqa"
-            versionName "5.3.02-meqa"
+            versionName "5.4.0-meqa"
         }
         xxx2 {
             applicationId "org.smap.smapTask.android.xxx2"
-            versionName "5.3.02-xxx2"
+            versionName "5.4.0-xxx2"
         }
         pop {
             applicationId "org.smap.smapTask.android.pop"
-            versionName "5.3.02-pop"
+            versionName "5.4.0-pop"
         }
         tdh {
             applicationId "org.smap.smapTask.android.tdh"
-            versionName "5.3.02-tdh"
+            versionName "5.4.0-tdh"
         }
         informEd {
             applicationId "org.smap.smapTask.android.informEd"
-            versionName "5.3.02-informEd"
+            versionName "5.4.0-informEd"
         }
         pangolin {
             applicationId "org.smap.smapTask.android.pangolin"
-            versionName "5.3.02-pangolin"
+            versionName "5.4.0-pangolin"
         }
         stl2 {
             applicationId "org.smap.smapTask.android.stl2"
-            versionName "5.3.02-stl2"
+            versionName "5.4.0-stl2"
         }
         ljstracker {
             applicationId "org.smap.smapTask.android.ljstracker"
-            versionName "5.3.02-ljstracker"
+            versionName "5.4.0-ljstracker"
         }
         bps {
             applicationId "org.smap.smapTask.android.bps"
-            versionName "5.3.02-bps"
+            versionName "5.4.0-bps"
         }
     }
 
@@ -202,7 +202,8 @@ android {
                 signingConfig signingConfigs.release
             }
             minifyEnabled(true)
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            shrinkResources(true)
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsApiKey)
             resValue("string", "mapbox_access_token", mapboxAccessToken)
         }
@@ -213,7 +214,8 @@ android {
                 signingConfig signingConfigs.release
             }
             minifyEnabled(true)
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            shrinkResources(true)
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsApiKey)
             resValue("string", "mapbox_access_token", mapboxAccessToken)
 
@@ -224,7 +226,8 @@ android {
             signingConfig signingConfigs.selfSignedRelease
 
             minifyEnabled(true)
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            shrinkResources(true)
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
             resValue("string", "GOOGLE_MAPS_API_KEY", googleMapsApiKey)
             resValue("string", "mapbox_access_token", mapboxAccessToken)
 
@@ -242,15 +245,24 @@ android {
         }
     }
 
-    applicationVariants.configureEach { variant ->
-        if (variant.getName() == "selfSignedRelease" || variant.getName() == "odkCollectRelease") {
-            variant.outputs.configureEach { output ->
-                outputFileName = new File(outputFileName.replace("${variant.getName()}.apk", "${defaultConfig.versionName}.apk"))
+    androidComponents {
+        onVariants(selector().all()) { variant ->
+            if (variant.name == "selfSignedRelease" || variant.name == "odkCollectRelease") {
+                variant.outputs.forEach { output ->
+                    output.outputFileName.set(output.outputFileName.get().replace("${variant.name}.apk", "${defaultConfig.versionName}.apk"))
+                }
             }
         }
     }
 
     packaging {
+        jniLibs {
+            // Without useLegacyPackaging, Mapbox native libraries (.so)
+            // can grow by several MB after upgrading to AGP 9, even if the Mapbox
+            // version itself hasn’t changed. Legacy packaging keeps them as built,
+            // avoiding extra padding, alignment, and ELF headers, which keeps the APK smaller.
+            useLegacyPackaging = true
+        }
         resources {
             // These library licenses will be referenced in-app
             excludes += ['META-INF/ASL-2.0.txt', 'META-INF/LGPL-3.0.txt']
@@ -314,12 +326,10 @@ configurations.all {
         cacheChangingModulesFor(0, 'seconds')
 
         force 'org.objenesis:objenesis:2.6'
-
-        // Newer Jackson versions cannot be ued until Collect minSDK >= 26 (https://github.com/FasterXML/jackson-databind#android)
-        force 'com.fasterxml.jackson.core:jackson-databind:2.13.5'
+        force 'org.hamcrest:hamcrest:3.0'
 
         // smap - Force custom javarosa version to prevent upgrade to upstream version
-        force 'org.getodk:javarosa:5.1.4-smap'
+        force 'org.getodk:javarosa:5.1.5-smap'
     }
     
     transitive = true
@@ -365,6 +375,7 @@ dependencies {
     implementation project(':db')
     implementation project(':open-rosa')
     implementation project(':mobile-device-management')
+    implementation project(':timedgrid')
 
     implementation project(':mapbox')
 
@@ -394,7 +405,9 @@ dependencies {
     implementation libs.awsAndroidSdkDdb
     implementation libs.awsAndroidSdkDdbMapper
 
-    implementation libs.persianJodaTime
+    implementation (libs.persianJodaTime) {
+        exclude group: "com.android.support"
+    }
     implementation libs.myanmarCalendar
     implementation files('libs/bikram-sambat-1.8.0.jar')
     implementation 'com.github.PhilJay:MPAndroidChart:v3.0.2'  // smap chart widgets
@@ -402,9 +415,9 @@ dependencies {
     implementation (libs.opencsv) {
         exclude group: 'commons-logging'
     }
-    // smap - Use custom javarosa library (v5.1.4-smap)
+    // smap - Use custom javarosa library (v5.1.5-smap)
     // Loaded from .local-m2/ (checked in) or ~/.m2/ (for active development)
-    implementation('org.getodk:javarosa:5.1.4-smap') {
+    implementation('org.getodk:javarosa:5.1.5-smap') {
         exclude group: 'commons-io'
         exclude group: 'joda-time'
         exclude group: 'org.slf4j'
@@ -429,14 +442,14 @@ dependencies {
 
     // Dagger:
     implementation libs.dagger
-    kapt libs.daggerCompiler
+    ksp libs.daggerCompiler
 
     // Needed for injection into Robolectric tests
-    testAnnotationProcessor libs.daggerCompiler
+    kspTest libs.daggerCompiler
 
     // Dagger Android:
     implementation libs.daggerAndroid
-    annotationProcessor libs.daggerAndroidProcessor
+    ksp libs.daggerAndroidProcessor
 
     implementation libs.armen101AudioRecorderView
 
@@ -497,6 +510,7 @@ dependencies {
     androidTestImplementation libs.androidxWorkTesting
     androidTestImplementation libs.uiautomator
     androidTestImplementation libs.mockitoKotlin
+    androidTestImplementation libs.hamcrest
 
     debugImplementation project(':fragments-test')
     debugImplementation(project(':test-shared',)) {

@@ -165,7 +165,7 @@ public class SmapMain extends CollectAbstractActivity implements NFCListener {
     StoragePathProvider storagePathProvider;
 
     @Inject
-    org.odk.collect.android.instancemanagement.autosend.AutoSendSettingsProvider autoSendSettingsProvider;
+    org.odk.collect.android.instancemanagement.send.autosend.AutoSendSettingsProvider autoSendSettingsProvider;
 
     @Inject
     org.odk.collect.android.instancemanagement.InstancesDataService instancesDataService;

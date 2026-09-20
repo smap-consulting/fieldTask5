@@ -7,19 +7,19 @@ references:
   android_config_small: &android_config_small
     working_directory: ~/work
     docker:
-      - image: cimg/android:2025.09
+      - image: cimg/android:2026.02
     resource_class: small
 
   android_config: &android_config
     working_directory: ~/work
     docker:
-      - image: cimg/android:2025.09
+      - image: cimg/android:2026.02
     resource_class: large
 
   android_config_large: &android_config_large
     working_directory: ~/work
     docker:
-      - image: cimg/android:2025.09
+      - image: cimg/android:2026.02
     resource_class: xlarge
 
   gcloud_config: &gcloud_config
@@ -33,6 +33,10 @@ jobs:
     <<: *android_config
     steps:
       - checkout
+      - run:
+          name: Validate Gradlew Wrapper
+          command: ./validate-gradle-wrapper.sh
+
       - restore_cache:
           keys:
             - compile-{{ checksum "gradle/libs.versions.toml" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
@@ -264,9 +268,9 @@ jobs:
           name: Check APK size hasn't increased
           command: |
             if [[ -n "$GOOGLE_MAPS_API_KEY" ]]; then \
-              ./check-size.sh 23117869
+              ./check-size.sh 20447232
             else
-              ./check-size.sh 13900000
+              ./check-size.sh 11010048
             fi
 
       - run:
@@ -343,7 +347,7 @@ workflows:
             branches:
               ignore:
                 - master
-                - /^v((20)[0-9]{2})\.\d+\.\d+$/
+                - /^v\d+\.\d+.x$/
       - compile:
           requires:
             - hold_pr
@@ -370,7 +374,7 @@ workflows:
             branches:
               only:
                 - master
-                - /^v((20)[0-9]{2})\.\d+\.\d+$/
+                - /^v\d+\.\d+.x$/
       - check_quality:
           requires:
             - compile
@@ -412,7 +416,7 @@ workflows:
       - compile:
           filters:
             tags:
-              only: /^v((20)[0-9]{2})\.\d+\.\d+$/ # matches semvers like v1.2.3
+              only: /^v\d+\.\d+.\d+$/
             branches:
               ignore: /.*/
       - create_dependency_backup:
@@ -420,7 +424,7 @@ workflows:
             - compile
           filters:
             tags:
-              only: /^v((20)[0-9]{2})\.\d+\.\d+$/ # matches semvers like v1.2.3
+              only: /^v\d+\.\d+.\d+$/
             branches:
               ignore: /.*/
 

@@ -51,7 +51,7 @@ import org.odk.collect.geo.geopoly.GeoPolySettingsDialogFragment;
 import org.odk.collect.location.Location;
 import org.odk.collect.location.tracker.LocationTracker;
 import org.odk.collect.location.tracker.LocationTrackerKt;
-import org.odk.collect.maps.LineDescription;
+import org.odk.collect.maps.traces.LineDescription;
 import org.odk.collect.maps.MapConsts;
 import org.odk.collect.maps.MapFragmentFactory;
 import org.odk.collect.maps.MapFragment;
@@ -99,6 +99,9 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
 
     @Inject
     LocationTracker locationTracker;
+
+    // smap - true once the map has been zoomed to the first GPS fix
+    private boolean zoomedToFirstFix;
 
     @Inject
     ReferenceLayerRepository referenceLayerRepository;
@@ -333,8 +336,11 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         map.setGpsLocationListener(this::onGpsLocation);
         if (!points.isEmpty()) {
             map.zoomToBoundingBox(points, 0.6, false);
-        } else {
-            map.runOnGpsLocationReady(this::onGpsLocationReady);
+        } else if (map.getGpsLocation() != null) {
+            // smap - MapFragment#runOnGpsLocationReady was removed upstream; zoom now if there
+            // is already a fix, otherwise onGpsLocation() does it on the first one.
+            zoomedToFirstFix = true;
+            onGpsLocationReady(map);
         }
         updateUi();
     }
@@ -370,7 +376,7 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
         if (existingFeatureId != null) {
             map.setMarkerIcon(existingFeatureId, iconDesc);
         } else {
-            MarkerDescription markerDesc = new MarkerDescription(point, false, MapFragment.CENTER, iconDesc);
+            MarkerDescription markerDesc = new MarkerDescription(point, false, MapFragment.IconAnchor.CENTER, iconDesc);
             int newFeatureId = map.addMarker(markerDesc);
             markerFeatureIds.put(vertexIdx, newFeatureId);
         }
@@ -550,6 +556,11 @@ public class GeoCompoundActivity extends LocalizedActivity implements GeoPolySet
     }
 
     private void onGpsLocation(MapPoint point) {
+        // smap - stands in for the removed MapFragment#runOnGpsLocationReady
+        if (!zoomedToFirstFix) {
+            zoomedToFirstFix = true;
+            onGpsLocationReady(map);
+        }
         if (inputActive && recordingEnabled) {
             map.setCenter(point, false);
         }

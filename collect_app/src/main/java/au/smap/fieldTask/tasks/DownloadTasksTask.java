@@ -47,7 +47,8 @@ import au.smap.fieldTask.database.TraceUtilities;
 
 import org.odk.collect.android.backgroundwork.InstanceSubmitScheduler;
 import org.odk.collect.android.projects.ProjectsDataService;
-import org.odk.collect.android.tasks.InstanceUploaderTask;
+import org.odk.collect.android.instancemanagement.InstancesDataService;
+import org.odk.collect.android.instancemanagement.send.InstanceUploadResult;
 import org.odk.collect.android.utilities.FormsRepositoryProvider;
 import org.odk.collect.android.utilities.InstancesRepositoryProvider;
 import org.odk.collect.forms.FormsRepository;
@@ -158,6 +159,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
 
     @Inject
     ProjectsDataService projectsDataService;            // smap - needed to get project id for cancelSubmit
+
+    @Inject
+    InstancesDataService instancesDataService;          // smap - submits completed forms within the refresh
 
     @Inject
     org.odk.collect.async.Scheduler scheduler;          // smap - schedules the offline layer download
@@ -372,11 +376,9 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                  * response reflects up-to-date task statuses. Newly-unorphaned instances
                  * (whose form was just re-downloaded) will be submitted on the next refresh.
                  */
-                InstanceUploaderTask.Outcome submitOutcome = submitCompletedForms();
-                if(submitOutcome != null && submitOutcome.messagesByInstanceId != null) {
-                    for (String key : submitOutcome.messagesByInstanceId.keySet()) {
-                        results.put(key, submitOutcome.messagesByInstanceId.get(key));
-                    }
+                HashMap<String, String> submitMessages = submitCompletedForms();
+                if (submitMessages != null) {
+                    results.putAll(submitMessages);
                 }
 
 	            if(isCancelled()) { throw new CancelException("cancelled"); };		// Return if the user cancels
@@ -608,7 +610,12 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
         }
     }
 
-    private InstanceUploaderTask.Outcome submitCompletedForms() {
+    /**
+     * smap - Submits finalised forms as part of a refresh.
+     *
+     * Returns a map of instance id to user facing message, or null if nothing was sent.
+     */
+    private HashMap<String, String> submitCompletedForms() {
 
         // smap - skip automatic submission while the server is rejecting our credentials. A manual
         // refresh always tries, so the user is never stuck waiting for the window to expire.
@@ -663,17 +670,52 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 } catch (Exception e) {
                     Timber.w(e, "Failed to cancel auto-send before smap upload");
                 }
-                InstanceUploaderTask instanceUploaderTask = new InstanceUploaderTask();
-                publishProgress(Collect.getInstance().getString(R.string.smap_submitting, toUpload.size()));
-                instanceUploaderTask.setUploaderListener((InstanceUploaderListener) mStateListener);
-                instanceUploaderTask.setRepositories(instancesRepository, formsRepository, settingsProvider);
-                Long[] toSendArray = new Long[toUpload.size()];
-                toUpload.toArray(toSendArray);
-                Timber.i("Submitting " + toUpload.size() + " finalised surveys");
 
-                InstanceUploaderTask.Outcome o = instanceUploaderTask.doInBackground(toSendArray);	// Already running a background task so call direct
-            	instanceUploaderTask.onPostExecute(o);
-                return o;
+                List<Instance> instances = new ArrayList<>();
+                for (Long id : toUpload) {
+                    Instance instance = instancesRepository.get(id);
+                    if (instance != null) {
+                        instances.add(instance);
+                    }
+                }
+
+                if (instances.isEmpty()) {
+                    return null;
+                }
+
+                publishProgress(Collect.getInstance().getString(R.string.smap_submitting, instances.size()));
+                Timber.i("Submitting " + instances.size() + " finalised surveys");
+
+                // smap - runs synchronously; we are already on a background thread
+                List<InstanceUploadResult> uploadResults = instancesDataService.sendInstances(
+                        projectsDataService.requireCurrentProject().getUuid(),
+                        instances,
+                        "",
+                        null,
+                        true,
+                        null,
+                        Collect.getInstance().getString(org.odk.collect.strings.R.string.success),
+                        () -> kotlin.Unit.INSTANCE,
+                        (current, total) -> {
+                            if (mStateListener instanceof InstanceUploaderListener) {
+                                ((InstanceUploaderListener) mStateListener).progressUpdate(current, total);
+                            }
+                            return kotlin.Unit.INSTANCE;
+                        });
+
+                HashMap<String, String> messagesByInstanceId = new HashMap<>();
+                for (InstanceUploadResult uploadResult : uploadResults) {
+                    String message = uploadResult instanceof InstanceUploadResult.Success
+                            ? ((InstanceUploadResult.Success) uploadResult).getMessage()
+                            : ((InstanceUploadResult.Error) uploadResult).getException().getMessage();
+                    messagesByInstanceId.put(uploadResult.getInstance().getDbId().toString(), message);
+                }
+
+                if (mStateListener instanceof InstanceUploaderListener) {
+                    ((InstanceUploaderListener) mStateListener).uploadingComplete(messagesByInstanceId);
+                }
+
+                return messagesByInstanceId;
             } else {
             	return null;
             }

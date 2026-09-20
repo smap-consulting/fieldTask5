@@ -18,6 +18,7 @@ import org.odk.collect.android.projects.DuplicateProjectConfirmationKeys.MATCHIN
 import org.odk.collect.android.projects.DuplicateProjectConfirmationKeys.SETTINGS_JSON
 import org.odk.collect.android.utilities.SoftKeyboardController
 import org.odk.collect.androidshared.ui.DialogFragmentUtils
+import org.odk.collect.androidshared.ui.EdgeToEdge.applyBottomBarInsetMargins
 import org.odk.collect.androidshared.ui.ToastUtils
 import org.odk.collect.androidshared.utils.Validator
 import org.odk.collect.material.MaterialFullScreenDialogFragment
@@ -87,13 +88,11 @@ class ManualProjectCreatorDialog :
         binding.addButton.setOnClickListener {
             handleAddingNewProject()
         }
+
+        binding.bottomContainer.applyBottomBarInsetMargins()
     }
 
     override fun onCloseClicked() {
-    }
-
-    override fun onBackPressed() {
-        dismiss()
     }
 
     override fun getToolbar(): Toolbar {
@@ -101,7 +100,7 @@ class ManualProjectCreatorDialog :
     }
 
     private fun setUpToolbar() {
-        toolbar.setTitle(org.odk.collect.strings.R.string.add_project)
+        getToolbar().setTitle(org.odk.collect.strings.R.string.add_project)
     }
 
     private fun handleAddingNewProject() {

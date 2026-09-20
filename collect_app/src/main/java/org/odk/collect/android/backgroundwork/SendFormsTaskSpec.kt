@@ -51,11 +51,7 @@ class SendFormsTaskSpec : TaskSpec {
                 // expire; a manual refresh or a fresh login clears it sooner.
                 true
             } else if (projectId != null) {
-                if (formAutoSend) {
-                    instancesDataService.sendInstances(projectId, formAutoSend = true)
-                } else {
-                    instancesDataService.sendInstances(projectId)
-                }
+                instancesDataService.autoSendInstances(projectId, formAutoSend)
             } else {
                 throw IllegalArgumentException("No project ID provided!")
             }

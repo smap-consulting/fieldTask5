@@ -13,7 +13,6 @@
  */
 package org.odk.collect.android.activities
 
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
@@ -21,6 +20,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat.Type.systemBars
 import org.odk.collect.android.R
 import org.odk.collect.android.application.CollectComposeThemeProvider
+import org.odk.collect.androidshared.ui.EdgeToEdge.setView
 import org.odk.collect.strings.localization.LocalizedActivity
 
 /**
@@ -35,12 +35,9 @@ class ScannerWithFlashlightActivity : LocalizedActivity(), CollectComposeThemePr
         windowInsetsController.hide(systemBars())
 
         // Remove rotation animation - we'll handle configuration changes in Fragments
-        this.window.attributes.rotationAnimation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        this.window.attributes.rotationAnimation =
             WindowManager.LayoutParams.ROTATION_ANIMATION_SEAMLESS
-        } else {
-            WindowManager.LayoutParams.ROTATION_ANIMATION_CROSSFADE
-        }
 
-        setContentView(R.layout.activity_custom_scanner)
+        setView(R.layout.activity_custom_scanner, false)
     }
 }

@@ -16,7 +16,7 @@ package org.odk.collect.osmdroid;
 
 import static androidx.core.graphics.drawable.BitmapDrawableKt.toDrawable;
 import static androidx.core.graphics.drawable.DrawableKt.toBitmap;
-import static org.odk.collect.maps.TraceDescriptionKt.getMarkersForPoints;
+import static org.odk.collect.maps.traces.TraceDescriptionKt.getMarkersForPoints;
 import static org.odk.collect.maps.markers.MarkerIconCreator.toBitmap;
 
 import android.content.BroadcastReceiver;
@@ -44,15 +44,16 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.location.LocationListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.odk.collect.androidshared.system.ContextUtils;
+import org.odk.collect.androidshared.system.ContextExt;
 import org.odk.collect.location.LocationClient;
-import org.odk.collect.maps.LineDescription;
+import org.odk.collect.maps.circles.CircleDescription;
+import org.odk.collect.maps.traces.LineDescription;
 import org.odk.collect.maps.MapConfigurator;
 import org.odk.collect.maps.MapFragment;
 import org.odk.collect.maps.MapPoint;
 import org.odk.collect.maps.MapViewModel;
 import org.odk.collect.maps.MapViewModelMapFragment;
-import org.odk.collect.maps.PolygonDescription;
+import org.odk.collect.maps.traces.PolygonDescription;
 import org.odk.collect.maps.Zoom;
 import org.odk.collect.maps.ZoomObserver;
 import org.odk.collect.maps.layers.MapFragmentReferenceLayerUtils;
@@ -303,6 +304,10 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
     @Override
     public int addMarker(MarkerDescription markerDescription) {
         int featureId = nextFeatureId++;
+        return addMarker(featureId, markerDescription);
+    }
+
+    private int addMarker(int featureId, MarkerDescription markerDescription) {
         features.put(featureId, new MarkerFeature(map, markerDescription));
         return featureId;
     }
@@ -420,8 +425,12 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         for (MapFeature feature : features.values()) {
             feature.dispose();
         }
-        map.invalidate();
         features.clear();
+
+        if (map != null) {
+            map.invalidate();
+        }
+
         nextFeatureId = 1;
     }
 
@@ -456,11 +465,6 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
     }
 
     @Override
-    public void runOnGpsLocationReady(@NonNull ReadyListener listener) {
-        myLocationOverlay.runOnFirstFix(() -> getActivity().runOnUiThread(() -> listener.onReady(this)));
-    }
-
-    @Override
     public void setGpsLocationEnabled(boolean enable) {
         if (enable != clientWantsLocationUpdates) {
             clientWantsLocationUpdates = enable;
@@ -472,13 +476,6 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
     public @Nullable
     MapPoint getGpsLocation() {
         return fromLocation(myLocationOverlay);
-    }
-
-    @Override
-    public @Nullable
-    String getLocationProvider() {
-        Location fix = myLocationOverlay.getLastFix();
-        return fix != null ? fix.getProvider() : null;
     }
 
     @Override
@@ -682,7 +679,7 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         return marker;
     }
 
-    private float getIconAnchorValueX(@MapFragment.Companion.IconAnchor String iconAnchor) {
+    private float getIconAnchorValueX(MapFragment.IconAnchor iconAnchor) {
         switch (iconAnchor) {
             case BOTTOM:
             default:
@@ -690,7 +687,7 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         }
     }
 
-    private float getIconAnchorValueY(@MapFragment.Companion.IconAnchor String iconAnchor) {
+    private float getIconAnchorValueY(MapFragment.IconAnchor iconAnchor) {
         switch (iconAnchor) {
             case BOTTOM:
                 return Marker.ANCHOR_BOTTOM;
@@ -772,6 +769,22 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
     @Override
     public MapViewModel getMapViewModel() {
         return mapViewModel;
+    }
+
+    @Override
+    public void updateMarker(int featureId, @NotNull MarkerDescription markerDescription) {
+        features.get(featureId).dispose();
+        addMarker(featureId, markerDescription);
+    }
+
+    @Override
+    public int addCircle(@NotNull CircleDescription circleDescription) {
+        return -1;
+    }
+
+    @Override
+    public void updateCircle(int featureId, @NotNull CircleDescription circleDescription) {
+
     }
 
     /**
@@ -1004,7 +1017,7 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
         }
 
         public void addPoint(MapPoint point) {
-            markers.add(createMarker(map, new MarkerDescription(point, true, MapFragment.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point))));
+            markers.add(createMarker(map, new MarkerDescription(point, true, MapFragment.IconAnchor.CENTER, new MarkerIconDescription.DrawableResource(org.odk.collect.icons.R.drawable.ic_map_point))));
             update();
         }
 
@@ -1162,7 +1175,7 @@ public class OsmDroidMapFragment extends MapViewModelMapFragment implements
 
             paint = new Paint();
             paint.setAntiAlias(true);
-            paint.setColor(ContextUtils.getThemeAttributeValue(context, com.google.android.material.R.attr.colorOnSurface));
+            paint.setColor(ContextExt.getThemeAttributeValue(context, com.google.android.material.R.attr.colorOnSurface));
             paint.setTextSize(FONT_SIZE_DP *
                     context.getResources().getDisplayMetrics().density);
             paint.setTextAlign(Paint.Align.RIGHT);

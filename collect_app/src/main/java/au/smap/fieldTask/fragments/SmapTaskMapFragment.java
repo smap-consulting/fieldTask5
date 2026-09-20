@@ -46,7 +46,7 @@ import au.smap.fieldTask.loaders.PointEntry;
 import au.smap.fieldTask.loaders.SurveyData;
 import au.smap.fieldTask.loaders.TaskEntry;
 import org.odk.collect.androidshared.ui.FragmentFactoryBuilder;
-import org.odk.collect.maps.LineDescription;
+import org.odk.collect.maps.traces.LineDescription;
 import org.odk.collect.maps.MapFragment;
 import org.odk.collect.maps.MapFragmentFactory;
 import org.odk.collect.maps.MapPoint;
@@ -291,7 +291,7 @@ public class SmapTaskMapFragment extends Fragment {
                 if (point != null) {
                     int iconDrawable = getIconDrawable(t.taskStatus, t.repeat, t.locationTrigger != null, t.taskFinish);
                     MarkerDescription desc = new MarkerDescription(
-                        point, false, MapFragment.BOTTOM,
+                        point, false, MapFragment.IconAnchor.BOTTOM,
                         new MarkerIconDescription.DrawableResource(iconDrawable)
                     );
                     int featureId = mapFragment.addMarker(desc);

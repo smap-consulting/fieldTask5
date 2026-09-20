@@ -65,7 +65,7 @@ class FormEntryMenuProviderTest {
         settingsProvider,
         { false },
         formEntryMenuClickListener
-    )
+    ) { true }
 
     @Test
     fun onPrepare_inRepeatQuestion_showsAddRepeat() {
