@@ -18,6 +18,7 @@
 
 package au.smap.fieldTask.external.handler;
 
+import org.jetbrains.annotations.NotNull;
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.core.model.condition.IFunctionHandler;
 import org.javarosa.xpath.expr.XPathFuncExpr;
@@ -48,8 +49,8 @@ public class SmapRemoteDataHandlerGetMedia implements IFunctionHandler {
     }
 
     @Override
-    public List<Class[]> getPrototypes() {
-        return new ArrayList<Class[]>();
+    public @NotNull List<@NotNull Class<?>@NotNull []> getPrototypes() {
+        return new ArrayList<>();
     }
 
     @Override

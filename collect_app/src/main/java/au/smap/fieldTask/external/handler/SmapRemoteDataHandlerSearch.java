@@ -18,6 +18,7 @@
 
 package au.smap.fieldTask.external.handler;
 
+import org.jetbrains.annotations.NotNull;
 import static org.odk.collect.androidshared.ui.ToastUtils.showLongToast;
 
 import com.google.gson.Gson;
@@ -100,8 +101,8 @@ public class SmapRemoteDataHandlerSearch implements IFunctionHandler {
     }
 
     @Override
-    public List<Class[]> getPrototypes() {
-        return new ArrayList<Class[]>();
+    public @NotNull List<@NotNull Class<?>@NotNull []> getPrototypes() {
+        return new ArrayList<>();
     }
 
     @Override

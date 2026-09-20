@@ -18,6 +18,7 @@
 
 package au.smap.fieldTask.external.handler;
 
+import org.jetbrains.annotations.NotNull;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -63,8 +64,8 @@ public class SmapRemoteDataHandlerLookup implements IFunctionHandler {
     }
 
     @Override
-    public List<Class[]> getPrototypes() {
-        return new ArrayList<Class[]>();
+    public @NotNull List<@NotNull Class<?>@NotNull []> getPrototypes() {
+        return new ArrayList<>();
     }
 
     @Override

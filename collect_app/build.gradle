@@ -313,7 +313,7 @@ configurations.all {
         force 'org.hamcrest:hamcrest:3.0'
 
         // smap - Force custom javarosa version to prevent upgrade to upstream version
-        force 'org.getodk:javarosa:5.1.6-smap'
+        force 'org.getodk:javarosa:6.0.0-smap'
     }
     
     transitive = true
@@ -398,9 +398,9 @@ dependencies {
     implementation (libs.opencsv) {
         exclude group: 'commons-logging'
     }
-    // smap - Use custom javarosa library (v5.1.6-smap)
+    // smap - Use custom javarosa library (v6.0.0-smap)
     // Loaded from .local-m2/ (checked in) or ~/.m2/ (for active development)
-    implementation('org.getodk:javarosa:5.1.6-smap') {
+    implementation('org.getodk:javarosa:6.0.0-smap') {
         exclude group: 'commons-io'
         exclude group: 'joda-time'
         exclude group: 'org.slf4j'
