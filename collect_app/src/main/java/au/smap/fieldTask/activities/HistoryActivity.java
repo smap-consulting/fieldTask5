@@ -14,6 +14,7 @@
 
 package au.smap.fieldTask.activities;
 
+import org.odk.collect.androidshared.ui.EdgeToEdge;
 import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -48,7 +49,7 @@ public class HistoryActivity extends SmapHistoryListActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.form_chooser_list);
+        EdgeToEdge.setView(this, R.layout.form_chooser_list, false); // smap - keep content clear of the system bars
 
         setTitle(getString(R.string.smap_history));       // smap change to history
 

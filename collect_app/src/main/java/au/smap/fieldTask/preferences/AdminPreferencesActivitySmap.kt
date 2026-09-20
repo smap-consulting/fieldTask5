@@ -13,6 +13,7 @@
  */
 package au.smap.fieldTask.preferences
 
+import org.odk.collect.androidshared.ui.EdgeToEdge.setView
 import android.os.Bundle
 import au.smap.fieldTask.activities.SmapMain
 import org.odk.collect.android.R
@@ -80,7 +81,7 @@ class AdminPreferencesActivitySmap :
             .build()
 
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_preferences_layout)
+        setView(R.layout.activity_preferences_layout, false) // smap - keep content clear of the system bars
         setTitle(org.odk.collect.strings.R.string.admin_preferences)
 
         if (savedInstanceState == null) {

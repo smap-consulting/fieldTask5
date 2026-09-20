@@ -14,6 +14,7 @@
 
 package au.smap.fieldTask.activities;
 
+import org.odk.collect.androidshared.ui.EdgeToEdge;
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
@@ -197,7 +198,7 @@ public class SmapMain extends CollectAbstractActivity implements NFCListener {
         initSplashScreen();
         super.onCreate(savedInstanceState);
         binding = SmapMainLayoutBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        EdgeToEdge.setView(this, binding.getRoot(), false); // smap - keep content clear of the system bars
 
         LocationRegister lr = new LocationRegister();
         DaggerUtils.getComponent(this).inject(this);

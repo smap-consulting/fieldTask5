@@ -14,6 +14,7 @@
 
 package au.smap.fieldTask.activities;
 
+import org.odk.collect.androidshared.ui.EdgeToEdge;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +33,7 @@ public class SurveyNotesActivity extends CollectAbstractActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.survey_note);
+        EdgeToEdge.setView(this, R.layout.survey_note, false); // smap - keep content clear of the system bars
 
         final Button sb = findViewById(R.id.save_button);
         sb.setOnClickListener(new View.OnClickListener() {

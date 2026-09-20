@@ -14,6 +14,7 @@ package au.smap.fieldTask.activities;
  * the License.
  */
 
+import org.odk.collect.androidshared.ui.EdgeToEdge;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -90,7 +91,7 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
 
         //setTheme(R.style.DarkAppTheme);     // override theme for login
         binding = SmapActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        EdgeToEdge.setView(this, binding.getRoot(), false); // smap - keep content clear of the system bars
 
         org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
 

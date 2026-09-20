@@ -1,5 +1,6 @@
 package au.smap.fieldTask.activities
 
+import org.odk.collect.androidshared.ui.EdgeToEdge.setView
 import android.os.Bundle
 import org.odk.collect.android.R
 import org.odk.collect.android.application.CollectComposeThemeProvider
@@ -22,7 +23,7 @@ class SmapLoginQRActivity : LocalizedActivity(), CollectComposeThemeProvider {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DaggerUtils.getComponent(this).inject(this)
-        setContentView(R.layout.activity_smap_login_qr)
+        setView(R.layout.activity_smap_login_qr, false) // smap - keep content clear of the system bars
         setupAppBarLayout(this, getString(org.odk.collect.strings.R.string.scan_qr_code_fragment_title))
 
         permissionsProvider.requestCameraPermission(
