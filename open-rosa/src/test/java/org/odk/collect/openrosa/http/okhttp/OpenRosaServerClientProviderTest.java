@@ -14,11 +14,17 @@ import org.odk.collect.openrosa.http.HttpCredentials;
 import org.odk.collect.openrosa.http.OpenRosaConstants;
 import org.odk.collect.openrosa.support.MockWebServerRule;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import okhttp3.Dns;
+import okhttp3.Request;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -26,6 +32,10 @@ import okhttp3.mockwebserver.RecordedRequest;
 public abstract class OpenRosaServerClientProviderTest {
 
     protected abstract OpenRosaServerClientProvider buildSubject();
+
+    // smap - a subject whose client resolves every hostname to the local MockWebServer, so that a
+    // request can carry a public hostname without a real public server
+    protected abstract OpenRosaServerClientProvider buildSubject(Dns dns);
 
     private OpenRosaServerClientProvider subject;
 
@@ -79,7 +89,23 @@ public abstract class OpenRosaServerClientProviderTest {
     }
 
     @Test
-    public void withCredentials_whenBasicChallengeReceived_whenHttp_doesNotRetryWithCredentials() throws Exception {
+    // smap - upstream asserted this for every http host. It now holds only for public hosts,
+    // so the request is given a public hostname rather than the MockWebServer's loopback one.
+    public void withCredentials_whenBasicChallengeReceived_whenHttpAndPublicHost_doesNotRetryWithCredentials() throws Exception {
+        MockWebServer mockWebServer = mockWebServerRule.start();
+        enqueueBasicChallenge(mockWebServer);
+        enqueueSuccess(mockWebServer);
+
+        OpenRosaServerClient client = buildSubject(loopbackDns())
+                .get("http", "Android", new HttpCredentials("user", "pass"));
+        client.makeRequest(buildPublicHostRequest(mockWebServer), new Date());
+
+        assertThat(mockWebServer.getRequestCount(), equalTo(1));
+    }
+
+    @Test
+    // smap - a development server on the local network is plain http, so basic auth is answered there
+    public void withCredentials_whenBasicChallengeReceived_whenHttpAndPrivateHost_retriesWithCredentials() throws Exception {
         MockWebServer mockWebServer = mockWebServerRule.start();
         enqueueBasicChallenge(mockWebServer);
         enqueueSuccess(mockWebServer);
@@ -87,7 +113,10 @@ public abstract class OpenRosaServerClientProviderTest {
         OpenRosaServerClient client = subject.get("http", "Android", new HttpCredentials("user", "pass"));
         client.makeRequest(buildRequest(mockWebServer, ""), new Date());
 
-        assertThat(mockWebServer.getRequestCount(), equalTo(1));
+        assertThat(mockWebServer.getRequestCount(), equalTo(2));
+        mockWebServer.takeRequest();
+        RecordedRequest request = mockWebServer.takeRequest();
+        assertThat(request.getHeader("Authorization"), equalTo("Basic dXNlcjpwYXNz"));
     }
 
     @Test
@@ -279,8 +308,11 @@ public abstract class OpenRosaServerClientProviderTest {
         enqueueBasicChallenge(host);
         enqueueSuccess(host);
 
-        subject.get("https", "Android", new HttpCredentials("user", "pass")).makeRequest(buildRequest(host, ""), new Date());
-        subject.get("http", "Android", new HttpCredentials("user", "pass")).makeRequest(buildRequest(host, ""), new Date());
+        // smap - the http leg uses a public hostname, since basic auth over http is now
+        // answered for private hosts
+        OpenRosaServerClientProvider provider = buildSubject(loopbackDns());
+        provider.get("https", "Android", new HttpCredentials("user", "pass")).makeRequest(buildRequest(host, ""), new Date());
+        provider.get("http", "Android", new HttpCredentials("user", "pass")).makeRequest(buildPublicHostRequest(host), new Date());
 
         assertThat(host.getRequestCount(), equalTo(3));
 
@@ -304,6 +336,24 @@ public abstract class OpenRosaServerClientProviderTest {
         mockWebServer.takeRequest();
         RecordedRequest request = mockWebServer.takeRequest();
         assertThat(request.getHeader("Cookie"), isEmptyOrNullString());
+    }
+
+    // smap - resolves any hostname to the loopback address the MockWebServer listens on
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private static Dns loopbackDns() {
+        return new Dns() {
+            @Override
+            public List<InetAddress> lookup(String hostname) throws UnknownHostException {
+                return Collections.singletonList(InetAddress.getByName("127.0.0.1"));
+            }
+        };
+    }
+
+    // smap - a request to the MockWebServer that carries a public hostname
+    private static Request buildPublicHostRequest(MockWebServer mockWebServer) {
+        return new Request.Builder()
+                .url("http://example.com:" + mockWebServer.getPort() + "/")
+                .build();
     }
 
     protected void enqueueSuccess(MockWebServer mockWebServer) {

@@ -12,6 +12,7 @@ import org.odk.collect.shared.TempFiles;
 import java.io.File;
 import java.util.Date;
 
+import okhttp3.Dns;
 import okhttp3.OkHttpClient;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.tls.internal.TlsUtil;
@@ -31,6 +32,19 @@ public class OkHttpOpenRosaServerClientProviderTest extends OpenRosaServerClient
                 .build();
 
         return new OkHttpOpenRosaServerClientProvider(baseClient, cacheDir);
+    }
+
+    @Override
+    // smap - see OpenRosaServerClientProviderTest#buildSubject(Dns)
+    protected OpenRosaServerClientProvider buildSubject(Dns dns) {
+        OkHttpClient baseClient = new OkHttpClient.Builder()
+                .sslSocketFactory(
+                        TlsUtil.localhost().sslSocketFactory(),
+                        TlsUtil.localhost().trustManager())
+                .dns(dns)
+                .build();
+
+        return new OkHttpOpenRosaServerClientProvider(baseClient, null);
     }
 
     @Test

@@ -29,6 +29,7 @@ import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.Route;
 
 public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientProvider {
 
@@ -90,6 +91,9 @@ public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientP
             daBuilder.with("digest", new DigestAuthenticator(cred));
             if (scheme.equalsIgnoreCase("https")) {
                 daBuilder.with("basic", new BasicAuthenticator(cred));
+            } else {
+                // smap - allow basic auth over plain http, but only to a server on the local network
+                daBuilder.with("basic", new PrivateNetworkBasicAuthenticator(cred));
             }
 
             DispatchingAuthenticator authenticator = daBuilder.build();
@@ -133,6 +137,85 @@ public class OkHttpOpenRosaServerClientProvider implements OpenRosaServerClientP
             SimpleDateFormat dateFormatGmt = new SimpleDateFormat("E, dd MMM yyyy hh:mm:ss zz", Locale.US);
             dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
             return dateFormatGmt.format(currentTime);
+        }
+    }
+
+    /**
+     * smap - true if the host is a loopback, RFC1918 or link-local address, ie a server that can
+     * only be reached from the local network. Hosts that would need DNS resolution are treated as
+     * public, so a development server addressed by name (other than localhost or an mDNS .local
+     * name) still needs https.
+     */
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP") // smap - the literals are what this check is for
+    private static boolean isPrivateHost(String host) {
+        if (host == null) {
+            return false;
+        }
+
+        String h = host.toLowerCase(Locale.US);
+        if (h.startsWith("[") && h.endsWith("]")) {
+            h = h.substring(1, h.length() - 1);     // IPv6 literal
+        }
+
+        if (h.equals("localhost") || h.endsWith(".localhost") || h.endsWith(".local") || h.equals("::1")) {
+            return true;
+        }
+
+        String[] parts = h.split("\\.");
+        if (parts.length != 4) {
+            return false;
+        }
+
+        int[] octets = new int[4];
+        for (int i = 0; i < 4; i++) {
+            try {
+                octets[i] = Integer.parseInt(parts[i]);
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            if (octets[i] < 0 || octets[i] > 255) {
+                return false;
+            }
+        }
+
+        return octets[0] == 127                                             // loopback
+                || octets[0] == 10                                          // RFC1918
+                || (octets[0] == 172 && octets[1] >= 16 && octets[1] <= 31) // RFC1918
+                || (octets[0] == 192 && octets[1] == 168)                   // RFC1918
+                || (octets[0] == 169 && octets[1] == 254);                  // link-local
+    }
+
+    /**
+     * smap - basic auth over plain http, restricted to servers on the local network.
+     *
+     * Upstream ODK registers {@link BasicAuthenticator} only for https so that credentials are
+     * never sent in the clear over the internet. That also blocks logging in to a development
+     * server, which is typically plain http behind Apache. This keeps the upstream guarantee for
+     * public hosts and answers the challenge only when the host is private, checked per request
+     * because the provider is given the scheme but not the host.
+     */
+    private static class PrivateNetworkBasicAuthenticator implements CachingAuthenticator {
+
+        private final BasicAuthenticator delegate;
+
+        PrivateNetworkBasicAuthenticator(Credentials credentials) {
+            this.delegate = new BasicAuthenticator(credentials);
+        }
+
+        @Override
+        public Request authenticate(Route route, Response response) throws IOException {
+            if (!isPrivateHost(response.request().url().host())) {
+                return null;
+            }
+            return delegate.authenticate(route, response);
+        }
+
+        @Override
+        public Request authenticateWithState(Route route, Request request) throws IOException {
+            if (!isPrivateHost(request.url().host())) {
+                return null;
+            }
+            return delegate.authenticateWithState(route, request);
         }
     }
 }
