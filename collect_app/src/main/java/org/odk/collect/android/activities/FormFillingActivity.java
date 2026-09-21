@@ -783,16 +783,28 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
             return;
         }
 
-        Uri formUri = getIntent().getData();
-        if (formUri == null) {
+        Uri uri = getIntent().getData();
+        if (uri == null) {
             readOnly = false;
             return;
         }
 
-        long formId = ContentUriHelper.getIdFromUri(formUri);
+        // smap - the intent carries a form uri when a blank form is started but an instance uri
+        // when an existing record is opened, such as a case.  Instance ids and form ids are
+        // separate sequences, so the id has to be looked up in the table the uri names or an
+        // unrelated form decides whether this one is read only.
+        boolean isInstance = InstancesContract.CONTENT_ITEM_TYPE.equals(getContentResolver().getType(uri));
+        long id = ContentUriHelper.getIdFromUri(uri);
         scheduler.immediate(
                 () -> {
-                    Form form = formsRepositoryProvider.create().get(formId);
+                    Form form;
+                    if (isInstance) {
+                        Instance instance = new InstancesRepositoryProvider(Collect.getInstance()).create().get(id);
+                        form = instance == null ? null : formsRepositoryProvider.create()
+                                .getLatestByFormIdAndVersion(instance.getFormId(), instance.getFormVersion());
+                    } else {
+                        form = formsRepositoryProvider.create().get(id);
+                    }
                     return form != null && "yes".equals(form.getReadOnly());
                 },
                 isReadOnly -> {
