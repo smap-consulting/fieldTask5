@@ -1,5 +1,6 @@
 package org.odk.collect.android.feature.settings
 
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.Test
@@ -26,7 +27,12 @@ class FormMetadataSettingsTest {
         .around(
             ResetStateRule(
                 object : AppDependencyModule() {
-                    override fun providesInstallIDProvider(settingsProvider: SettingsProvider): InstallIDProvider {
+                    // smap - the provider takes a Context so the device id can be prefixed
+                    // with the flavor's app name
+                    override fun providesInstallIDProvider(
+                        context: Context,
+                        settingsProvider: SettingsProvider
+                    ): InstallIDProvider {
                         return installIDProvider
                     }
                 }

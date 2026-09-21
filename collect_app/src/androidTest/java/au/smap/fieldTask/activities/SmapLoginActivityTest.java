@@ -26,13 +26,13 @@ public class SmapLoginActivityTest {
     @Test
     public void testActivityLaunches() {
         // Test that login activity displays correctly
-        onView(withId(R.id.username_edit)).check(matches(isDisplayed()));
-        onView(withId(R.id.password_edit)).check(matches(isDisplayed()));
+        onView(withId(R.id.input_username)).check(matches(isDisplayed()));
+        onView(withId(R.id.input_password)).check(matches(isDisplayed()));
     }
 
     @Test
     public void testLoginButton() {
         // Test login button is displayed
-        onView(withId(R.id.login_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.btn_login)).check(matches(isDisplayed()));
     }
 }

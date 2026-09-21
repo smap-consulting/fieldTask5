@@ -54,7 +54,7 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
     override fun executeGetRequest(
         uri: URI,
         contentType: String?,
-        credentials: HttpCredentialsInterface
+        credentials: HttpCredentialsInterface?
     ): HttpGetResult {
         accesses += 1
 
@@ -98,7 +98,7 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
 
     override fun executeHeadRequest(
         uri: URI,
-        credentials: HttpCredentialsInterface
+        credentials: HttpCredentialsInterface?
     ): HttpHeadResult {
         accesses += 1
 
