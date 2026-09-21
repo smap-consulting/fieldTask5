@@ -1089,13 +1089,9 @@ public class SmapMain extends CollectAbstractActivity implements NFCListener {
             Timber.i("Login check - pwPolicy: %d, lastLogin: %d, url: %s, user: %s, password: %s",
                     pwPolicy, lastLogin, url, user, password != null ? "***" : "null");
 
-            // Show the login screen if required by password policy
-            // 0 - always login, > 0 is number of days before login is required
-            // Alternatively show the login screen if any of the login details are empty
-            boolean loginRequired = pwPolicy == 0 ||
-                   (pwPolicy > 0 && (System.currentTimeMillis() - lastLogin) > pwPolicy * 24 * 3600 * 1000) ||
-                   password == null || user == null || url == null ||
-                   password.trim().isEmpty() || user.trim().isEmpty() || url.trim().isEmpty();
+            // smap - see LoginPolicy, shared with the other activity that asks this
+            boolean loginRequired = au.smap.fieldTask.utilities.LoginPolicy.loginRequired(
+                    pwPolicy, lastLogin, System.currentTimeMillis(), url, user, password);
 
             Timber.i("Login required: %b", loginRequired);
             return loginRequired;
