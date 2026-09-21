@@ -128,8 +128,8 @@ public class OkHttpConnection implements OpenRosaHttpInterface {
      */
     @NonNull
     @Override
-    public HttpGetResult executeGetRequest(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials,
-                                           @Nullable HashMap<String, String> headers) throws Exception {
+    public HttpGetResult executeGetRequestWithHeaders(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials,
+                                                      @Nullable HashMap<String, String> headers) throws Exception {
         URI physicalUri = getPhysicalUri(uri, credentials);
         OpenRosaServerClient httpClient = clientFactory.get(physicalUri.getScheme(), userAgent, credentials);
 

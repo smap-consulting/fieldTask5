@@ -194,7 +194,7 @@ class StubOpenRosaServer : OpenRosaHttpInterface {
         return "success"
     }
 
-    override fun executeGetRequest(
+    override fun executeGetRequestWithHeaders(
         uri: URI,
         credentials: HttpCredentialsInterface?,
         headers: HashMap<String, String>?

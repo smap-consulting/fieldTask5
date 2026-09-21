@@ -1,8 +1,9 @@
 package org.odk.collect.openrosa.http;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -129,27 +130,39 @@ public abstract class OpenRosaGetRequestTest {
     }
 
     @Test
-    public void whenStatusCodeIsNot200_returnsNullBodyAndStatusCode() throws Exception {
+    // smap - upstream returned a null body and the status code. OkHttpConnection now throws on
+    // any non-200 so that a failed download is not mistaken for an empty one.
+    public void whenStatusCodeIsNot200_throws() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(500));
 
-        HttpGetResult result = subject.executeGetRequest(mockWebServer.url("").uri(), null, null);
-        assertThat(result.getInputStream(), nullValue());
-        assertThat(result.getStatusCode(), equalTo(500));
+        try {
+            subject.executeGetRequest(mockWebServer.url("").uri(), null, null);
+            fail("Expected an exception for a 500 response");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("500"));
+        }
     }
 
     @Test
-    public void whenResponseBodyIsNull_returnsNullBodyAndStatusCode() throws Exception {
+    // smap - 204 and 304 carry no body and are non-200, so they throw as well
+    public void whenResponseBodyIsNull_throws() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
-        HttpGetResult result1 = subject.executeGetRequest(mockWebServer.url("").uri(), null, null);
-        assertThat(result1.getInputStream(), nullValue());
-        assertThat(result1.getStatusCode(), equalTo(204));
+        try {
+            subject.executeGetRequest(mockWebServer.url("").uri(), null, null);
+            fail("Expected an exception for a 204 response");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("204"));
+        }
 
         mockWebServer.enqueue(new MockResponse().setResponseCode(304));
 
-        HttpGetResult result2 = subject.executeGetRequest(mockWebServer.url("").uri(), null, null);
-        assertThat(result2.getInputStream(), nullValue());
-        assertThat(result2.getStatusCode(), equalTo(304));
+        try {
+            subject.executeGetRequest(mockWebServer.url("").uri(), null, null);
+            fail("Expected an exception for a 304 response");
+        } catch (Exception e) {
+            assertThat(e.getMessage(), containsString("304"));
+        }
     }
 
     private static byte[] gzip(String data) throws IOException {

@@ -151,8 +151,8 @@ public interface OpenRosaHttpInterface {
      * @throws Exception if the request fails
      */
     @NonNull
-    HttpGetResult executeGetRequest(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials,
-                                    @Nullable HashMap<String, String> headers) throws Exception;
+    HttpGetResult executeGetRequestWithHeaders(@NonNull URI uri, @Nullable HttpCredentialsInterface credentials,
+                                               @Nullable HashMap<String, String> headers) throws Exception;
 
     interface FileToContentTypeMapper {
 

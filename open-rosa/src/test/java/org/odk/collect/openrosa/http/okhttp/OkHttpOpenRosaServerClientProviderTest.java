@@ -21,7 +21,7 @@ public class OkHttpOpenRosaServerClientProviderTest extends OpenRosaServerClient
 
     @Override
     protected OpenRosaServerClientProvider buildSubject() {
-        return buildSubject(null);
+        return buildSubject((String) null);
     }
 
     private OkHttpOpenRosaServerClientProvider buildSubject(String cacheDir) {

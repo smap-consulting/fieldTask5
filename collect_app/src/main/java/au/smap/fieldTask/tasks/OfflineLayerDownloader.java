@@ -211,7 +211,7 @@ public class OfflineLayerDownloader {
         URI uri = URI.create(layer.url);
         HttpCredentialsInterface credentials = webCredentialsUtils.getCredentials(uri);
 
-        HttpGetResult result = httpInterface.executeGetRequest(uri, credentials, headers);
+        HttpGetResult result = httpInterface.executeGetRequestWithHeaders(uri, credentials, headers);
 
         // If the server ignored the range and sent the whole file, start from the beginning
         boolean append = have > 0 && result.getStatusCode() == 206;
