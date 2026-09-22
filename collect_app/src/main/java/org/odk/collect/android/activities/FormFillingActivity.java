@@ -276,6 +276,9 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
     private Animation inAnimation;
     private Animation outAnimation;
     private Direction pendingDirection;  // smap - Track pending navigation direction during remote calls
+    // smap - whether any call in the current batch actually returned data.  A failed call clears
+    // its cache entry, so refreshing after one would re-evaluate, start the call again and loop.
+    private boolean remoteDataArrived;
 
     private AppBarLayout appBarLayout;
     private FrameLayout questionHolder;
@@ -2539,6 +2542,10 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
         app.setRemoteItem(item);
         app.endRemoteCall();
 
+        if (item != null && item.data != null) {
+            remoteDataArrived = true;
+        }
+
         // Dismiss progress dialog when all remote calls are complete
         if (!app.inRemoteCall()) {
             org.odk.collect.material.MaterialProgressDialogFragment dialog =
@@ -2555,7 +2562,23 @@ public class FormFillingActivity extends LocalizedActivity implements CollectCom
                 Direction savedDirection = pendingDirection;
                 pendingDirection = null;
                 moveScreen(savedDirection);
+            } else if (remoteDataArrived) {
+                // smap - Nothing was waiting on navigation, so whatever triggered the call is
+                // already on screen.  lookup_choices works this way: the itemset is evaluated
+                // while the question is being drawn, returns empty, and the choices arrive here.
+                // Redraw the question so they are shown, rather than leaving it empty until the
+                // user navigates away.
+                Timber.d("remoteComplete: Refreshing the current question with the retrieved data");
+                // The empty list this question cached while the call was in flight has to go,
+                // or the redraw reuses it instead of evaluating the itemset again.
+                formEntryViewModel.clearSelectChoicesCache();
+                onScreenRefresh(false);
+            } else {
+                // Only failures in this batch.  Redrawing would re-evaluate, find no cache entry
+                // and start the call over, so leave the question as it is.
+                Timber.w("remoteComplete: Remote call returned no data, not refreshing");
             }
+            remoteDataArrived = false;
         }
     }
 }

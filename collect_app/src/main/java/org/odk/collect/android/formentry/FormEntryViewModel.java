@@ -336,6 +336,18 @@ public class FormEntryViewModel extends ViewModel implements SelectChoiceLoader 
         }, ignored -> {});
     }
 
+    /**
+     * smap - Drop the preloaded choice lists so the next draw re-evaluates the itemsets.
+     *
+     * A lookup_choices question caches an empty list while its remote call is in flight.  The
+     * cache is otherwise only cleared by updateIndex, on navigation, so without this the question
+     * keeps showing that empty list after the data arrives and only fills in once the user
+     * navigates away and back.
+     */
+    public void clearSelectChoicesCache() {
+        choices.clear();
+    }
+
     private void updateIndex(boolean isAsync, @Nullable ValidationResult validationResult) {
         updateIndex(isAsync, validationResult, null);
     }
