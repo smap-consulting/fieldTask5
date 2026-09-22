@@ -55,6 +55,8 @@ import org.odk.collect.maps.MapFragment;
 import org.odk.collect.maps.MapFragmentKt;
 import org.odk.collect.maps.circles.CurrentLocationDelegate;
 import org.odk.collect.maps.MapFragmentFactory;
+import org.odk.collect.android.geo.MapFragmentFactoryImpl; // smap
+import org.odk.collect.googlemaps.GoogleMapFragment; // smap
 import org.odk.collect.maps.MapPoint;
 import org.odk.collect.maps.markers.MarkerDescription;
 import org.odk.collect.maps.markers.MarkerIconDescription;
@@ -93,7 +95,11 @@ public class SmapTaskMapFragment extends Fragment {
     private MapFragment mapFragment;
     private int polyFeatureId = -1;
     private Map<Integer, TaskEntry> markerTaskMap = new HashMap<>();
-    private String currentBasemap = null;
+    // smap - the provider actually instantiated and the setting it was created for, recorded
+    // when the fragment is created. The map-ready callback does not reliably fire for a fragment
+    // added by reinitializeMap, so anything recorded only there can be left stale.
+    private MapFragment createdMapFragment = null;
+    private String createdBasemap = null;
 
     SurveyDataViewModel model;
 
@@ -162,14 +168,12 @@ public class SmapTaskMapFragment extends Fragment {
         });
 
         Fragment fragment = ((FragmentContainerView) view.findViewById(R.id.map_container)).getFragment();
+        recordCreatedProvider((MapFragment) fragment);   // smap
         ((MapFragment) fragment).init(this::initMap, () -> {});
     }
 
     private void initMap(MapFragment map) {
         this.mapFragment = map;
-        currentBasemap = DaggerUtils.getComponent(getContext())
-            .settingsProvider().getUnprotectedSettings()
-            .getString(ProjectKeys.KEY_BASEMAP_SOURCE);
         mapFragment.setLongPressListener(this::onMapLongPress);
         mapFragment.setFeatureClickListener(this::onFeatureClick);
 
@@ -279,17 +283,42 @@ public class SmapTaskMapFragment extends Fragment {
     public void onResume() {
         Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.mipmap.ic_nav);
-        if (currentBasemap != null) {
+        if (createdBasemap != null) {
             String newBasemap = DaggerUtils.getComponent(getContext())
                 .settingsProvider().getUnprotectedSettings()
                 .getString(ProjectKeys.KEY_BASEMAP_SOURCE);
-            if (!newBasemap.equals(currentBasemap)) {
+            if (!newBasemap.equals(createdBasemap) || !providerMatches(newBasemap)) {
                 reinitializeMap();
                 return; // initMap() will trigger refresh and loadData()
             }
         }
         model.loadData();   // Update the user trail display with latest points
         super.onResume();
+    }
+
+    /**
+     * smap - true when the live child fragment is the provider the setting asks for.
+     *
+     * The bookkeeping used to live in initMap, the map-ready callback, which does not reliably
+     * fire for a fragment added by reinitializeMap.  That left the recorded provider stale - the
+     * setting said google while a Mapbox fragment was on screen - and the string comparison alone
+     * never noticed, so the map stayed on the old provider until the activity was recreated.
+     */
+    private boolean providerMatches(String basemapSource) {
+        if (createdMapFragment == null) {
+            return true;
+        }
+        boolean mapboxWanted = MapFragmentFactoryImpl.isMapboxSource(basemapSource);
+        boolean mapboxShown = !(createdMapFragment instanceof GoogleMapFragment);
+        return mapboxWanted == mapboxShown;
+    }
+
+    /** smap - note the provider on screen as soon as it exists, before it is ready */
+    private void recordCreatedProvider(MapFragment map) {
+        createdMapFragment = map;
+        createdBasemap = DaggerUtils.getComponent(getContext())
+            .settingsProvider().getUnprotectedSettings()
+            .getString(ProjectKeys.KEY_BASEMAP_SOURCE);
     }
 
     private void reinitializeMap() {
@@ -301,6 +330,7 @@ public class SmapTaskMapFragment extends Fragment {
             .beginTransaction()
             .replace(R.id.map_container, newMapFrag)
             .commitNow();
+        recordCreatedProvider((MapFragment) newMapFrag);   // smap
         ((MapFragment) newMapFrag).init(this::initMap, () -> {});
         super.onResume();
     }

@@ -28,7 +28,17 @@ class MapFragmentFactoryImpl(private val settingsProvider: SettingsProvider) : M
             returns(true) implies (source != null)
         }
 
-        return when (source) {
+        return isMapboxSource(source)
+    }
+
+    companion object {
+
+        /**
+         * smap - which family of fragment a basemap source needs.  Exposed so a caller holding a
+         * live MapFragment can tell whether it still matches the setting.
+         */
+        @JvmStatic
+        fun isMapboxSource(source: String?): Boolean = when (source) {
             ProjectKeys.BASEMAP_SOURCE_MAPBOX,
             ProjectKeys.BASEMAP_SOURCE_OSM,
             ProjectKeys.BASEMAP_SOURCE_USGS,
