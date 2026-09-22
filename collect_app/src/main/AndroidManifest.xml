@@ -143,7 +143,10 @@ the specific language governing permissions and limitations under the License.
 
         <activity android:name="org.odk.collect.android.activities.CrashHandlerActivity" />
 
-        <activity android:name="au.smap.fieldTask.activities.SmapLoginActivity" />
+        <!-- smap - adjustResize so the scrolling login form can move the focused field
+             clear of the soft keyboard -->
+        <activity android:name="au.smap.fieldTask.activities.SmapLoginActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- smap Survey notes activity -->
         <activity android:name="au.smap.fieldTask.activities.SurveyNotesActivity" />

@@ -3,11 +3,15 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fillViewport="true"
             android:fitsSystemWindows="true">
 
+    <!-- smap - wrap_content so the content can grow taller than the viewport and scroll when
+         the keyboard is up.  match_parent here pinned it to the viewport and nothing scrolled.
+         fillViewport on the ScrollView keeps the short case looking the same. -->
     <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical">
 
     <ProgressBar

@@ -92,6 +92,9 @@ public class SmapLoginActivity extends CollectAbstractActivity implements SmapLo
         //setTheme(R.style.DarkAppTheme);     // override theme for login
         binding = SmapActivityLoginBinding.inflate(getLayoutInflater());
         EdgeToEdge.setView(this, binding.getRoot(), false); // smap - keep content clear of the system bars
+        // smap - edge to edge stops the window itself resizing for the keyboard, so pad the
+        // scroll view instead. Without this the keyboard covers the password field.
+        EdgeToEdge.applyBottomInsets(binding.getRoot());
 
         org.odk.collect.shared.settings.Settings settings = settingsProvider.getUnprotectedSettings();
 
