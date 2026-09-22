@@ -1,6 +1,7 @@
 package org.odk.collect.android.application.initialization
 
 import android.content.Context
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -9,7 +10,6 @@ import org.odk.collect.android.application.MapboxClassInstanceCreator
 import org.odk.collect.android.geo.MapConfiguratorProvider
 import org.odk.collect.settings.SettingsProvider
 import org.odk.collect.settings.keys.ProjectKeys
-import timber.log.Timber
 import javax.inject.Inject
 
 class MapsInitializer @Inject constructor(
@@ -31,6 +31,9 @@ class MapsInitializer @Inject constructor(
 
     fun initializeUIComponents(activity: FragmentActivity, fragmentContainer: Int) {
         if (!UI_COMPONENTS_INITIALIZED) {
+            // smap - creating a MapView is what makes the Maps SDK read the renderer
+            // preference, so the order relative to initializeFrameworks matters
+            Log.i(MAPS_LOG_TAG, "Creating the warm-up MapView")
             val mapView = MapView(activity.application)
             mapView.onCreate(null)
             activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
@@ -68,6 +71,10 @@ class MapsInitializer @Inject constructor(
 
     private fun initializeFrameworks() {
         try {
+            // smap - android.util.Log, not Timber: in a release build Timber goes to
+            // CrashReportingTree and on to NoopAnalytics, so Timber output is invisible in the
+            // field.  This has to be readable with adb logcat on a release build.
+            Log.i(MAPS_LOG_TAG, "Requesting the LATEST Google Maps renderer")
             com.google.android.gms.maps.MapsInitializer.initialize(
                 context,
                 // smap - was pinned to LEGACY in May 2026 (74cb30e990) because the LATEST
@@ -78,19 +85,22 @@ class MapsInitializer @Inject constructor(
                 // If the Android 13 crash returns, fix it without pinning the renderer.
                 com.google.android.gms.maps.MapsInitializer.Renderer.LATEST
             ) { renderer: com.google.android.gms.maps.MapsInitializer.Renderer ->
-                when (renderer) {
-                    com.google.android.gms.maps.MapsInitializer.Renderer.LATEST -> Timber.d("The latest version of Google Maps renderer is used.")
-                    com.google.android.gms.maps.MapsInitializer.Renderer.LEGACY -> Timber.d("The legacy version of Google Maps renderer is used.")
-                }
+                Log.i(MAPS_LOG_TAG, "Google Maps renderer in use: $renderer")
             }
-        } catch (ignore: Exception) {
-            // ignored
-        } catch (ignore: Error) {
-            // ignored
+            Log.i(MAPS_LOG_TAG, "MapsInitializer.initialize returned without throwing")
+        } catch (e: Exception) {
+            // smap - this used to be swallowed in silence, which hid why the renderer
+            // preference was never registered on some devices
+            Log.e(MAPS_LOG_TAG, "MapsInitializer.initialize threw", e)
+        } catch (e: Error) {
+            Log.e(MAPS_LOG_TAG, "MapsInitializer.initialize failed with an Error", e)
         }
     }
 
     companion object {
         private var UI_COMPONENTS_INITIALIZED = false
+
+        /** smap - grep for this with adb logcat -s SmapMapsInit */
+        private const val MAPS_LOG_TAG = "SmapMapsInit"
     }
 }

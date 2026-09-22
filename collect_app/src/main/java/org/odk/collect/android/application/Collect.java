@@ -187,7 +187,15 @@ public class Collect extends Application implements
                     new Thread(() -> au.smap.fieldTask.notifications.SmapNotificationChannels.INSTANCE.createChannels(this)).start();
 
                     // smap - Pre-initialize Maps SDK off main thread to avoid Binder IPC blocking main thread (ANR on Android 11)
-                    MapsInitializer.initialize(this, Renderer.LATEST, null);
+                    // smap - logged with android.util.Log so it is visible on a release build,
+                    // where Timber goes to NoopAnalytics.  This is the second initialize call;
+                    // whichever runs first decides the renderer.
+                    try {
+                        MapsInitializer.initialize(this, Renderer.LATEST, null);
+                        android.util.Log.i("SmapMapsInit", "Collect.onCreate MapsInitializer.initialize returned");
+                    } catch (Throwable t) {
+                        android.util.Log.e("SmapMapsInit", "Collect.onCreate MapsInitializer.initialize failed", t);
+                    }
                 }
         );
     }
