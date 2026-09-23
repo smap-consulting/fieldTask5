@@ -35,6 +35,18 @@ import timber.log.Timber;
 
 /**
  * Download a media item to be used as a dynamic default value
+ *
+ * smap - Do not remove this handler because get_media() is deprecated.
+ *
+ * get_image() is what survey authors are told to use now, and it is deprecated only at the
+ * authoring layer.  The server rewrites get_image() to get_media() when it generates the XForm
+ * for the device, so a form written with get_image() arrives here as:
+ *
+ *     calculate="default(if(string-length( /main/q1 ) > 0, get_media( /main/q1 ), ''))"
+ *
+ * There is no get_image handler in the app and none in javarosa, so dropping this one would
+ * break every get_image form.  If get_media is ever to go, the transformer has to stop emitting
+ * it in the same release.  Verified against the "Dynamic Images" test survey, Sep 2026.
  */
 public class SmapRemoteDataHandlerGetMedia implements IFunctionHandler {
 
