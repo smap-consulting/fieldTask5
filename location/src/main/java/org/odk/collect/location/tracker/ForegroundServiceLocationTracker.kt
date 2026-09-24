@@ -23,6 +23,7 @@ import org.odk.collect.location.LocationClient
 import org.odk.collect.location.LocationClientProvider
 import org.odk.collect.location.LocationDependencyComponentProvider
 import org.odk.collect.strings.localization.getLocalizedString
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val LOCATION_KEY = "location"
@@ -42,10 +43,16 @@ class ForegroundServiceLocationTracker(private val application: Application) : L
             }
         }
 
-        if (notification) {
-            application.startForegroundService(intent)
-        } else {
-            application.startService(intent)
+        // smap - onResume can run while the OS still sees the app as background (e.g. behind
+        // the lock screen), and API 31+ then throws BackgroundServiceStartNotAllowedException
+        try {
+            if (notification) {
+                application.startForegroundService(intent)
+            } else {
+                application.startService(intent)
+            }
+        } catch (e: IllegalStateException) {
+            Timber.w(e, "Location tracker service not started: app in background")
         }
     }
 
