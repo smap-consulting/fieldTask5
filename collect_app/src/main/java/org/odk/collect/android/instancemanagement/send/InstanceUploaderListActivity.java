@@ -371,6 +371,9 @@ public class InstanceUploaderListActivity extends LocalizedActivity implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
         Cursor c = (Cursor) listView.getAdapter().getItem(position);
+        if (c == null || c.isClosed()) {
+            return;     // smap - cursor swapped out (loader restart/reset) while row still visible
+        }
         boolean encryptedForm = !Boolean.parseBoolean(c.getString(c.getColumnIndex(DatabaseInstanceColumns.CAN_EDIT_WHEN_COMPLETE)));
         if (encryptedForm) {
             ToastUtils.showLongToast(org.odk.collect.strings.R.string.encrypted_form);

@@ -184,6 +184,9 @@ public class InstanceChooserList extends AppListActivity implements InstanceList
         if (MultiClickGuard.allowClick(getClass().getName())) {
             if (view.isEnabled()) {
                 Cursor c = (Cursor) listView.getAdapter().getItem(position);
+                if (c == null || c.isClosed()) {
+                    return;     // smap - cursor swapped out (loader restart/reset) while row still visible
+                }
                 long instanceId = c.getLong(c.getColumnIndex(DatabaseInstanceColumns._ID));
                 Uri instanceUri = InstancesContract.getUri(projectsDataService.requireCurrentProject().getUuid(), instanceId);
 
