@@ -386,6 +386,14 @@ public class DownloadTasksTask extends AsyncTask<Void, String, HashMap<String, S
                 /*
                  * Get an array of the existing server tasks on the phone and create a hashmap indexed on the assignment id
                  */
+                int repaired = Utilities.repairRelabelledTasks();
+                if(repaired > 0) {
+                    Timber.i("Repaired %d tasks relabelled as a case", repaired);
+                }
+                int removed = Utilities.removeDuplicateTasks();
+                if(removed > 0) {
+                    Timber.i("Removed %d duplicate copies of tasks", removed);
+                }
                 Utilities.getTasks(tasks, false, ApplicationConstants.SortingOrder.BY_NAME_ASC, "", true, false, true);
                 for(TaskEntry t : tasks) {
                     taskMap.put(getTaskCaseString(t.taskType, t.assId, t.updateId), new TaskStatus(t.id, t.taskStatus, t.uploadTime));

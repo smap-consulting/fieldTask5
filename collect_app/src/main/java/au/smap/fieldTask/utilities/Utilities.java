@@ -935,6 +935,67 @@ public class Utilities {
     /*
      * Delete the previous copy of a case that has been replaced
      */
+    /*
+     * Repair tasks that were relabelled as a case or reference.  A task for the same record as a case
+     * had its type overwritten by the case, so it never matched on refresh and was downloaded again
+     * each time.  Cases and references always have assignment id 0, so any other is a task.
+     */
+    public static int repairRelabelledTasks() {
+        String selectClause = "(" + InstanceColumns.T_TASK_TYPE + " = 'case' or "
+                + InstanceColumns.T_TASK_TYPE + " = 'reference') and "
+                + InstanceColumns.T_ASS_ID + " != 0 and "
+                + InstanceColumns.SOURCE + " = ?";
+        ContentValues values = new ContentValues();
+        values.put(InstanceColumns.T_TASK_TYPE, "xform");
+        return Collect.getInstance().getContentResolver().update(InstanceColumns.CONTENT_URI, values,
+                selectClause, new String[] { Utilities.getSource() });
+    }
+
+    /*
+     * Remove extra copies of a task left on the phone by the relabelling above, so each task is held once.
+     * Repeating tasks legitimately have several copies and are left alone.  The copy changed most recently
+     * is kept, and another copy is only removed if it is still incomplete, so no finalized or sent work is lost.
+     */
+    public static int removeDuplicateTasks() {
+        String[] proj = {
+                InstanceColumns._ID,
+                InstanceColumns.T_ASS_ID,
+                InstanceColumns.T_UPDATEID,
+                InstanceColumns.STATUS,
+                InstanceColumns.LAST_STATUS_CHANGE_DATE
+        };
+        String selectClause = InstanceColumns.T_ASS_ID + " != 0 and "
+                + InstanceColumns.T_TASK_TYPE + " = 'xform' and "
+                + InstanceColumns.DELETED_DATE + " is null and "
+                + "(" + InstanceColumns.T_REPEAT + " is null or " + InstanceColumns.T_REPEAT + " = 0) and "
+                + InstanceColumns.SOURCE + " = ?";
+        String sortOrder = InstanceColumns.LAST_STATUS_CHANGE_DATE + " desc, " + InstanceColumns._ID + " asc";
+
+        HashMap<String, Long> kept = new HashMap<>();
+        ArrayList<Long> toDelete = new ArrayList<>();
+        try (Cursor c = Collect.getInstance().getContentResolver().query(InstanceColumns.CONTENT_URI, proj,
+                selectClause, new String[] { Utilities.getSource() }, sortOrder)) {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    String key = c.getLong(c.getColumnIndexOrThrow(InstanceColumns.T_ASS_ID)) + "-"
+                            + c.getString(c.getColumnIndexOrThrow(InstanceColumns.T_UPDATEID));
+                    long id = c.getLong(c.getColumnIndexOrThrow(InstanceColumns._ID));
+                    if (!kept.containsKey(key)) {
+                        kept.put(key, id);      // The first is the most recently changed
+                    } else if (Instance.STATUS_INCOMPLETE.equals(c.getString(c.getColumnIndexOrThrow(InstanceColumns.STATUS)))) {
+                        toDelete.add(id);
+                    }
+                }
+            }
+        }
+
+        for (Long id : toDelete) {
+            Collect.getInstance().getContentResolver().delete(InstanceColumns.CONTENT_URI,
+                    InstanceColumns._ID + " = ?", new String[] { String.valueOf(id) });
+        }
+        return toDelete.size();
+    }
+
     public static void deleteOldCase(String updateId) {
 
         Uri dbUri = InstanceColumns.CONTENT_URI;
@@ -944,6 +1005,7 @@ public class Utilities {
         String selectClause = "(" + InstanceColumns.T_TASK_TYPE + " = 'case' or "
                 + InstanceColumns.T_TASK_TYPE + " = 'reference') and "
                 + InstanceColumns.T_UPDATEID + " = ? and "
+                + InstanceColumns.T_ASS_ID + " = 0 and "      // Not a task for the same record
                 + InstanceColumns.SOURCE + " = ?";
 
         ArrayList<String> selectArgsList = new ArrayList<>();
@@ -987,8 +1049,11 @@ public class Utilities {
         // update id instead so we only update the one record - otherwise updating one case or
         // reference would overwrite the task type (and other parameters) of every other case
         // and reference on the phone.
+        // A task can be for the same record as a case, so also require assignment id 0, otherwise the
+        // task is relabelled as a case, no longer matches on the next refresh and is downloaded again
         if (assId == 0 && ta.task.update_id != null) {
             selectClause = InstanceColumns.T_UPDATEID + " = ? and "
+                    + InstanceColumns.T_ASS_ID + " = 0 and "
                     + InstanceColumns.SOURCE + " = ?";
             selectArgs = new String[] { ta.task.update_id, Utilities.getSource() };
         } else {
