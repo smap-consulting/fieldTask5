@@ -1508,6 +1508,9 @@
     <string name="geocompound_title">Compound Map</string>
     <string name="smap_set_marker">Set Marker</string>
     <string name="smap_apply">Apply</string>
+    <string name="smap_conv_received">Received</string>
+    <string name="smap_conv_sent">Sent</string>
+    <string name="smap_conv_email">Email</string>
 
     <!-- smap - Location tracking notification -->
     <string name="location_tracking_active">Location tracking is active</string>

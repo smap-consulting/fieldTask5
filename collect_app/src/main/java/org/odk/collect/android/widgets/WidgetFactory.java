@@ -67,6 +67,7 @@ import au.smap.fieldTask.widgets.SmapChartHorizontalBarWidget;
 import au.smap.fieldTask.widgets.SmapFormWidget;
 import au.smap.fieldTask.widgets.NfcWidget;
 import au.smap.fieldTask.widgets.GeoCompoundWidget;
+import au.smap.fieldTask.widgets.ConversationWidget;
 
 import org.odk.collect.audioclips.AudioPlayer;
 import org.odk.collect.android.widgets.utilities.AudioRecorderRecordingStatusHandler;
@@ -223,6 +224,8 @@ public class WidgetFactory {
                             questionWidget = new UrlWidget(activity, questionDetails, CustomTabsWebPageService.INSTANCE, dependencies);
                         } else if (questionDetails.getPrompt().getQuestion().getAdditionalAttribute(null, "form_identifier") != null) {        // smap form launcher
                             questionWidget = new SmapFormWidget(activity, questionDetails, appearance, dependencies, formController);
+                        } else if (appearance.contains("conversation")) {        // smap conversation, read only chat
+                            questionWidget = new ConversationWidget(activity, questionDetails, dependencies);
                         } else if (appearance.contains("chart")) {        // smap chart
                             String chartType = questionDetails.getPrompt().getQuestion().getAdditionalAttribute(null, "chart_type");
                             if(chartType == null) {
